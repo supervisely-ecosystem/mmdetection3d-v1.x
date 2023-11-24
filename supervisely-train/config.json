@@ -1,0 +1,32 @@
+{
+  "type": "app",
+  "version": "2.0.0",
+  "name": "Train MMDetection3D v1.x",
+  "entrypoint": "python -m uvicorn src.main:app --host 0.0.0.0 --port 8000",
+  "port": 8000,
+  "categories": [
+    "neural network",
+    "pointclouds",
+    "semantic segmentation",
+    "detection & tracking",
+    "train"
+  ],
+  "description": "Train MMDetection3D for detection or segmentation on Point Clouds",
+  "docker_image": "supervisely/mmdet3d-v1.x:1.0.0",
+  "instance_version": "6.6.7",
+  "task_location": "workspace_tasks",
+  "need_gpu": true,
+  "gpu": "required",
+  "community_agent": false,
+  "context_menu": {
+    "target": [
+      "point_cloud_episodes_project",
+      "point_cloud_project"
+    ],
+    "context_root": "Neural Networks",
+    "context_category": "MMDetection3D"
+  },
+  "license": {
+    "type": "Apache-2.0" 
+  }
+}

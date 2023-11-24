@@ -1,0 +1,13 @@
+__pycache__/
+.ipynb_checkpoints
+.env
+.venv
+env/
+venv/
+*.pth
+/preds*
+/app_data
+/todo.txt
+/config.py
+/my_model
+/src-hrda
