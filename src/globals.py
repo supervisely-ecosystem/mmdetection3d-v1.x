@@ -25,6 +25,6 @@ STATIC_DIR = app_dir + "/static"
 os.makedirs(STATIC_DIR, exist_ok=True)
 
 # params
-MAX_CLASSES_FOR_PERCLASS_METRICS = 10
+# MAX_CLASSES_FOR_PERCLASS_METRICS = 10
 
 # state = State()
