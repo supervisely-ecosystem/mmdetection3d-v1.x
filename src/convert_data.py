@@ -22,13 +22,19 @@ def save_labels(labels, dst_path):
         f.writelines(map(lambda item: " ".join(map(str, item))+"\n", labels))
 
 
-def convert_cuboid_to_mmdet3d(geometry: Cuboid3d, category_name: str):
+def convert_figure_to_mmdet3d_ann(figure: sly.PointcloudFigure):
     # format: [x, y, z, dx, dy, dz, yaw, category_name]
-    geometry_json = geometry.to_json()
+    category_name = figure.parent_object.obj_class.name
+    geometry_json = figure.geometry.to_json()
     pos = list(geometry_json["position"].values())
     dim = list(geometry_json["dimensions"].values())
     yaw = geometry_json["rotation"]["z"]
     return pos + dim + [yaw, category_name]
+
+
+def convert_figure_to_mmdet3d_segmentation(figure: sly.PointcloudFigure):
+    category_name = figure.parent_object.obj_class.name
+    raise NotImplementedError("Segmentation task is not implemeted yet.")
 
 
 def convert_sly_project_to_mmdet3d(project_dir, is_episodes, output_dir, cv_task: str):
@@ -49,18 +55,18 @@ def convert_sly_project_to_mmdet3d(project_dir, is_episodes, output_dir, cv_task
         ann = dataset.get_ann(project.meta)
         names = dataset.get_items_names()
         for name in names:
-            # rel_images = dataset.get_related_images(name)
-            # calibs
+            # TODO: Camera images for multi-modal + calibs: rel_images = dataset.get_related_images(name)
             labels = []
             ann_frame = dataset.get_ann_frame(name, ann)
             for figure in ann_frame.figures:
-                geometry = figure.geometry
-                if cv_task == "detection" and isinstance(geometry, Cuboid3d):
-                    # category_name = xxx
-                    labels.append(convert_cuboid_to_mmdet3d(geometry, category_name))
-                elif cv_task == "segmentation" and isinstance(geometry, Mask3D):
-                    raise NotImplementedError("Segmentation task is not implemeted yet.")
+                if cv_task == "detection" and isinstance(figure.geometry, Cuboid3d):
+                    label = convert_figure_to_mmdet3d_ann(figure)
+                    labels.append(label)
+                elif cv_task == "segmentation" and isinstance(figure.geometry, Mask3D):
+                    label = convert_figure_to_mmdet3d_segmentation(figure)
+                    labels.append(label)
                 else:
+                    # skip other geometries
                     continue
             
             base_name = os.path.splitext(name)[0]

@@ -11,3 +11,4 @@ venv/
 /config.py
 /my_model
 /src-hrda
+/mmdetection3d

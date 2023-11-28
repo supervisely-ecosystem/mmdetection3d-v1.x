@@ -19,12 +19,14 @@ What is data format & pre-processing?
 2.2 convert sly annotation to semantic_mask.bin (?)
 	tools/create_data.py
 	https://github.com/open-mmlab/mmdetection3d/blob/dev-1.x/tools/dataset_converters/semantickitti_converter.py
-3. Deal with Calibration Format (?)
+3. Deal with Calibration Format (only for multi-modal)
 4. Organize files in dir
 5. train/test split (train.txt, test.txt)
 6. train_pipeline config
 6. Prepare model config: voxel-based models, anchor_range/size.
 7. Visualize dataset using tools/misc/browse_dataset.py
+
+8. Infer any model on a point cloud
 
 hooks
 
@@ -36,8 +38,41 @@ metrics
 - KittiMetric
 
 # Converting Data Format
-pcd -> bin
-sly_ann -> txt OR semantic.bin
-is context image supported?
++ pcd -> bin
++ Cuboid3D -> txt
+- Mask3D -> semantic.bin
+- is context image supported in mmdet3d?
+- calibs?
+- trans_vec (norm vector)
+- посмотреть код convert_kitti.py
 
 Train/val split: (random, tags, datasets)
+
+
+__getitem__:
+full_init
+- load_data_list
+- - load -- annotations['data_list'] = load(self.ann_file)
+- - parse_data_info -- for x in annotations['data_list']: self.parse_data_info(x)
+- - - parse_ann_info
+- - - returns paths
+- filter_data
+- _serialize_data
+
+prepare_data(idx)
+- get_data_info(idx)
+- self.pipeline(data_info)
+
+
+
+ориентироваться на модели:
+- BEVFusion (SOTA)
+- PETR
+- DETR3D
+- TPVFormer (segmentation)
+- Cylinder3D (segmentation)
+- CenterFormer
+- DSVT
+- PV-RCNN
+не надо:
+- TR3D (indoor)
