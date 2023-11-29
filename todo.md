@@ -38,15 +38,28 @@ metrics
 - KittiMetric
 
 # Converting Data Format
+- Два пути - либо конвертировать sly project в существующие датасеты (KITTI, Waymo, etc) и наследовать класс;
+- либо делать свой класс датасета на базе Det3dDataset.
+- по сути нам надо разобраться только с путями (ann_info), загрузки данных уже делают Transform'ы.
+
+- положить point_cloud в info["lidar_points"] ["lidar_path"]
+- положить bbox3d в info['ann_info'] ['gt_bboxes_3d']
+- LoadPointsFromFile, LoadAnnotations3D
+- ? LoadPointsFromMultiSweeps, GlobalRotScaleTrans
+- load - json/yaml/pickle
+
+annotation.json / pkl:
+metainfo: {}
+data_list: []
+
 + pcd -> bin
 + Cuboid3D -> txt
 - Mask3D -> semantic.bin
-- is context image supported in mmdet3d?
-- calibs?
-- trans_vec (norm vector)
-- посмотреть код convert_kitti.py
+- зачем calibs и 2d images? (как подготовить multi-modal dataset)
 
-Train/val split: (random, tags, datasets)
+- Train/val split: (random, tags, datasets)
+
+- visualize: tools/misc/browse_dataset.py
 
 
 __getitem__:
@@ -66,7 +79,7 @@ prepare_data(idx)
 
 
 ориентироваться на модели:
-- BEVFusion (SOTA)
+- BEVFusion (SOTA) (BEV mode)
 - PETR
 - DETR3D
 - TPVFormer (segmentation)

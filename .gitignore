@@ -12,3 +12,5 @@ venv/
 /my_model
 /src-hrda
 /mmdetection3d
+/data
+/kitti_sample
