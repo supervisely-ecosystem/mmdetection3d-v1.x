@@ -29,7 +29,7 @@ class CustomDataset(Det3DDataset):
             "metainfo":{"classes": ["xxx"]},
             "data_list": [
                 {
-                    "lidar_points": {"lidar_path": "0000000000.pcd", "num_pts_feats": 444},
+                    "lidar_points": {"lidar_path": "0000000000.pcd", "num_pts_feats": None},
                     "instances": [{"bbox_3d": LiDARInstance3DBoxes(x[:-1], origin=(0.5,0.5,0.5)), "bbox_label_3d": 0} for x in data]
                 }
             ]
@@ -44,7 +44,7 @@ class CustomDataset(Det3DDataset):
 import mmdet3d.datasets.transforms
 
 backend_args = None
-pipline = [
+pipeline = [
     dict(
         type='LoadPointsFromFile',
         coord_type='LIDAR',
@@ -76,8 +76,8 @@ pipline = [
         type='Pack3DDetInputs',
         keys=['points', 'gt_bboxes_3d', 'gt_labels_3d'])
 ]
-for p in pipline:
+for p in pipeline:
     p["_scope_"] = "mmdet3d"
-dataset = CustomDataset("app_data/mmdet3d_dataset", pipeline=pipline)
+dataset = CustomDataset("app_data/mmdet3d_dataset", pipeline=pipeline)
 x = dataset[0]
 print(x)

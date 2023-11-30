@@ -42,11 +42,19 @@ metrics
 - либо делать свой класс датасета на базе Det3dDataset.
 - по сути нам надо разобраться только с путями (ann_info), загрузки данных уже делают Transform'ы.
 
+- код составления annotation.json / pkl
 - положить point_cloud в info["lidar_points"] ["lidar_path"]
-- положить bbox3d в info['ann_info'] ['gt_bboxes_3d']
+- положить LidarInstanceBBox3D в info['ann_info'] ['gt_bboxes_3d']
+- положить calib матрицы и пути картинок в info
+	- info["image"]: (keys) image_idx image_path image_shape
+- instances, cam_instances, image, lidar_points
+- переименовать ключи сразу в правильные
+
 - LoadPointsFromFile, LoadAnnotations3D
 - ? LoadPointsFromMultiSweeps, GlobalRotScaleTrans
-- load - json/yaml/pickle
+- ObjectSample and ObjectNoise could be slow.
+- нужно ли нормализовать pcd? pcd_range?
+- gt_database? box_np_ops.points_in_rbbox(points, gt_boxes_3d)
 
 annotation.json / pkl:
 metainfo: {}
@@ -89,3 +97,9 @@ prepare_data(idx)
 - PV-RCNN
 не надо:
 - TR3D (indoor)
+
+
+Config Management:
+- merge existed with custom
+- make unified config with ENV substitutions
+- ...
