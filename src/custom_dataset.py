@@ -2,6 +2,7 @@ from typing import Callable, List, Optional, Union
 from mmdet3d.registry import DATASETS
 from mmdet3d.datasets.det3d_dataset import Det3DDataset
 from mmdet3d.structures import CameraInstance3DBoxes, LiDARInstance3DBoxes
+from mmengine.registry import init_default_scope
 
 
 @DATASETS.register_module()
@@ -10,7 +11,7 @@ class CustomDataset(Det3DDataset):
                  data_root: Optional[str] = None,
                  ann_file: str = '',
                  metainfo: Optional[dict] = None,
-                 data_prefix: dict = dict(pts='points', img=''),
+                 data_prefix: dict = dict(pts='pointcloud', img='related_images'),
                  pipeline: List[Union[dict, Callable]] = [],
                  modality: dict = dict(use_lidar=True, use_camera=False),
                  default_cam_key: str = None,

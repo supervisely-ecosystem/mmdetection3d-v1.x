@@ -56,6 +56,19 @@ metrics
 - нужно ли нормализовать pcd? pcd_range?
 - gt_database? box_np_ops.points_in_rbbox(points, gt_boxes_3d)
 
+0. dataset downloaded
+1. convert_data.py
+- создаем infos_train.pkl, infos_val.pkl
+- info["lidar_points"]: ["lidar_path"] + ["num_pts_feats"] + ["всякие матрицы связанные с лидаром"] (4x4)
+- info['images']: CAM0: "img_path": "000000.png",
+          "height": 370,
+          "width": 1224,
+		  "cam2img" (3x3),
+		  "lidar2cam" (4x4).
+		info[‘images’][‘CAM_XXX’][‘cam2img’]: The transformation matrix recording the intrinsic parameters when projecting 3D points to each image plane. (3x3 list)
+- info['instances']: bbox_label_3d + bbox_3d
+
+
 annotation.json / pkl:
 metainfo: {}
 data_list: []
