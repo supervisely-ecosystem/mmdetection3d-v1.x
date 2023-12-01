@@ -8,39 +8,6 @@ from mmdet3d.structures import CameraInstance3DBoxes, LiDARInstance3DBoxes
 from mmengine.registry import build_from_cfg
 from mmengine import Config, ConfigDict
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import numpy as np
-import open3d as o3d
-
-# Load your point cloud data
-pcd = o3d.io.read_point_cloud("app_data/sly_project/KITTI/pointcloud/0000000000.pcd")
-
-# Convert Open3D.o3d.geometry.PointCloud to numpy array
-point_cloud = np.asarray(pcd.points)
-
-# Example box data (just one box in this case)
-box_corners = np.array([[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], 
-                        [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]])
-
-# Creating a 3D plot
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-# Plotting the point cloud
-ax.scatter(point_cloud[:, 0], point_cloud[:, 1], point_cloud[:, 2], s=7)
-
-# Plotting the box
-for start, end in zip(box_corners, box_corners):
-    ax.plot3D(*zip(start, end), color="r")
-
-# Removing the axes for clarity
-# ax.set_axis_off()
-
-# Save the plot as a PNG
-plt.savefig("3d_render.png", format='png', bbox_inches='tight')
-plt.close()
-
 
 backend_args = None
 pipeline = [
