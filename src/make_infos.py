@@ -1,10 +1,13 @@
 import os
+from typing import Union
+
 import supervisely as sly
-import mmengine
 from supervisely.geometry.cuboid_3d import Cuboid3d
 from supervisely.geometry.mask_3d import Mask3D
-import constants
 import sly_utils
+
+
+NUM_PTS_FEATS = 6
 
 
 def get_local_path(project_dir: str, file_path: str):
@@ -54,7 +57,7 @@ def collect_mmdet3d_info(project_dir, cv_task: str):
 
     data_list = []
     for dataset in project.datasets:
-        dataset : sly.PointcloudDataset
+        dataset : Union[sly.PointcloudDataset, sly.PointcloudEpisodeDataset]
         if is_episodes:
             ann = dataset.get_ann(project.meta)
         names = dataset.get_items_names()
@@ -91,7 +94,7 @@ def collect_mmdet3d_info(project_dir, cv_task: str):
             pcd_path = get_local_path(project_dir, paths.pointcloud_path)
             lidar_info = {
                 "lidar_path": pcd_path,
-                "num_pts_feats": constants.num_pts_feats,
+                "num_pts_feats": NUM_PTS_FEATS,
             }
 
             # Collect image info
@@ -124,6 +127,8 @@ def collect_mmdet3d_info(project_dir, cv_task: str):
 
 
 if __name__ == "__main__":
+    import mmengine
+    
     project_dir = "app_data/sly_project"
     mmdet3d_info = collect_mmdet3d_info(project_dir, "detection")
     mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")
