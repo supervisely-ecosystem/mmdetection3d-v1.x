@@ -14,3 +14,4 @@ venv/
 /mmdetection3d
 /data
 /kitti_sample
+/data_info.json
