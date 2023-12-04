@@ -10,7 +10,9 @@ available_datasets
 
 TODO:
 + Infer pre-trained model on a point cloud
-- Pipeline Maker (train, infer)
++ Try to train a model
++ Pipeline Maker
+- Do we need a custom eval metric?
 - Prepare model configs
     traverse over model-infex.yml
         using mmdet3d.apis.Base3DInferencer
@@ -28,7 +30,6 @@ TODO:
 - Visualization
     opt1: create tmp scene in Supervisely, then open it in the labeling tool 3D
     opt2: draw with plotly
-- Try to train a model
 
 for UI:
 - visualize: tools/misc/browse_dataset.py
@@ -43,10 +44,10 @@ for UI:
 - multi-modal (points + iamges)
 - Mask3D -> semantic.bin
 - BEV
-- ObjectSample and ObjectNoise could be slow.
+- ObjectSample and ObjectNoise? (could be slow)
+- gt_database? box_np_ops.points_in_rbbox(points, gt_boxes_3d)
 - normalize pcd?
 - point_cloud_range?
-- gt_database? box_np_ops.points_in_rbbox(points, gt_boxes_3d)
 - voxel-based models, anchor_range/size.
 
 
