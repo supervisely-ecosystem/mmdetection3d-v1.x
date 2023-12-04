@@ -9,14 +9,32 @@ available_datasets
 
 
 TODO:
-- Infer pre-trained model on a point cloud
++ Infer pre-trained model on a point cloud
+- Pipeline Maker (train, infer)
+- Prepare model configs
+    traverse over model-infex.yml
+        using mmdet3d.apis.Base3DInferencer
+        _get_repo_or_mim_dir(scope)
+        _get_models_from_metafile(mim_dir)
+    Support pretrained weights: on/off
+    Filter modalities: mono_3d
+- Detect the modality of the model
+    opt1: use metafile.Models.Results.Task
+    opt2: use config
+- Inferecnce using LidarDet3DInferencer and its versions
+    detect Inferencer type (modality)
+    download weights
+    inference code
+- Visualization
+    opt1: create tmp scene in Supervisely, then open it in the labeling tool 3D
+    opt2: draw with plotly
 - Try to train a model
 
 for UI:
 - visualize: tools/misc/browse_dataset.py
 - Train/val split: (random, tags, datasets)
 - hooks
-- augmentations
+- augmentations?
 - hyperparameters + config
 - metrics (KITTI, Waymo, etc)
 

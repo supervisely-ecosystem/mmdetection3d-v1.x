@@ -41,40 +41,41 @@ class CustomDataset(Det3DDataset):
         ann_info['gt_bboxes_3d'] = LiDARInstance3DBoxes(ann_info['gt_bboxes_3d'], origin=(0.5, 0.5, 0.5))
         return ann_info
     
+    
+if __name__ == "__main__":
+    backend_args = None
+    pipeline = [
+        dict(
+            type='LoadPointsFromPcdFile',
+            coord_type='LIDAR',
+            load_dim=4,
+            use_dim=4,
+            backend_args=backend_args),
+        dict(type='LoadAnnotations3D', with_bbox_3d=True, with_label_3d=True),
+        # dict(type='ObjectSample', db_sampler=db_sampler),
+        # dict(
+        #     type='ObjectNoise',
+        #     num_try=100,
+        #     translation_std=[1.0, 1.0, 0.5],
+        #     global_rot_range=[0.0, 0.0],
+        #     rot_range=[-0.78539816, 0.78539816]),
+        dict(type='RandomFlip3D', flip_ratio_bev_horizontal=0.5),
+        dict(
+            type='GlobalRotScaleTrans',
+            rot_range=[-0.78539816, 0.78539816],
+            scale_ratio_range=[0.95, 1.05]),
+        # dict(type='PointsRangeFilter', point_cloud_range=point_cloud_range),
+        # dict(type='ObjectRangeFilter', point_cloud_range=point_cloud_range),
+        dict(type='PointShuffle'),
+        dict(
+            type='Pack3DDetInputs',
+            keys=['points', 'gt_bboxes_3d', 'gt_labels_3d'])
+    ]
 
-backend_args = None
-pipeline = [
-    dict(
-        type='LoadPointsFromPcdFile',
-        coord_type='LIDAR',
-        load_dim=4,
-        use_dim=4,
-        backend_args=backend_args),
-    dict(type='LoadAnnotations3D', with_bbox_3d=True, with_label_3d=True),
-    # dict(type='ObjectSample', db_sampler=db_sampler),
-    # dict(
-    #     type='ObjectNoise',
-    #     num_try=100,
-    #     translation_std=[1.0, 1.0, 0.5],
-    #     global_rot_range=[0.0, 0.0],
-    #     rot_range=[-0.78539816, 0.78539816]),
-    dict(type='RandomFlip3D', flip_ratio_bev_horizontal=0.5),
-    dict(
-        type='GlobalRotScaleTrans',
-        rot_range=[-0.78539816, 0.78539816],
-        scale_ratio_range=[0.95, 1.05]),
-    # dict(type='PointsRangeFilter', point_cloud_range=point_cloud_range),
-    # dict(type='ObjectRangeFilter', point_cloud_range=point_cloud_range),
-    dict(type='PointShuffle'),
-    dict(
-        type='Pack3DDetInputs',
-        keys=['points', 'gt_bboxes_3d', 'gt_labels_3d'])
-]
+    init_default_scope("mmdet3d")
+    dataset = CustomDataset("app_data/sly_project", "infos_train.pkl", pipeline=pipeline)
+    x = dataset[0]
+    print(x)
 
-init_default_scope("mmdet3d")
-dataset = CustomDataset("app_data/sly_project", "infos_train.pkl", pipeline=pipeline)
-x = dataset[0]
-print(x)
-
-for x in dataset:
-    continue
+    for x in dataset:
+        continue

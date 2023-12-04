@@ -1,22 +1,34 @@
-import globals as g
-import supervisely as sly
+from src.custom_dataset import CustomDataset
+from mmdet3d.apis.inference import inference_detector, init_model
+from mmengine import Config
+from mmdet3d.apis import LidarDet3DInferencer
+LidarDet3DInferencer.list_models("mmdet3d")
 
-project_type = g.PROJECT_INFO.type
+test_pipeline = [
+    dict(
+        type='LoadPointsFromFile',
+        coord_type='LIDAR',
+        load_dim=3,  # replace with your point cloud data dimension
+        use_dim=3),
+    dict(type='Pack3DDetInputs', keys=['points'])
+]
+# Instantiate the CustomDataset
+dataset = CustomDataset(
+    data_root='app_data/sly_project/',
+    ann_file='app_data/sly_project/infos_train.pkl',
+    pipeline=test_pipeline,
+)
 
-if not sly.fs.dir_exists(g.PROJECT_DIR):
-    sly.fs.mkdir(g.PROJECT_DIR)
-    if project_type == str(sly.ProjectType.POINT_CLOUD_EPISODES):
-        sly.download_pointcloud_episode_project(g.api, g.PROJECT_ID, g.PROJECT_DIR, progress_cb=None)
-    elif project_type == str(sly.ProjectType.POINT_CLOUDS):
-        sly.download_pointcloud_project(g.api, g.PROJECT_ID, g.PROJECT_DIR, progress_cb=None)
-    else:
-        raise ValueError(f"Couldn't download the project with type {project_type}.")
+checkpoint_path = None
+config_file = 'configs/baseline_model_config.py'  # Replace with the actual config file path
+cfg = Config.fromfile(config_file)
 
-if project_type == str(sly.ProjectType.POINT_CLOUD_EPISODES):
-    dataset = sly.PointcloudEpisodeProject(g.PROJECT_DIR, sly.OpenMode.READ)
-elif project_type == str(sly.ProjectType.POINT_CLOUDS):
-    dataset = sly.PointcloudProject(g.PROJECT_DIR, sly.OpenMode.READ)
-else:
-    raise ValueError(f"Couldn't download the project with type {project_type}.")
+# Build the detector
+model = init_model(cfg, checkpoint_path, device='cuda:0')
 
-print(dataset)
+
+# Inference through the dataset
+for i in range(len(dataset)):
+    data = dataset[i]
+    result = inference_detector(model, data)
+    # Process the result (e.g., visualization, saving, etc.)
