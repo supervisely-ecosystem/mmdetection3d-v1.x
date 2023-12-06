@@ -12,7 +12,7 @@ TODO:
 + Infer pre-trained model on a point cloud
 + Try to train a model
 + Pipeline Maker
-- Do we need a custom eval metric?
++ Eval metric?
 - Prepare model configs
     traverse over model-infex.yml
         using mmdet3d.apis.Base3DInferencer
@@ -30,6 +30,9 @@ TODO:
 - Visualization
     opt1: create tmp scene in Supervisely, then open it in the labeling tool 3D
     opt2: draw with plotly
+    mlab: https://github.com/lkk688/WaymoObjectDetection/blob/master/WaymoKitti3DVisualizev2.ipynb
+
+
 
 for UI:
 - visualize: tools/misc/browse_dataset.py

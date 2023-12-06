@@ -110,7 +110,8 @@ def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data
 
 def get_evaluator(data_root):
     val_evaluator = dict(
-        type='KittiMetric',
+        type='NuScenesMetric',
+        data_root=data_root,
         ann_file=data_root + '/infos_val.pkl',
         metric='bbox'
     )
