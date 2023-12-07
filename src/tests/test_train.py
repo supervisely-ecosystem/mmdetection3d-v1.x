@@ -5,8 +5,6 @@ from mmengine.logging import print_log
 from mmdet3d.registry import RUNNERS
 from mmengine.runner import Runner
 
-from config_utils import training_params
-
 
 def build_runner(cfg: Config, work_dir: str, amp: bool, auto_scale_lr: bool = False) -> Runner:
 
@@ -75,27 +73,34 @@ def configure_init_weights_and_resume(cfg: Config, mmdet_checkpoint_path: str = 
 
 
 if __name__ == "__main__":
-    from src.config_utils import detection3d
+    from src.config_factory import training_params
+    from src.config_factory import detection3d, kitti
+    import src.dataset.custom_dataset
+    import src.evaluation.nusecnes_metric
 
     # Dataset
-    data_root = "app_data/sly_project"
+    data_root = "kitti_sample"
     batch_size = 4
     num_workers = 0
     lidar_dims = 4
-    point_cloud_range = None
+    point_cloud_range = [0, -39.68, -3, 69.12, 39.68, 1]  # PointPillars
+    # point_cloud_range = [0, -40, -3, 70.4, 40, 1]  # KITTI
     # TODO: voxel_size = [0.05, 0.05, 0.1]
+    num_points = 16384
+    sample_range = 40.0
     aug_pipeline = detection3d.get_default_aug_pipeline()
 
     # Model
-    cfg_model = "mmdetection3d/configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py"
-
+    # cfg_model = "mmdetection3d/configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py"
+    cfg_model = "mmdetection3d/configs/point_rcnn/point-rcnn_8xb2_kitti-3d-3class.py"
+    
     # Runner
     max_epochs = 1
     val_interval = 1
 
     # make config
-    cfg = Config.fromfile("src/config_utils/default_runtime.py")
-    detection3d.configure_datasets(cfg, data_root, batch_size, num_workers, lidar_dims, point_cloud_range, aug_pipeline)
+    cfg = Config.fromfile("src/config_factory/default_runtime.py")
+    kitti.configure_datasets(cfg, data_root, batch_size, num_workers, lidar_dims, point_cloud_range, aug_pipeline, num_points=num_points, sample_range=sample_range)
     training_params.configure_training_params(cfg, max_epochs, val_interval)
     cfg_model = Config.fromfile(cfg_model)
     cfg.model = cfg_model.model

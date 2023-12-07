@@ -5,7 +5,7 @@ from mmdet3d.structures import CameraInstance3DBoxes, LiDARInstance3DBoxes
 from mmengine.registry import init_default_scope
 import mmengine
 import numpy as np
-import src.load_points_from_pcd
+import src.dataset.load_points_from_pcd
 
 
 @DATASETS.register_module()

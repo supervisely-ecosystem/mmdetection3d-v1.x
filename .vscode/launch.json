@@ -2,27 +2,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "create_data",
-            "type": "python",
-            "request": "launch",
-            "program": "tools/create_data.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "kitti",
-                "--root-path",
-                "../kitti_sample",
-                "--out-dir",
-                "../kitti_sample",
-                "--extra-tag",
-                "kitti_sample",
-            ],
-            "cwd": "${workspaceFolder}/mmdetection3d",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/mmdetection3d:${PYTHONPATH}",
-            }
-        },
-        {
             "name": "Uvicorn Train",
             "type": "python",
             "request": "launch",
@@ -81,7 +60,7 @@
             "name": "test_train.py",
             "type": "python",
             "request": "launch",
-            "program": "src/test_train.py",
+            "program": "src/tests/test_train.py",
             "console": "integratedTerminal",
             "justMyCode": false,
             "env": {
@@ -93,12 +72,33 @@
             "name": "test_eval.py",
             "type": "python",
             "request": "launch",
-            "program": "src/test_eval.py",
+            "program": "src/tests/test_eval.py",
             "console": "integratedTerminal",
             "justMyCode": false,
             "env": {
                 "PYTHONPATH": "${workspaceFolder}:${PYTHONPATH}",
                 "LOG_LEVEL": "DEBUG",
+            }
+        },
+        {
+            "name": "create_data",
+            "type": "python",
+            "request": "launch",
+            "program": "tools/create_data.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "kitti",
+                "--root-path",
+                "../kitti_sample",
+                "--out-dir",
+                "../kitti_sample",
+                "--extra-tag",
+                "kitti_sample",
+            ],
+            "cwd": "${workspaceFolder}/mmdetection3d",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/mmdetection3d:${PYTHONPATH}",
             }
         },
     ]

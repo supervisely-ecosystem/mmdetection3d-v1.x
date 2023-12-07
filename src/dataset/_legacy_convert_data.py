@@ -76,4 +76,6 @@ def convert_sly_project_to_mmdet3d(project_dir, is_episodes, output_dir, cv_task
             pcd_path = paths.pointcloud_path
             convert_pcd_to_bin(pcd_path, f"{output_dir}/points/{base_name}.bin")
 
-convert_sly_project_to_mmdet3d("app_data/sly_project", True, "app_data/mmdet3d_dataset", "detection")
+
+if __name__ == "__main__":
+    convert_sly_project_to_mmdet3d("app_data/sly_project", True, "app_data/mmdet3d_dataset", "detection")

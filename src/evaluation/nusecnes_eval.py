@@ -14,7 +14,7 @@ from nuscenes.eval.detection.config import config_factory
 from nuscenes.eval.detection.data_classes import DetectionConfig
 
 
-class MyNuScenesEval(DetectionEval):
+class CustomNuScenesEval(DetectionEval):
     def __init__(self,
                  pred_nusc_boxes: str,
                  gt_nusc_boxes: str,

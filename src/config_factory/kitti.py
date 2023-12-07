@@ -1,14 +1,13 @@
 from mmengine import Config
-import src.custom_dataset
 
 
-def get_pipelines(lidar_dims, point_cloud_range=None):
+def get_pipelines(lidar_dims, point_cloud_range=None, num_points=None, sample_range=None):
     """
     return train_pipeline, test_pipeline
     """
     train_pipeline = [
         dict(
-            type='LoadPointsFromPcdFile',
+            type='LoadPointsFromFile',
             coord_type='LIDAR',
             load_dim=lidar_dims,
             use_dim=lidar_dims),
@@ -23,7 +22,7 @@ def get_pipelines(lidar_dims, point_cloud_range=None):
 
     test_pipeline = [
         dict(
-            type='LoadPointsFromPcdFile',
+            type='LoadPointsFromFile',
             coord_type='LIDAR',
             load_dim=lidar_dims,
             use_dim=lidar_dims),
@@ -49,6 +48,10 @@ def get_pipelines(lidar_dims, point_cloud_range=None):
         train_pipeline.insert(-1, dict(type='ObjectRangeFilter', point_cloud_range=point_cloud_range))
         test_pipeline[1]["transforms"].append(dict(type='PointsRangeFilter', point_cloud_range=point_cloud_range))
 
+    if num_points is not None and sample_range is not None:
+        train_pipeline.insert(-1, dict(type='PointSample', num_points=num_points, sample_range=sample_range))
+        test_pipeline[1]["transforms"].append(dict(type='PointSample', num_points=num_points, sample_range=sample_range))
+    
     return train_pipeline, test_pipeline
 
 
@@ -77,19 +80,22 @@ def insert_aug_pipeline(train_pipeline: list, aug_pipeline: list):
 
 
 def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root):
-
     persistent_workers = num_workers != 0
-
+    ann_file_prefx = "kitti_sample_"
+    class_names = ['Pedestrian', 'Cyclist', 'Car']
+    metainfo = dict(classes=class_names)
     train_dataloader = dict(
         batch_size=batch_size,
         num_workers=num_workers,
         persistent_workers=persistent_workers,
         sampler=dict(type='DefaultSampler', shuffle=True),
         dataset=dict(
-                type="CustomDataset",
+                type="KittiDataset",
                 data_root=data_root,
-                ann_file='infos_train.pkl',
+                data_prefix=dict(pts='training/velodyne_reduced', img='training/image_2'),
+                ann_file=ann_file_prefx + 'infos_train.pkl',
                 pipeline=train_pipeline,
+                metainfo=metainfo,
                 test_mode=False))
     
     val_dataloader = dict(
@@ -99,27 +105,29 @@ def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data
         drop_last=False,
         sampler=dict(type='DefaultSampler', shuffle=False),
         dataset=dict(
-                type="CustomDataset",
+                type="KittiDataset",
                 data_root=data_root,
-                ann_file='infos_val.pkl',
+                data_prefix=dict(pts='training/velodyne_reduced', img='training/image_2'),
+                ann_file=ann_file_prefx + 'infos_train.pkl',
                 pipeline=test_pipeline,
+                metainfo=metainfo,
                 test_mode=True))
     
     return train_dataloader, val_dataloader
     
 
 def get_evaluator(data_root):
+    ann_file_prefx = "kitti_sample_"
     val_evaluator = dict(
-        type='NuScenesMetric',
-        data_root=data_root,
-        ann_file=data_root + '/infos_val.pkl',
+        type='KittiMetric',
+        ann_file=f"{data_root}/{ann_file_prefx}infos_train.pkl",
         metric='bbox'
     )
     return val_evaluator
 
 
-def configure_datasets(cfg: Config, data_root: str, batch_size: int, num_workers: int, lidar_dims: int, point_cloud_range: list, aug_pipeline: list):
-    train_pipeline, test_pipeline = get_pipelines(lidar_dims, point_cloud_range)
+def configure_datasets(cfg: Config, data_root: str, batch_size: int, num_workers: int, lidar_dims: int, point_cloud_range: list, aug_pipeline: list, num_points: int = None, sample_range: float = None):
+    train_pipeline, test_pipeline = get_pipelines(lidar_dims, point_cloud_range, num_points, sample_range)
     train_pipeline = insert_aug_pipeline(train_pipeline, aug_pipeline)
     train_dataloader, val_dataloader = get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root)
     val_evaluator = get_evaluator(data_root)
@@ -128,5 +136,3 @@ def configure_datasets(cfg: Config, data_root: str, batch_size: int, num_workers
     cfg.test_dataloader = val_dataloader
     cfg.val_evaluator = val_evaluator
     cfg.test_evaluator = val_evaluator
-
-    # cfg.custom_imports = dict(imports=['src.custom_dataset'], allow_failed_imports=False)

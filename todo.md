@@ -13,6 +13,8 @@ TODO:
 + Try to train a model
 + Pipeline Maker
 + Eval metric?
+- Test eval on kitti
+- Train doesn't work
 - Prepare model configs
     traverse over model-infex.yml
         using mmdet3d.apis.Base3DInferencer
