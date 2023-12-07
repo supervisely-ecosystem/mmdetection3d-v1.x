@@ -1,11 +1,8 @@
 from nuscenes.eval.detection import constants
-constants.DETECTION_NAMES = [0]
-constants.ATTRIBUTE_NAMES = ["dummy_attr"]
 
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import pyquaternion
-import torch
 
 from mmdet3d.structures import LiDARInstance3DBoxes
 from mmdet3d.evaluation.metrics.nuscenes_metric import NuScenesMetric, output_to_nusc_box
@@ -19,30 +16,31 @@ from nuscenes.eval.detection.data_classes import DetectionConfig
 
 class MyNuScenesEval(DetectionEval):
     def __init__(self,
-                 config: DetectionConfig,
                  pred_nusc_boxes: str,
                  gt_nusc_boxes: str,
-                 verbose: bool = True) -> None:
+                 verbose: bool = False) -> None:
         
-        self.cfg = config
         self.pred_boxes = pred_nusc_boxes
         self.gt_boxes = gt_nusc_boxes
         self.verbose = verbose
+        cfg_data = {
+            "class_range": {k: 50 for k in constants.DETECTION_NAMES},
+            "dist_fcn": "center_distance",
+            "dist_ths": [0.5, 1.0, 2.0, 4.0],
+            "dist_th_tp": 2.0,
+            "min_recall": 0.1,
+            "min_precision": 0.1,
+            "max_boxes_per_sample": 500,
+            "mean_ap_weight": 5
+        }
+        self.cfg = DetectionConfig.deserialize(cfg_data)
 
 
-pred = [
-    {
-    'pred_instances_3d': {'scores_3d': torch.tensor([0.99]), 'bboxes_3d': LiDARInstance3DBoxes(torch.tensor([[39.909996032714844, 0.79256671667099, -0.7598658800125122, 1.7, 3.77, 1.5, -1.72]]), origin=(0.5,0.5,0.5)), 'labels_3d': torch.tensor([0])},
-    'sample_idx': 0,
-    },
-]
 
-gt = [
-    {
-        'instances': [{'bbox_3d': [39.909996032714844, 0.79256671667099, -0.7598658800125122, 1.7, 3.77, 1.5, -1.72], 'bbox_label_3d': 0}],
-        'sample_idx': 0,
-    }
-]
+def override_constants(NEW_DETECTION_NAMES: list, NEW_ATTRIBUTE_NAMES: list):
+    constants.DETECTION_NAMES = NEW_DETECTION_NAMES
+    constants.ATTRIBUTE_NAMES = NEW_ATTRIBUTE_NAMES
+
 
 def convert_pred_to_nusc_boxes(pred: List[Dict]) -> EvalBoxes:
     eval_boxes = EvalBoxes()
@@ -96,28 +94,7 @@ def convert_gt_to_nusc_boxes(gt: List[Dict]) -> EvalBoxes:
     return eval_boxes
 
 
-cfg_data = {
-  "class_range": {k: 50 for k in constants.DETECTION_NAMES},
-  "dist_fcn": "center_distance",
-  "dist_ths": [0.5, 1.0, 2.0, 4.0],
-  "dist_th_tp": 2.0,
-  "min_recall": 0.1,
-  "min_precision": 0.1,
-  "max_boxes_per_sample": 500,
-  "mean_ap_weight": 5
-}
-
-
-if __name__ == "__main__":
-    pred_nusc_boxes = convert_pred_to_nusc_boxes(pred)
-    gt_nusc_boxes = convert_gt_to_nusc_boxes(gt)
-    cfg = DetectionConfig.deserialize(cfg_data)
-    eval = MyNuScenesEval(cfg, pred_nusc_boxes, gt_nusc_boxes, verbose=True)
-    metrics, metric_data_list = eval.evaluate()
-
-
-    metrics_summary = metrics.serialize()
-
+def print_metrics_summary(metrics_summary: dict):
     # Print high-level metrics.
     print('mAP: %.4f' % (metrics_summary['mean_ap']))
     err_name_mapping = {
