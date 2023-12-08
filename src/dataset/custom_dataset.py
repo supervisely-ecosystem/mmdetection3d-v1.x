@@ -5,7 +5,7 @@ from mmdet3d.structures import CameraInstance3DBoxes, LiDARInstance3DBoxes
 from mmengine.registry import init_default_scope
 import mmengine
 import numpy as np
-import src.dataset.load_points_from_pcd
+import supervisely as sly
 
 
 @DATASETS.register_module()
@@ -14,6 +14,7 @@ class CustomDataset(Det3DDataset):
                  data_root: str,
                  ann_file: str,
                  pipeline: List[Union[dict, Callable]] = [],
+                 selected_classes: Union[List[str], dict] = None,
                  modality: dict = dict(use_lidar=True, use_camera=False),
                  default_cam_key: str = None,
                  filter_empty_gt: bool = True,
@@ -23,12 +24,28 @@ class CustomDataset(Det3DDataset):
                  show_ins_var: bool = False,
                  **kwargs) -> None:
         sly_meta = mmengine.load(f"{data_root}/meta.json")
-        classes = [x["title"] for x in sly_meta["classes"]]
-        self.METAINFO = {"classes": classes}
+        sly_meta = sly.ProjectMeta.from_json(sly_meta)
+        classes = [x.name for x in sly_meta.obj_classes]
+        palette = [x.color for x in sly_meta.obj_classes]
+        self.METAINFO = {"classes": classes, "palette": palette}
+        if selected_classes:
+            if isinstance(selected_classes, list):
+                filtered_classes = [x for x in classes if x in set(selected_classes)]
+            elif isinstance(selected_classes, dict):
+                filtered_classes = [x for x in classes if x in set(selected_classes.keys())]
+            assert len(filtered_classes) > 0, f"selected_classes {selected_classes} not found in {classes}"
+            metainfo = self.METAINFO.copy()
+            metainfo["classes"] = filtered_classes
+        else:
+            metainfo = None
         data_prefix = dict(pts='', img='')
         box_type_3d = "LiDAR"
-        super().__init__(data_root, ann_file, None, data_prefix, pipeline, modality, default_cam_key, box_type_3d, filter_empty_gt, test_mode, load_eval_anns, backend_args, show_ins_var, **kwargs)
+        super().__init__(data_root, ann_file, metainfo, data_prefix, pipeline, modality, default_cam_key, box_type_3d, filter_empty_gt, test_mode, load_eval_anns, backend_args, show_ins_var, **kwargs)
 
+        if isinstance(selected_classes, dict):
+            self.label_mapping = {i: selected_classes.get(x, -1) for i, x in enumerate(classes)}
+
+        print(f"{self.METAINFO['classes']=}, {self.label_mapping=}")
 
     def parse_ann_info(self, info: dict) -> dict:
         ann_info = super().parse_ann_info(info)
@@ -38,11 +55,28 @@ class CustomDataset(Det3DDataset):
             ann_info['gt_bboxes_3d'] = np.zeros((0, 7), dtype=np.float32)
             ann_info['gt_labels_3d'] = np.zeros(0, dtype=np.int64)
 
+        ann_info = self._remove_dontcare(ann_info)  # removes gt with -1 label
         ann_info['gt_bboxes_3d'] = LiDARInstance3DBoxes(ann_info['gt_bboxes_3d'], origin=(0.5, 0.5, 0.5))
         return ann_info
     
+    def filter_data(self) -> List[dict]:
+        # 1. filter by selected_labels
+        # 2. filter by self.filter_empty_gt
+        selected_labels = set(self.label_mapping.values())
+        data_list = []
+        for info in self.data_list:
+            instances: list = info["instances"]
+            instances = [x for x in instances if x["bbox_label_3d"] in selected_labels]
+            if self.filter_empty_gt and len(instances) == 0:
+                continue
+            info = info.copy()
+            info["instances"] = instances
+            data_list.append(info)
+        return data_list
+    
     
 if __name__ == "__main__":
+    import src.dataset.load_points_from_pcd
     backend_args = None
     pipeline = [
         dict(
@@ -73,7 +107,9 @@ if __name__ == "__main__":
     ]
 
     init_default_scope("mmdet3d")
-    dataset = CustomDataset("app_data/sly_project", "infos_train.pkl", pipeline=pipeline)
+    selected_classes = ["Car"]
+    # selected_classes = None
+    dataset = CustomDataset("app_data/sly_project_episodes", "infos_train.pkl", pipeline=pipeline, selected_classes=selected_classes)
     x = dataset[0]
     print(x)
 

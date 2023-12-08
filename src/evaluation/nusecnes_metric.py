@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Sequence, Tuple, Union
 import mmengine
 from mmengine.evaluator import BaseMetric
 from mmdet3d.registry import METRICS
+import supervisely as sly
 
 from src.evaluation import nusecnes_eval
 
@@ -40,6 +41,7 @@ class CustomNuScenesMetric(BaseMetric):
                  data_root: str,
                  ann_file: str,
                  metric: str = 'bbox',
+                 selected_classes: Union[List[str], dict] = None,
                  modality: dict = dict(use_camera=False, use_lidar=True),
                  prefix: Optional[str] = None,
                  collect_device: str = 'cpu',
@@ -57,8 +59,22 @@ class CustomNuScenesMetric(BaseMetric):
         self.backend_args = backend_args
         
         self.annotations = mmengine.load(self.ann_file)
-        self.class_names = self.annotations['metainfo']['classes']
-        nusecnes_eval.override_constants(self.class_names, ["dummy_attr"])
+
+        try:        
+            sly_meta = mmengine.load(f"{data_root}/meta.json")
+            sly_meta = sly.ProjectMeta.from_json(sly_meta)
+            classes = [x.name for x in sly_meta.obj_classes]
+        except:
+            classes = list(self.annotations["metainfo"]["categories"].keys())
+
+        self._create_label_mapping(classes, selected_classes)
+        self.map_gt_label_to_class_name = {i: x for i, x in enumerate(classes)}
+        self.map_pred_label_to_class_name = {idx_pred: classes[idx_gt] for idx_gt, idx_pred in self.label_mapping.items() if idx_pred != -1}
+        self.classes = classes
+        self.selected_classes = self._parse_selected_classes(selected_classes, classes)
+        if self.selected_classes != self.classes:
+            self._filter_annotations_by_selected_classes(self.annotations, self.selected_classes)
+        nusecnes_eval.override_constants(self.selected_classes, ["dummy_attr"])
 
     def process(self, data_batch: dict, data_samples: Sequence[dict]) -> None:
         """Process one batch of data samples and predictions.
@@ -94,11 +110,64 @@ class CustomNuScenesMetric(BaseMetric):
             Dict[str, float]: The computed metrics. The keys are the names of
             the metrics, and the values are corresponding results.
         """
-        pred_nusc_boxes = nusecnes_eval.convert_pred_to_nusc_boxes(results)
-        gt_nusc_boxes = nusecnes_eval.convert_gt_to_nusc_boxes(self.annotations)
+        pred_nusc_boxes = nusecnes_eval.convert_pred_to_nusc_boxes(results, self.map_pred_label_to_class_name)
+        gt_nusc_boxes = nusecnes_eval.convert_gt_to_nusc_boxes(self.annotations["data_list"], self.map_gt_label_to_class_name)
 
         eval = nusecnes_eval.CustomNuScenesEval(pred_nusc_boxes, gt_nusc_boxes, verbose=True)
         metrics, metric_data_list = eval.evaluate()
 
         metrics_summary = metrics.serialize()
         nusecnes_eval.print_metrics_summary(metrics_summary)
+
+        return {
+            "mAP": metrics_summary["mean_ap"],
+            "NDS": metrics_summary["nd_score"],
+        }
+
+    def _parse_selected_classes(self, selected_classes, classes) -> List[str]:
+        if selected_classes:
+            if isinstance(selected_classes, list):
+                filtered_classes = [x for x in classes if x in set(selected_classes)]
+            elif isinstance(selected_classes, dict):
+                filtered_classes = [x for x in classes if x in set(selected_classes.keys())]
+            assert len(filtered_classes) > 0, f"selected_classes {selected_classes} not found in {classes}"
+            return filtered_classes
+        else:
+            return classes
+        
+    def _create_label_mapping(self, classes: List[str], selected_classes: Union[List[str], dict] = None):
+        if selected_classes:
+            if isinstance(selected_classes, list):
+                filtered_classes = [x for x in classes if x in set(selected_classes)]
+            elif isinstance(selected_classes, dict):
+                filtered_classes = [x for x in classes if x in set(selected_classes.keys())]
+            assert len(filtered_classes) > 0, f"selected_classes {selected_classes} not found in {classes}"
+            metainfo = {"classes": filtered_classes}
+        else:
+            metainfo = None
+
+        if metainfo is not None and 'classes' in metainfo:
+            # we allow to train on subset of self.METAINFO['classes']
+            # map unselected labels to -1
+            self.label_mapping = {
+                i: -1
+                for i in range(len(classes))
+            }
+            self.label_mapping[-1] = -1
+            for label_idx, name in enumerate(metainfo['classes']):
+                ori_label = classes.index(name)
+                self.label_mapping[ori_label] = label_idx
+        else:
+            self.label_mapping = {
+                i: i
+                for i in range(len(classes))
+            }
+            self.label_mapping[-1] = -1
+
+        if isinstance(selected_classes, dict):
+            self.label_mapping = {i: selected_classes.get(x, -1) for i, x in enumerate(classes)}
+
+    def _filter_annotations_by_selected_classes(self, annotations: dict, selected_classes: List[str]):
+        for info in annotations["data_list"]:
+            info["instances"] = [x for x in info["instances"] if x["bbox_label_3d"] in set(selected_classes)]
+        return annotations

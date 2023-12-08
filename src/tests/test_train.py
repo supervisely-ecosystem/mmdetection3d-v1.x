@@ -73,35 +73,45 @@ def configure_init_weights_and_resume(cfg: Config, mmdet_checkpoint_path: str = 
 
 
 if __name__ == "__main__":
+    from src.tests.extract_weights_url import find_weights_url
     from src.config_factory import training_params
     from src.config_factory import detection3d, kitti
+    from src.evaluation.nusecnes_eval import override_constants
+    # Register custom_imports
     import src.dataset.custom_dataset
+    import src.dataset.load_points_from_pcd
     import src.evaluation.nusecnes_metric
 
     # Dataset
     data_root = "kitti_sample"
+    # data_root = "app_data/sly_project"
     batch_size = 4
-    num_workers = 0
+    num_workers = 4
     lidar_dims = 4
     point_cloud_range = [0, -39.68, -3, 69.12, 39.68, 1]  # PointPillars
     # point_cloud_range = [0, -40, -3, 70.4, 40, 1]  # KITTI
     # TODO: voxel_size = [0.05, 0.05, 0.1]
-    num_points = 16384
-    sample_range = 40.0
+    selected_classes = ['Pedestrian', 'Cyclist', 'Car']
+    selected_classes = {x: i for i, x in enumerate(selected_classes)}
+    # num_points, sample_range = 16384, 40.0
+    num_points, sample_range = None, None
     aug_pipeline = detection3d.get_default_aug_pipeline()
 
     # Model
-    # cfg_model = "mmdetection3d/configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py"
-    cfg_model = "mmdetection3d/configs/point_rcnn/point-rcnn_8xb2_kitti-3d-3class.py"
+    cfg_model = "mmdetection3d/configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py"
+    # cfg_model = "mmdetection3d/configs/point_rcnn/point-rcnn_8xb2_kitti-3d-3class.py"
+    model_index = "mmdetection3d/model-index.yml"
+    weights_url = find_weights_url(model_index, cfg_model)
     
     # Runner
-    max_epochs = 1
+    max_epochs = 50
     val_interval = 1
 
     # make config
     cfg = Config.fromfile("src/config_factory/default_runtime.py")
-    kitti.configure_datasets(cfg, data_root, batch_size, num_workers, lidar_dims, point_cloud_range, aug_pipeline, num_points=num_points, sample_range=sample_range)
+    kitti.configure_datasets(cfg, data_root, batch_size, num_workers, lidar_dims, point_cloud_range, aug_pipeline, selected_classes, num_points=num_points, sample_range=sample_range)
     training_params.configure_training_params(cfg, max_epochs, val_interval)
+    configure_init_weights_and_resume(cfg, mmdet_checkpoint_path=weights_url)
     cfg_model = Config.fromfile(cfg_model)
     cfg.model = cfg_model.model
 

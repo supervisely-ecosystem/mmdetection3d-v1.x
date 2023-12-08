@@ -38,11 +38,13 @@ class CustomNuScenesEval(DetectionEval):
 
 
 def override_constants(NEW_DETECTION_NAMES: list, NEW_ATTRIBUTE_NAMES: list):
-    constants.DETECTION_NAMES = NEW_DETECTION_NAMES
-    constants.ATTRIBUTE_NAMES = NEW_ATTRIBUTE_NAMES
+    constants.DETECTION_NAMES.clear()
+    constants.DETECTION_NAMES.extend(NEW_DETECTION_NAMES)
+    constants.ATTRIBUTE_NAMES.clear()
+    constants.ATTRIBUTE_NAMES.extend(NEW_ATTRIBUTE_NAMES)
 
 
-def convert_pred_to_nusc_boxes(pred: List[Dict]) -> EvalBoxes:
+def convert_pred_to_nusc_boxes(pred: List[Dict], id2class: dict = None) -> EvalBoxes:
     eval_boxes = EvalBoxes()
     for sample in pred:
         sample_idx = sample['sample_idx']
@@ -62,7 +64,7 @@ def convert_pred_to_nusc_boxes(pred: List[Dict]) -> EvalBoxes:
                 translation = box_gravity_center[i],
                 size = box_dims[i],
                 rotation = pyquaternion.Quaternion(axis=[0, 0, 1], radians=box_yaw[i]).elements.tolist(),
-                detection_name = labels_3d[i],
+                detection_name = id2class[labels_3d[i]],
                 detection_score = scores_3d[i],
                 attribute_name="dummy_attr",
             )
@@ -71,10 +73,10 @@ def convert_pred_to_nusc_boxes(pred: List[Dict]) -> EvalBoxes:
     return eval_boxes
 
 
-def convert_gt_to_nusc_boxes(gt: List[Dict]) -> EvalBoxes:
+def convert_gt_to_nusc_boxes(gt: List[Dict], id2class: dict = None) -> EvalBoxes:
     eval_boxes = EvalBoxes()
-    for sample in gt:
-        sample_idx = sample['sample_idx']
+    for idx, sample in enumerate(gt):
+        sample_idx = idx
         instances = sample['instances']
         boxes = []
         for instance in instances:
@@ -85,7 +87,7 @@ def convert_gt_to_nusc_boxes(gt: List[Dict]) -> EvalBoxes:
                 translation = bbox_3d[:3],
                 size = bbox_3d[3:6],
                 rotation = pyquaternion.Quaternion(axis=[0, 0, 1], radians=bbox_3d[6]).elements.tolist(),
-                detection_name = bbox_label_3d,
+                detection_name = id2class[bbox_label_3d],
                 detection_score = -1.0,
                 attribute_name="dummy_attr",
             )

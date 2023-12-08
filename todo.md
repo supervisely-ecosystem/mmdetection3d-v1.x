@@ -13,6 +13,7 @@ TODO:
 + Try to train a model
 + Pipeline Maker
 + Eval metric?
+- проверить обучение на данных китти но с дефолтным конфигом и через CLI
 - Test eval on kitti
 - Train doesn't work
 - Prepare model configs

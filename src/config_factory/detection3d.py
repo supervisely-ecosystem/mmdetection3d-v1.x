@@ -1,7 +1,7 @@
 from mmengine import Config
 
 
-def get_pipelines(lidar_dims, point_cloud_range=None):
+def get_pipelines(lidar_dims, point_cloud_range=None, num_points=None, sample_range=None):
     """
     return train_pipeline, test_pipeline
     """
@@ -48,6 +48,10 @@ def get_pipelines(lidar_dims, point_cloud_range=None):
         train_pipeline.insert(-1, dict(type='ObjectRangeFilter', point_cloud_range=point_cloud_range))
         test_pipeline[1]["transforms"].append(dict(type='PointsRangeFilter', point_cloud_range=point_cloud_range))
 
+    if num_points is not None and sample_range is not None:
+        train_pipeline.insert(-1, dict(type='PointSample', num_points=num_points, sample_range=sample_range))
+        test_pipeline[1]["transforms"].append(dict(type='PointSample', num_points=num_points, sample_range=sample_range))
+    
     return train_pipeline, test_pipeline
 
 
@@ -75,7 +79,7 @@ def insert_aug_pipeline(train_pipeline: list, aug_pipeline: list):
     return p1 + p2
 
 
-def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root):
+def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root, selected_classes):
 
     persistent_workers = num_workers != 0
 
@@ -89,6 +93,7 @@ def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data
                 data_root=data_root,
                 ann_file='infos_train.pkl',
                 pipeline=train_pipeline,
+                selected_classes=selected_classes,
                 test_mode=False))
     
     val_dataloader = dict(
@@ -102,26 +107,28 @@ def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data
                 data_root=data_root,
                 ann_file='infos_val.pkl',
                 pipeline=test_pipeline,
+                selected_classes=selected_classes,
                 test_mode=True))
     
     return train_dataloader, val_dataloader
     
 
-def get_evaluator(data_root):
+def get_evaluator(data_root, selected_classes):
     val_evaluator = dict(
         type='CustomNuScenesMetric',
         data_root=data_root,
         ann_file=data_root + '/infos_val.pkl',
-        metric='bbox'
+        metric='bbox',
+        selected_classes=selected_classes,
     )
     return val_evaluator
 
 
-def configure_datasets(cfg: Config, data_root: str, batch_size: int, num_workers: int, lidar_dims: int, point_cloud_range: list, aug_pipeline: list):
-    train_pipeline, test_pipeline = get_pipelines(lidar_dims, point_cloud_range)
+def configure_datasets(cfg: Config, data_root: str, batch_size: int, num_workers: int, lidar_dims: int, point_cloud_range: list, aug_pipeline: list, selected_classes: list, num_points: int = None, sample_range: float = None):
+    train_pipeline, test_pipeline = get_pipelines(lidar_dims, point_cloud_range, num_points, sample_range)
     train_pipeline = insert_aug_pipeline(train_pipeline, aug_pipeline)
-    train_dataloader, val_dataloader = get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root)
-    val_evaluator = get_evaluator(data_root)
+    train_dataloader, val_dataloader = get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root, selected_classes)
+    val_evaluator = get_evaluator(data_root, selected_classes)
     cfg.train_dataloader = train_dataloader
     cfg.val_dataloader = val_dataloader
     cfg.test_dataloader = val_dataloader

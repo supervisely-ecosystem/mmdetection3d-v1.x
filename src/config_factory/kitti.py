@@ -116,7 +116,7 @@ def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data
     return train_dataloader, val_dataloader
     
 
-def get_evaluator(data_root):
+def get_evaluator(data_root, selected_classes):
     ann_file_prefx = "kitti_sample_"
     val_evaluator = dict(
         type='KittiMetric',
@@ -126,11 +126,23 @@ def get_evaluator(data_root):
     return val_evaluator
 
 
-def configure_datasets(cfg: Config, data_root: str, batch_size: int, num_workers: int, lidar_dims: int, point_cloud_range: list, aug_pipeline: list, num_points: int = None, sample_range: float = None):
+def get_evaluator_nusc(data_root, selected_classes):
+    ann_file_prefx = "kitti_sample_"
+    val_evaluator = dict(
+        type='CustomNuScenesMetric',
+        data_root=data_root,
+        ann_file=f"{data_root}/{ann_file_prefx}infos_train.pkl",
+        metric='bbox',
+        selected_classes=selected_classes,
+    )
+    return val_evaluator
+
+
+def configure_datasets(cfg: Config, data_root: str, batch_size: int, num_workers: int, lidar_dims: int, point_cloud_range: list, aug_pipeline: list, selected_classes: list, num_points: int = None, sample_range: float = None):
     train_pipeline, test_pipeline = get_pipelines(lidar_dims, point_cloud_range, num_points, sample_range)
     train_pipeline = insert_aug_pipeline(train_pipeline, aug_pipeline)
     train_dataloader, val_dataloader = get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root)
-    val_evaluator = get_evaluator(data_root)
+    val_evaluator = get_evaluator_nusc(data_root, selected_classes)
     cfg.train_dataloader = train_dataloader
     cfg.val_dataloader = val_dataloader
     cfg.test_dataloader = val_dataloader
