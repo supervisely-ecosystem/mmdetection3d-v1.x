@@ -15,3 +15,7 @@ venv/
 /data
 /kitti_sample
 /data_info.json
+/gpt_week
+/work_dirs
+*.deb
+*.run
