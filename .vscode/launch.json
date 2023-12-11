@@ -69,6 +69,18 @@
             }
         },
         {
+            "name": "test_train_origin.py",
+            "type": "python",
+            "request": "launch",
+            "program": "src/tests/test_train_origin.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${PYTHONPATH}",
+                "LOG_LEVEL": "DEBUG",
+            }
+        },
+        {
             "name": "test_eval.py",
             "type": "python",
             "request": "launch",

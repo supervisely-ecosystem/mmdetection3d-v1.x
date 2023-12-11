@@ -17,7 +17,7 @@ TODO:
 - Test eval on kitti
 - Train doesn't work
 - Prepare model configs
-    traverse over model-infex.yml
+    traverse over model-index.yml
         using mmdet3d.apis.Base3DInferencer
         _get_repo_or_mim_dir(scope)
         _get_models_from_metafile(mim_dir)
