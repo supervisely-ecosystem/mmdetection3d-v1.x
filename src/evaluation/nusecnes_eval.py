@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import pyquaternion
 
-from mmdet3d.structures import LiDARInstance3DBoxes
+from mmdet3d.structures import LiDARInstance3DBoxes, BaseInstance3DBoxes
 from mmdet3d.evaluation.metrics.nuscenes_metric import NuScenesMetric, output_to_nusc_box
 
 from nuscenes.eval.detection.data_classes import DetectionBox
@@ -51,7 +51,7 @@ def convert_pred_to_nusc_boxes(pred: List[Dict], id2class: dict = None) -> EvalB
         pred_instances_3d = sample['pred_instances_3d']
         scores_3d = pred_instances_3d['scores_3d'].tolist()
         labels_3d = pred_instances_3d['labels_3d'].tolist()
-        bboxes_3d : LiDARInstance3DBoxes = pred_instances_3d['bboxes_3d']
+        bboxes_3d : BaseInstance3DBoxes = pred_instances_3d['bboxes_3d']
         
         box_gravity_center = bboxes_3d.gravity_center.tolist()
         box_dims = bboxes_3d.dims.tolist()
@@ -82,6 +82,32 @@ def convert_gt_to_nusc_boxes(gt: List[Dict], id2class: dict = None) -> EvalBoxes
         for instance in instances:
             bbox_3d = instance['bbox_3d']
             bbox_label_3d = instance['bbox_label_3d']
+            box = DetectionBox(
+                sample_token = str(sample_idx),
+                translation = bbox_3d[:3],
+                size = bbox_3d[3:6],
+                rotation = pyquaternion.Quaternion(axis=[0, 0, 1], radians=bbox_3d[6]).elements.tolist(),
+                detection_name = id2class[bbox_label_3d],
+                detection_score = -1.0,
+                attribute_name="dummy_attr",
+            )
+            boxes.append(box)
+        eval_boxes.add_boxes(str(sample_idx), boxes)
+    return eval_boxes
+
+
+def convert_gt_kitti_to_nusc_boxes(gt: List[Dict], id2class: dict = None) -> EvalBoxes:
+    # SAMPLE: {'CAM2': [{'bbox_label': 0, 'bbox_label_3d': 0, 'bbox': [710.4446301035068, 144.00207112943306, 820.2930685018162, 307.58688675239017], 'bbox_3d_isvalid': True, 'bbox_3d': [1.840000033378601, 1.4700000286102295, 8.40999984741211, 1.2000000476837158, 1.8899999856948853, 0.47999998927116394, 0.009999999776482582], 'velocity': -1, 'center_2d': [763.7633056640625, 224.4706268310547], 'depth': 8.4149808883667}]}
+    eval_boxes = EvalBoxes()
+    for idx, sample in enumerate(gt):
+        sample_idx = idx
+        instances = sample["cam_instances"]['CAM2']
+        boxes = []
+        for instance in instances:
+            bbox_3d = instance['bbox_3d']
+            bbox_label_3d = instance['bbox_label_3d']
+            if id2class[bbox_label_3d] not in constants.DETECTION_NAMES:
+                continue
             box = DetectionBox(
                 sample_token = str(sample_idx),
                 translation = bbox_3d[:3],

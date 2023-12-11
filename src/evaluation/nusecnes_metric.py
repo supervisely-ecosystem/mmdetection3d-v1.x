@@ -45,6 +45,7 @@ class CustomNuScenesMetric(BaseMetric):
                  modality: dict = dict(use_camera=False, use_lidar=True),
                  prefix: Optional[str] = None,
                  collect_device: str = 'cpu',
+                 gt_is_kitti: bool = False,
                  backend_args: Optional[dict] = None) -> None:
         self.default_prefix = 'NuScenes metric'
         super().__init__(collect_device=collect_device, prefix=prefix)
@@ -56,6 +57,7 @@ class CustomNuScenesMetric(BaseMetric):
         self.ann_file = ann_file
         self.data_root = data_root
         self.modality = modality
+        self.gt_is_kitti = gt_is_kitti
         self.backend_args = backend_args
         
         self.annotations = mmengine.load(self.ann_file)
@@ -111,7 +113,11 @@ class CustomNuScenesMetric(BaseMetric):
             the metrics, and the values are corresponding results.
         """
         pred_nusc_boxes = nusecnes_eval.convert_pred_to_nusc_boxes(results, self.map_pred_label_to_class_name)
-        gt_nusc_boxes = nusecnes_eval.convert_gt_to_nusc_boxes(self.annotations["data_list"], self.map_gt_label_to_class_name)
+        
+        if self.gt_is_kitti:
+            gt_nusc_boxes = nusecnes_eval.convert_gt_kitti_to_nusc_boxes(self.annotations["data_list"], self.map_gt_label_to_class_name)
+        else:
+            gt_nusc_boxes = nusecnes_eval.convert_gt_to_nusc_boxes(self.annotations["data_list"], self.map_gt_label_to_class_name)
 
         eval = nusecnes_eval.CustomNuScenesEval(pred_nusc_boxes, gt_nusc_boxes, verbose=True)
         metrics, metric_data_list = eval.evaluate()
