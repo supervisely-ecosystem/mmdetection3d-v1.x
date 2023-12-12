@@ -20,3 +20,9 @@ def download_project(api, project_id, is_episodes, dst_project_dir, progress_cb=
 
 
 # download_project(sly.Api(), 31907, False, "app_data/sly_project_2")
+
+def download_point_cloud(api: sly.Api, pcd_id: int, dst_dir: str):
+    pcd_info = api.pointcloud.get_info_by_id(pcd_id)
+    path = f"{dst_dir}/{pcd_info.name}"
+    api.pointcloud.download_path(pcd_id, path)
+    return path

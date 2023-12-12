@@ -19,3 +19,5 @@ venv/
 /work_dirs
 *.deb
 *.run
+/apply-det3d-to-project-dataset
+/app_mmdetection_3d

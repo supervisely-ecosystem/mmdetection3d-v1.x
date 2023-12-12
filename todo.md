@@ -13,9 +13,11 @@ TODO:
 + Try to train a model
 + Pipeline Maker
 + Eval metric?
-- проверить обучение на данных китти но с дефолтным конфигом и через CLI
-- Test eval on kitti
-- Train doesn't work
++ проверить обучение на данных китти но с дефолтным конфигом и через CLI
+- Make Serving App
+- Метрики плохо себя ведут (Nuscenes по нулям)
+    Train on kitti_sample with Kitti eval - ok
+    Train on kitti_sample with Nuscenes eval - zero metrics
 - Prepare model configs
     traverse over model-index.yml
         using mmdet3d.apis.Base3DInferencer
@@ -35,6 +37,10 @@ TODO:
     opt2: draw with plotly
     mlab: https://github.com/lkk688/WaymoObjectDetection/blob/master/WaymoKitti3DVisualizev2.ipynb
 
+
+Serve
+- pcd_id
+- create_annos
 
 
 for UI:
