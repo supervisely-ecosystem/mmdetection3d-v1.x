@@ -1,61 +1,79 @@
 import os
-from mmengine.config import Config
-from src.tests.extract_weights_url import find_weights_url
-from src.sly_utils import download_point_cloud
+import re
 import supervisely as sly
+from mmengine.config import Config
+from mmdet3d.apis import LidarDet3DInferencer
+from src.tests.extract_weights_url import find_weights_url
+from src.sly_utils import download_point_cloud, upload_point_cloud
 from src.inference.pcd_inferencer import PcdDet3DInferencer
-from src.inference.functional import bbox_3d_to_cuboid3d, up_bbox3d
+from src.inference.functional import create_sly_annotation, up_bbox3d, filter_by_confidence
+from src.pcd_utils import convert_bin_to_pcd
 
 
-if __name__ == "__main__":
-    # globals    
-    api = sly.Api()
-    pcd_id = 28435493
-    project_id = 32768
-    pcd_path = "app_data/inference/000021.pcd"
-    dst_dir = "app_data/inference"
+# globals    
+api = sly.Api()
+project_id = 32768
+dataset_id = 81541
+pcd_path = "app_data/lyft/LYFT/pointcloud/host-a005_lidar1_1231201454801395736.pcd"
+# pcd_id = 28435493
+# dst_dir = "app_data/inference"
+project_meta = sly.ProjectMeta.from_json(api.project.get_meta(project_id))
 
-    if pcd_path is None:
-        os.makedirs(dst_dir, exist_ok=True)
-        pcd_path = download_point_cloud(api, pcd_id, dst_dir)
 
-    project_meta = sly.ProjectMeta.from_json(api.project.get_meta(project_id))
+_, ext = os.path.splitext(pcd_path)
+is_bin = ext == ".bin"
 
-    # Model
-    cfg_model = "mmdetection3d/configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class_custom_nus_eval.py"
-    # cfg_model = "mmdetection3d/configs/point_rcnn/point-rcnn_8xb2_kitti-3d-3class_custom.py"
-    model_index = "mmdetection3d/model-index.yml"
-    import re
-    weights_url = find_weights_url(model_index, re.sub("_custom.*\.py", ".py", cfg_model))
-    weights_url = "app_data/work_dir/epoch_80.pth"
 
-    # make config
-    cfg = Config.fromfile(cfg_model)
-    model_class_names = cfg.class_names
+# Model
+weights_url = "app_data/work_dir/epoch_20-centerpoint.pth"
+cfg_model = "mmdetection3d/configs/centerpoint/centerpoint_voxel01_second_secfpn_head-circlenms_8xb4-cyclic-20e_nus-3d.py"
+model_index = "mmdetection3d/model-index.yml"
+# weights_url = find_weights_url(model_index, re.sub("_custom.*\.py", ".py", cfg_model))
 
-    # Inference
+# Make config
+# loading cfg_model is unsafe
+cfg = Config.fromfile(cfg_model)
+model_class_names = cfg.class_names
+print(f"Model class names: {model_class_names}")
+
+# add classes to project meta
+need_update = False
+for class_name in model_class_names:
+    if project_meta.get_obj_class(class_name) is None:
+        from supervisely.geometry.cuboid_3d import Cuboid3d
+        project_meta = project_meta.add_obj_class(sly.ObjClass(class_name, Cuboid3d))
+        print(f"Added class {class_name} to project meta.")
+        need_update = True
+if need_update:
+    api.project.update_meta(project_id, project_meta.to_json())
+    api.project.pull_meta_ids(project_id, project_meta)
+
+# Inference
+if is_bin:
+    inferencer = LidarDet3DInferencer(cfg_model, weights_url, device='cuda:0')
+else:
     inferencer = PcdDet3DInferencer(cfg_model, weights_url, device='cuda:0')
-    results_dict = inferencer(inputs=dict(points=pcd_path), no_save_vis=True)
 
-    predictions = results_dict['predictions'][0]
-    box_type_3d = predictions['box_type_3d']
-    predictions.pop('box_type_3d')
-    predictions = [dict(zip(predictions, t)) for t in zip(*predictions.values())]
+results_dict = inferencer(inputs=dict(points=pcd_path), no_save_vis=True)
 
-    # create annotation
-    objects = []
-    figures = []
-    for prediction in predictions:
-        class_name = model_class_names[prediction['labels_3d']]
-        object = sly.PointcloudObject(project_meta.get_obj_class(class_name))
-        bbox3d = up_bbox3d(prediction['bboxes_3d'])
-        geometry = bbox_3d_to_cuboid3d(bbox3d)
-        figure = sly.PointcloudFigure(object, geometry)
-        objects.append(object)
-        figures.append(figure)
-    from supervisely.pointcloud_annotation.pointcloud_object_collection import PointcloudObjectCollection
-    objects = PointcloudObjectCollection(objects)
-    annotation = sly.PointcloudAnnotation(objects, figures)
-    
-    # upload annotation
-    api.pointcloud.annotation.append(pcd_id, annotation)
+predictions = results_dict['predictions'][0]
+bboxes_3d = predictions['bboxes_3d']
+labels_3d = predictions['labels_3d']
+scores_3d = predictions['scores_3d']
+bboxes_3d, labels_3d, scores_3d = filter_by_confidence(bboxes_3d, labels_3d, scores_3d, threshold=0.45)
+bboxes_3d = [up_bbox3d(bbox3d) for bbox3d in bboxes_3d]
+
+# Create annotation
+ann = create_sly_annotation(bboxes_3d, labels_3d, model_class_names, project_meta)
+
+# Upload pcd
+if is_bin:
+    convert_bin_to_pcd(pcd_path, "tmp.pcd")
+    pcd_path = "tmp.pcd"
+name = "tmp_infer_"+sly.rand_str(8)+".pcd"
+pcd_info = upload_point_cloud(api, dataset_id, pcd_path, name=name)
+print(name)
+
+# Upload annotation
+pcd_id = pcd_info.id
+api.pointcloud.annotation.append(pcd_id, ann)

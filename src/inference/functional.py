@@ -19,26 +19,26 @@ def up_bbox3d(bbox3d: list):
     return bbox3d
 
 
-def convert_predictions_to_annotation(predictions: dict, label2class_name: Union[list, dict], project_meta: sly.ProjectMeta):
-    box_type_3d = predictions['box_type_3d']
-    predictions.pop('box_type_3d')
-    predictions = [dict(zip(predictions, t)) for t in zip(*predictions.values())]
+# def convert_predictions_to_annotation(predictions: dict, label2class_name: Union[list, dict], project_meta: sly.ProjectMeta):
+#     box_type_3d = predictions['box_type_3d']
+#     predictions.pop('box_type_3d')
+#     predictions = [dict(zip(predictions, t)) for t in zip(*predictions.values())]
 
-    # create annotation
-    objects = []
-    figures = []
-    for prediction in predictions:
-        class_name = label2class_name[prediction['labels_3d']]
-        object = sly.PointcloudObject(project_meta.get_obj_class(class_name))
-        bbox3d = up_bbox3d(prediction['bboxes_3d'])
-        geometry = bbox_3d_to_cuboid3d(bbox3d)
-        figure = sly.PointcloudFigure(object, geometry)
-        objects.append(object)
-        figures.append(figure)
-    objects = PointcloudObjectCollection(objects)
-    annotation = sly.PointcloudAnnotation(objects, figures)
+#     # create annotation
+#     objects = []
+#     figures = []
+#     for prediction in predictions:
+#         class_name = label2class_name[prediction['labels_3d']]
+#         object = sly.PointcloudObject(project_meta.get_obj_class(class_name))
+#         bbox3d = up_bbox3d(prediction['bboxes_3d'])
+#         geometry = bbox_3d_to_cuboid3d(bbox3d)
+#         figure = sly.PointcloudFigure(object, geometry)
+#         objects.append(object)
+#         figures.append(figure)
+#     objects = PointcloudObjectCollection(objects)
+#     annotation = sly.PointcloudAnnotation(objects, figures)
 
-    return annotation
+#     return annotation
     
 
 
@@ -49,14 +49,15 @@ def create_sly_annotation(bboxes_3d: list, labels_3d: list, label2class_name: Un
         bboxes_3d = bboxes_3d.tolist()
     if isinstance(labels_3d, np.ndarray):
         labels_3d = labels_3d.tolist()
+    assert isinstance(bboxes_3d, list)
+    assert isinstance(labels_3d, list)
     # create annotation
     objects = []
     figures = []
     for bbox_3d, label_3d in zip(bboxes_3d, labels_3d):
         class_name = label2class_name[label_3d]
         object = sly.PointcloudObject(project_meta.get_obj_class(class_name))
-        bbox3d = up_bbox3d(bbox_3d)
-        geometry = bbox_3d_to_cuboid3d(bbox3d)
+        geometry = bbox_3d_to_cuboid3d(bbox_3d)
         figure = sly.PointcloudFigure(object, geometry)
         objects.append(object)
         figures.append(figure)
@@ -65,4 +66,43 @@ def create_sly_annotation(bboxes_3d: list, labels_3d: list, label2class_name: Un
     annotation = sly.PointcloudAnnotation(objects, figures)
 
     return annotation
+    
+
+def filter_by_confidence(bboxes_3d, labels_3d, scores_3d, threshold=0.5):
+    filtered_bboxes_3d = []
+    filtered_labels_3d = []
+    filtered_scores_3d = []
+    for bbox_3d, label_3d, score_3d in zip(bboxes_3d, labels_3d, scores_3d):
+        if score_3d > threshold:
+            filtered_bboxes_3d.append(bbox_3d)
+            filtered_labels_3d.append(label_3d)
+            filtered_scores_3d.append(score_3d)
+    return filtered_bboxes_3d, filtered_labels_3d, filtered_scores_3d
+
+
+def create_sly_annotation_episodes(bboxes_3d: list, labels_3d: list, label2class_name: Union[list, dict], project_meta: sly.ProjectMeta):
+    assert len(bboxes_3d) == len(labels_3d)
+    # numpy to list
+    if isinstance(bboxes_3d, np.ndarray):
+        bboxes_3d = bboxes_3d.tolist()
+    if isinstance(labels_3d, np.ndarray):
+        labels_3d = labels_3d.tolist()
+    assert isinstance(bboxes_3d, list)
+    assert isinstance(labels_3d, list)
+
+    # # create annotation
+    # objects = []
+    # figures = []
+    # for bbox_3d, label_3d in zip(bboxes_3d, labels_3d):
+    #     class_name = label2class_name[label_3d]
+    #     object = sly.PointcloudObject(project_meta.get_obj_class(class_name))
+    #     geometry = bbox_3d_to_cuboid3d(bbox_3d)
+    #     figure = sly.PointcloudFigure(object, geometry)
+    #     objects.append(object)
+    #     figures.append(figure)
+        
+    # objects = PointcloudObjectCollection(objects)
+    # annotation = sly.PointcloudEpisodeAnnotation(objects, figures)
+
+    # return annotation
     

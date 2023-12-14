@@ -14,6 +14,20 @@ TODO:
 + Pipeline Maker
 + Eval metric?
 + проверить обучение на данных китти но с дефолтным конфигом и через CLI
++ Infer and show in platform
+- visualize batch inputs in training on KITTI.
+- возможно дотренивать модель которая училась на KITTI - неправильно, тк там делается velodyne_reduced
+    - трэин и так работал
+    - проблема метрики была в разных системах координат в KITTI
+- дальше нужно сделать обучение на наших данных
+
+
+add_dummy_velocities:
+    centernet
+sample_points:
+    point_rcnn
+
+
 - Make Serving App
 - Метрики плохо себя ведут (Nuscenes по нулям)
     Train on kitti_sample with Kitti eval - ok
@@ -39,8 +53,6 @@ TODO:
 
 
 Serve
-- pcd_id
-- create_annos
 
 
 for UI:
