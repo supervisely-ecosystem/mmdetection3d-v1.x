@@ -22,7 +22,9 @@ class CustomDataset(Det3DDataset):
                  load_eval_anns: bool = True,
                  backend_args: Optional[dict] = None,
                  show_ins_var: bool = False,
+                 add_dummy_velocities: bool = False,
                  **kwargs) -> None:
+        self.add_dummy_velocities = add_dummy_velocities
         sly_meta = mmengine.load(f"{data_root}/meta.json")
         sly_meta = sly.ProjectMeta.from_json(sly_meta)
         classes = [x.name for x in sly_meta.obj_classes]
@@ -52,11 +54,21 @@ class CustomDataset(Det3DDataset):
         if ann_info is None:
             ann_info = dict()
             # empty instance
-            ann_info['gt_bboxes_3d'] = np.zeros((0, 7), dtype=np.float32)
+            if self.add_dummy_velocities:
+                ann_info['gt_bboxes_3d'] = np.zeros((0, 9), dtype=np.float32)
+            else:
+                ann_info['gt_bboxes_3d'] = np.zeros((0, 7), dtype=np.float32)
             ann_info['gt_labels_3d'] = np.zeros(0, dtype=np.int64)
-
-        ann_info = self._remove_dontcare(ann_info)  # removes gt with -1 label
-        ann_info['gt_bboxes_3d'] = LiDARInstance3DBoxes(ann_info['gt_bboxes_3d'], origin=(0.5, 0.5, 0.5))
+        else:
+            # add dummy velocities
+            if self.add_dummy_velocities:
+                bboxes_3d = ann_info['gt_bboxes_3d']
+                bboxes_3d = np.concatenate([bboxes_3d, np.zeros((bboxes_3d.shape[0], 2), dtype=bboxes_3d.dtype)], axis=1)
+                ann_info['gt_bboxes_3d'] = bboxes_3d
+                
+        ann_info = self._remove_dontcare(ann_info)  # removes gt with "-1" label
+        box_dim = ann_info['gt_bboxes_3d'].shape[-1]
+        ann_info['gt_bboxes_3d'] = LiDARInstance3DBoxes(ann_info['gt_bboxes_3d'], box_dim=box_dim, origin=(0.5, 0.5, 0.5))
         return ann_info
     
     def filter_data(self) -> List[dict]:

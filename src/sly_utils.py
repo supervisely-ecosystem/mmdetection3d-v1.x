@@ -33,5 +33,3 @@ def upload_point_cloud(api: sly.Api, dataset_id: int, pcd_path: str, name: str):
         # convert bin to pcd
         pass
     return api.pointcloud.upload_path(dataset_id, name, pcd_path)
-
-# download_project(sly.Api(), 31907, False, "app_data/sly_project_2")

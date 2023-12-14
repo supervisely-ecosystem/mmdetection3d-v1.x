@@ -79,7 +79,7 @@ def insert_aug_pipeline(train_pipeline: list, aug_pipeline: list):
     return p1 + p2
 
 
-def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root, selected_classes):
+def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root, selected_classes, add_dummy_velocities):
 
     persistent_workers = num_workers != 0
 
@@ -94,6 +94,7 @@ def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data
                 ann_file='infos_train.pkl',
                 pipeline=train_pipeline,
                 selected_classes=selected_classes,
+                add_dummy_velocities=add_dummy_velocities,
                 test_mode=False))
     
     val_dataloader = dict(
@@ -108,6 +109,7 @@ def get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data
                 ann_file='infos_val.pkl',
                 pipeline=test_pipeline,
                 selected_classes=selected_classes,
+                add_dummy_velocities=add_dummy_velocities,
                 test_mode=True))
     
     return train_dataloader, val_dataloader
@@ -124,10 +126,10 @@ def get_evaluator(data_root, selected_classes):
     return val_evaluator
 
 
-def configure_datasets(cfg: Config, data_root: str, batch_size: int, num_workers: int, lidar_dims: int, point_cloud_range: list, aug_pipeline: list, selected_classes: list, num_points: int = None, sample_range: float = None):
+def configure_datasets(cfg: Config, data_root: str, batch_size: int, num_workers: int, lidar_dims: int, point_cloud_range: list, aug_pipeline: list, selected_classes: list, num_points: int = None, sample_range: float = None, add_dummy_velocities: bool = False):
     train_pipeline, test_pipeline = get_pipelines(lidar_dims, point_cloud_range, num_points, sample_range)
     train_pipeline = insert_aug_pipeline(train_pipeline, aug_pipeline)
-    train_dataloader, val_dataloader = get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root, selected_classes)
+    train_dataloader, val_dataloader = get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root, selected_classes, add_dummy_velocities)
     val_evaluator = get_evaluator(data_root, selected_classes)
     cfg.train_dataloader = train_dataloader
     cfg.val_dataloader = val_dataloader
