@@ -15,11 +15,20 @@ TODO:
 + Eval metric?
 + проверить обучение на данных китти но с дефолтным конфигом и через CLI
 + Infer and show in platform
-- visualize batch inputs in training on KITTI.
-- возможно дотренивать модель которая училась на KITTI - неправильно, тк там делается velodyne_reduced
-    - трэин и так работал
-    - проблема метрики была в разных системах координат в KITTI
-- дальше нужно сделать обучение на наших данных
++ visualize batch inputs in training on KITTI.
++ возможно дотренивать модель которая училась на KITTI - неправильно, тк там делается velodyne_reduced
+    + трэин и так работал
+    + проблема метрики была в разных системах координат в KITTI
++ дальше нужно сделать обучение на наших данных
+
+- Test all detection models: 
+    - hint: loading existed 'cfg_model' is unsafe, because of inappropriate pipelines
+    - еще раз проверить pointpillars
+        - взять предоученную на nuscenes
+        - обучать на LYFT
+        - не забыть про unsafe loading cfg_model при инференсе
+    - Как быть с захардкожеными классами в моделях?
+        - можно брать исходную версию модели, где не привязок к классом (1.5 / sqrt(3))
 
 
 add_dummy_velocities:
@@ -62,6 +71,39 @@ for UI:
 - augmentations?
 - hyperparameters + config
 - metrics (KITTI, Waymo, etc)
+
+
+LiDAR-based 3D Object Detection models:
+    SECOND (Sensor'2018)
+    PointPillars (CVPR'2019)
+    PointRCNN (CVPR'2019)
+    SSN (ECCV'2020)
+    3DSSD (CVPR'2020)
+    SA-SSD (CVPR'2020)
+    Part-A2 (TPAMI'2020)
+    PV-RCNN (CVPR'2020)
+    CenterPoint (CVPR'2021)
+    CenterFormer (ECCV'2022)
+    BEVFusion (ICRA'2023) (in lidar-mode)
+
+Camera-based 3D Object Detection (Monocular 3D):
+    ImVoxelNet (WACV'2022)
+    SMOKE (CVPRW'2020)
+    FCOS3D (ICCVW'2021)
+    PGD (CoRL'2021)
+    MonoFlex (CVPR'2021)
+    DETR3D (CoRL'2021)
+    PETR (ECCV'2022)
+
+Multi-modal 3D Object Detection:
+    MVXNet (ICRA'2019)
+    BEVFusion (ICRA'2023)
+
+3D Semantic Segmentation:
+    MinkUNet (CVPR'2019)
+    SPVCNN (ECCV'2020)
+    Cylinder3D (CVPR'2021)
+    TPVFormer (CVPR'2023)
 
 
 # Backlog
