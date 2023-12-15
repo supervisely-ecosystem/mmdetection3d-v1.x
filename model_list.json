@@ -1,0 +1,632 @@
+{
+    "detection_3d": [
+        {
+            "name": "SECOND",
+            "paper": "Sensor",
+            "year": 2018,
+            "model_name": "second",
+            "base_configs": [
+                "configs/_base_/models/second_hv_secfpn_waymo.py",
+                "configs/_base_/models/second_hv_secfpn_kitti.py"
+            ],
+            "pre_trained_configs": [
+                {
+                    "config": "configs/second/second_hv_secfpn_8xb6-80e_kitti-3d-car.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.1.0_models/second/second_hv_secfpn_8xb6-80e_kitti-3d-car/second_hv_secfpn_8xb6-80e_kitti-3d-car-75d9305e.pth",
+                    "metadata": {
+                        "Training Data": "KITTI",
+                        "Training Memory (GB)": 5.4,
+                        "Training Resources": "8x V100 GPUs"
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "KITTI",
+                            "Metrics": {
+                                "mAP": 78.2
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/second/second_hv_secfpn_8xb6-80e_kitti-3d-3class.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.1.0_models/second/second_hv_secfpn_8xb6-80e_kitti-3d-3class/second_hv_secfpn_8xb6-80e_kitti-3d-3class-b086d0a3.pth",
+                    "metadata": {
+                        "Training Data": "KITTI",
+                        "Training Memory (GB)": 5.4,
+                        "Training Resources": "8x V100 GPUs"
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "KITTI",
+                            "Metrics": {
+                                "mAP": 65.3
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/second/second_hv_secfpn_8xb6-amp-80e_kitti-3d-car.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v0.1.0_models/fp16/hv_second_secfpn_fp16_6x8_80e_kitti-3d-car/hv_second_secfpn_fp16_6x8_80e_kitti-3d-car_20200924_211301-1f5ad833.pth",
+                    "metadata": {
+                        "Training Techniques": [
+                            "AdamW",
+                            "Mixed Precision Training"
+                        ],
+                        "Training Resources": "8x TITAN Xp",
+                        "Training Data": "KITTI",
+                        "Training Memory (GB)": 2.9
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "KITTI",
+                            "Metrics": {
+                                "mAP": 78.72
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/second/second_hv_secfpn_8xb6-amp-80e_kitti-3d-3class.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v0.1.0_models/fp16/hv_second_secfpn_fp16_6x8_80e_kitti-3d-3class/hv_second_secfpn_fp16_6x8_80e_kitti-3d-3class_20200925_110059-05f67bdf.pth",
+                    "metadata": {
+                        "Training Techniques": [
+                            "AdamW",
+                            "Mixed Precision Training"
+                        ],
+                        "Training Resources": "8x TITAN Xp",
+                        "Training Data": "KITTI",
+                        "Training Memory (GB)": 2.9
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "KITTI",
+                            "Metrics": {
+                                "mAP": 67.4
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "PointPillars",
+            "paper": "CVPR",
+            "year": 2019,
+            "model_name": "pointpillars",
+            "base_configs": [
+                "configs/_base_/models/pointpillars_hv_fpn_range100_lyft.py",
+                "configs/_base_/models/pointpillars_hv_secfpn_waymo.py",
+                "configs/_base_/models/pointpillars_hv_fpn_nus.py",
+                "configs/_base_/models/pointpillars_hv_secfpn_kitti.py",
+                "configs/_base_/models/pointpillars_hv_fpn_lyft.py"
+            ],
+            "pre_trained_configs": [
+                {
+                    "config": "configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-car.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/pointpillars/hv_pointpillars_secfpn_6x8_160e_kitti-3d-car/hv_pointpillars_secfpn_6x8_160e_kitti-3d-car_20220331_134606-d42d15ed.pth",
+                    "metadata": {
+                        "Training Data": "KITTI",
+                        "Training Memory (GB)": 5.4,
+                        "Training Resources": "8x V100 GPUs"
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "KITTI",
+                            "Metrics": {
+                                "AP": 77.6
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/pointpillars/hv_pointpillars_secfpn_6x8_160e_kitti-3d-3class/hv_pointpillars_secfpn_6x8_160e_kitti-3d-3class_20220301_150306-37dc2420.pth",
+                    "metadata": {
+                        "Training Data": "KITTI",
+                        "Training Memory (GB)": 5.5,
+                        "Training Resources": "8x V100 GPUs"
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "KITTI",
+                            "Metrics": {
+                                "AP": 64.07
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/pointpillars/pointpillars_hv_secfpn_sbn-all_8xb4-2x_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/pointpillars/hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d/hv_pointpillars_secfpn_sbn-all_4x8_2x_nus-3d_20210826_225857-f19d00a3.pth",
+                    "metadata": {
+                        "Training Data": "nuScenes",
+                        "Training Memory (GB)": 16.4,
+                        "Training Resources": "8x V100 GPUs"
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 34.33,
+                                "NDS": 49.1
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/pointpillars/pointpillars_hv_secfpn_sbn-all_8xb4-amp-2x_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v0.1.0_models/fp16/hv_pointpillars_secfpn_sbn-all_fp16_2x8_2x_nus-3d/hv_pointpillars_secfpn_sbn-all_fp16_2x8_2x_nus-3d_20201020_222626-c3f0483e.pth",
+                    "metadata": {
+                        "Training Techniques": [
+                            "AdamW",
+                            "Mixed Precision Training"
+                        ],
+                        "Training Resources": "8x TITAN Xp",
+                        "Architecture": [
+                            "Hard Voxelization"
+                        ],
+                        "Training Data": "nuScenes",
+                        "Training Memory (GB)": 8.37
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 35.19,
+                                "NDS": 50.27
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/pointpillars/pointpillars_hv_fpn_sbn-all_8xb4-2x_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/pointpillars/hv_pointpillars_fpn_sbn-all_4x8_2x_nus-3d/hv_pointpillars_fpn_sbn-all_4x8_2x_nus-3d_20210826_104936-fca299c1.pth",
+                    "metadata": {
+                        "Training Data": "nuScenes",
+                        "Training Memory (GB)": 16.3,
+                        "Training Resources": "8x V100 GPUs"
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 39.71,
+                                "NDS": 53.15
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/pointpillars/pointpillars_hv_fpn_sbn-all_8xb4-amp-2x_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v0.1.0_models/fp16/hv_pointpillars_fpn_sbn-all_fp16_2x8_2x_nus-3d/hv_pointpillars_fpn_sbn-all_fp16_2x8_2x_nus-3d_20201021_120719-269f9dd6.pth",
+                    "metadata": {
+                        "Training Techniques": [
+                            "AdamW",
+                            "Mixed Precision Training"
+                        ],
+                        "Training Resources": "8x TITAN Xp",
+                        "Architecture": [
+                            "Hard Voxelization"
+                        ],
+                        "Training Data": "nuScenes",
+                        "Training Memory (GB)": 8.4
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 39.26,
+                                "NDS": 53.26
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/pointpillars/pointpillars_hv_secfpn_sbn-all_8xb2-2x_lyft-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/pointpillars/hv_pointpillars_secfpn_sbn-all_2x8_2x_lyft-3d/hv_pointpillars_secfpn_sbn-all_2x8_2x_lyft-3d_20210829_100455-82b81c39.pth",
+                    "metadata": {
+                        "Training Data": "Lyft",
+                        "Training Memory (GB)": 12.2,
+                        "Training Resources": "8x V100 GPUs"
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "Lyft",
+                            "Metrics": {
+                                "Private Score": 13.8,
+                                "Public Score": 14.1
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/pointpillars/pointpillars_hv_fpn_sbn-all_8xb2-2x_lyft-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/pointpillars/hv_pointpillars_fpn_sbn-all_2x8_2x_lyft-3d/hv_pointpillars_fpn_sbn-all_2x8_2x_lyft-3d_20210822_095429-0b3d6196.pth",
+                    "metadata": {
+                        "Training Data": "Lyft",
+                        "Training Memory (GB)": 9.2,
+                        "Training Resources": "8x V100 GPUs"
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "Lyft",
+                            "Metrics": {
+                                "Private Score": 14.0,
+                                "Public Score": 15.0
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/pointpillars/pointpillars_hv_secfpn_sbn_2x16_2x_waymoD5-3d-car.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v0.1.0_models/pointpillars/hv_pointpillars_secfpn_sbn_2x16_2x_waymoD5-3d-car/hv_pointpillars_secfpn_sbn_2x16_2x_waymoD5-3d-car_20200901_204315-302fc3e7.pth",
+                    "metadata": {
+                        "Training Data": "Waymo",
+                        "Training Memory (GB)": 7.76,
+                        "Training Resources": "8x GeForce GTX 1080 Ti"
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "Waymo",
+                            "Metrics": {
+                                "mAP@L1": 70.2,
+                                "mAPH@L1": 69.6,
+                                "mAP@L2": 62.6,
+                                "mAPH@L2": 62.1
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/pointpillars/pointpillars_hv_secfpn_sbn-all_16xb2-2x_waymoD5-3d-3class.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v0.1.0_models/pointpillars/hv_pointpillars_secfpn_sbn_2x16_2x_waymoD5-3d-3class/hv_pointpillars_secfpn_sbn_2x16_2x_waymoD5-3d-3class_20200831_204144-d1a706b1.pth",
+                    "metadata": {
+                        "Training Data": "Waymo",
+                        "Training Memory (GB)": 8.12,
+                        "Training Resources": "8x GeForce GTX 1080 Ti"
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "Waymo",
+                            "Metrics": {
+                                "mAP@L1": 64.7,
+                                "mAPH@L1": 57.6,
+                                "mAP@L2": 58.4,
+                                "mAPH@L2": 52.1
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "PointRCNN",
+            "paper": "CVPR",
+            "year": 2019,
+            "model_name": "point_rcnn",
+            "base_configs": [
+                "configs/_base_/models/point_rcnn.py"
+            ],
+            "pre_trained_configs": [
+                {
+                    "config": "configs/point_rcnn/point-rcnn_8xb2_kitti-3d-3class.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/point_rcnn/point_rcnn_2x8_kitti-3d-3classes_20211208_151344.pth",
+                    "metadata": {
+                        "Training Memory (GB)": 4.6
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "KITTI",
+                            "Metrics": {
+                                "mAP": 70.83
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "SSN",
+            "paper": "ECCV",
+            "year": 2020,
+            "model_name": "ssn",
+            "pre_trained_configs": [
+                {
+                    "config": "configs/ssn/ssn_hv_secfpn_sbn-all_16xb2-2x_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/ssn/hv_ssn_secfpn_sbn-all_2x16_2x_nus-3d/hv_ssn_secfpn_sbn-all_2x16_2x_nus-3d_20210830_101351-51915986.pth",
+                    "metadata": {
+                        "Training Data": "nuScenes",
+                        "Training Memory (GB)": 3.6
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 40.91,
+                                "NDS": 54.44
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/ssn/ssn_hv_regnet-400mf_secfpn_sbn-all_16xb2-2x_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/ssn/hv_ssn_regnet-400mf_secfpn_sbn-all_2x16_2x_nus-3d/hv_ssn_regnet-400mf_secfpn_sbn-all_2x16_2x_nus-3d_20210829_210615-361e5e04.pth",
+                    "metadata": {
+                        "Training Data": "nuScenes",
+                        "Training Memory (GB)": 5.1
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 46.65,
+                                "NDS": 58.24
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/ssn/ssn_hv_secfpn_sbn-all_16xb2-2x_lyft-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/ssn/hv_ssn_secfpn_sbn-all_2x16_2x_lyft-3d/hv_ssn_secfpn_sbn-all_2x16_2x_lyft-3d_20210822_134731-46841b41.pth",
+                    "metadata": {
+                        "Training Data": "Lyft",
+                        "Training Memory (GB)": 8.5
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "Lyft",
+                            "Metrics": {
+                                "Private Score": 17.5,
+                                "Public Score": 17.5
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/ssn/hv_ssn_regnet-400mf_secfpn_sbn-all_16xb1-2x_lyft-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/ssn/hv_ssn_regnet-400mf_secfpn_sbn-all_1x16_2x_lyft-3d/hv_ssn_regnet-400mf_secfpn_sbn-all_1x16_2x_lyft-3d_20210829_122825-d93475a1.pth",
+                    "metadata": {
+                        "Training Data": "Lyft",
+                        "Training Memory (GB)": 7.4
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "Lyft",
+                            "Metrics": {
+                                "Private Score": 17.9,
+                                "Public Score": 18.0
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "3DSSD",
+            "paper": "CVPR",
+            "year": 2020,
+            "model_name": "3dssd",
+            "base_configs": [
+                "configs/_base_/models/3dssd.py"
+            ],
+            "pre_trained_configs": [
+                {
+                    "config": "configs/3dssd/3dssd_4xb4_kitti-3d-car.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/3dssd/3dssd_4x4_kitti-3d-car/3dssd_4x4_kitti-3d-car_20210818_203828-b89c8fc4.pth",
+                    "metadata": {
+                        "Training Memory (GB)": 4.7
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "KITTI",
+                            "Metrics": {
+                                "mAP": 78.58
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Part-A^2",
+            "paper": "TPAMI",
+            "year": 2020,
+            "model_name": "parta2",
+            "base_configs": [
+                "configs/_base_/models/parta2.py"
+            ],
+            "pre_trained_configs": [
+                {
+                    "config": "configs/parta2/parta2_hv_secfpn_8xb2-cyclic-80e_kitti-3d-3class.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/parta2/hv_PartA2_secfpn_2x8_cyclic_80e_kitti-3d-3class/hv_PartA2_secfpn_2x8_cyclic_80e_kitti-3d-3class_20210831_022017-454a5344.pth",
+                    "metadata": {
+                        "Training Memory (GB)": 4.1
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "KITTI",
+                            "Metrics": {
+                                "mAP": 68.33
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/parta2/parta2_hv_secfpn_8xb2-cyclic-80e_kitti-3d-car.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/parta2/hv_PartA2_secfpn_2x8_cyclic_80e_kitti-3d-car/hv_PartA2_secfpn_2x8_cyclic_80e_kitti-3d-car_20210831_022017-cb7ff621.pth",
+                    "metadata": {
+                        "Training Memory (GB)": 4.0
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "KITTI",
+                            "Metrics": {
+                                "mAP": 79.08
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "PV-RCNN",
+            "paper": "CVPR",
+            "year": 2020,
+            "model_name": "pv_rcnn",
+            "pre_trained_configs": [
+                {
+                    "config": "configs/pv_rcnn/pv_rcnn_8xb2-80e_kitti-3d-3class.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.1.0_models/pv_rcnn/pv_rcnn_8xb2-80e_kitti-3d-3class/pv_rcnn_8xb2-80e_kitti-3d-3class_20221117_234428-b384d22f.pth",
+                    "metadata": {
+                        "Training Memory (GB)": 5.4
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "KITTI",
+                            "Metrics": {
+                                "mAP": 72.28
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "CenterPoint",
+            "paper": "CVPR",
+            "year": 2021,
+            "model_name": "centerpoint",
+            "base_configs": [
+                "configs/_base_/models/centerpoint_voxel01_second_secfpn_nus.py",
+                "configs/_base_/models/centerpoint_pillar02_second_secfpn_nus.py"
+            ],
+            "pre_trained_configs": [
+                {
+                    "config": "configs/centerpoint/centerpoint_voxel01_second_secfpn_head-circlenms_8xb4-cyclic-20e_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/centerpoint/centerpoint_01voxel_second_secfpn_circlenms_4x8_cyclic_20e_nus/centerpoint_01voxel_second_secfpn_circlenms_4x8_cyclic_20e_nus_20220810_030004-9061688e.pth",
+                    "metadata": {
+                        "Training Memory (GB)": 5.2
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 56.11,
+                                "NDS": 64.61
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/centerpoint/centerpoint_voxel01_second_secfpn_head-dcn-circlenms_8xb4-cyclic-20e_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/centerpoint/centerpoint_01voxel_second_secfpn_dcn_circlenms_4x8_cyclic_20e_nus/centerpoint_01voxel_second_secfpn_dcn_circlenms_4x8_cyclic_20e_nus_20220810_052355-a6928835.pth",
+                    "metadata": {
+                        "Training Memory (GB)": 5.5
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 56.1,
+                                "NDS": 64.69
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/centerpoint/centerpoint_voxel0075_second_secfpn_head-circlenms_8xb4-cyclic-20e_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/centerpoint/centerpoint_0075voxel_second_secfpn_circlenms_4x8_cyclic_20e_nus/centerpoint_0075voxel_second_secfpn_circlenms_4x8_cyclic_20e_nus_20220810_011659-04cb3a3b.pth",
+                    "metadata": {
+                        "Training Memory (GB)": 8.2
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 56.54,
+                                "NDS": 65.17
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/centerpoint/centerpoint_voxel0075_second_secfpn_head-dcn-circlenms_8xb4-cyclic-20e_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/centerpoint/centerpoint_0075voxel_second_secfpn_dcn_circlenms_4x8_cyclic_20e_nus/centerpoint_0075voxel_second_secfpn_dcn_circlenms_4x8_cyclic_20e_nus_20220810_025930-657f67e0.pth",
+                    "metadata": {
+                        "Training Memory (GB)": 8.7
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 56.92,
+                                "NDS": 65.27
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/centerpoint/centerpoint_pillar02_second_secfpn_head-circlenms_8xb4-cyclic-20e_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/centerpoint/centerpoint_02pillar_second_secfpn_circlenms_4x8_cyclic_20e_nus/centerpoint_02pillar_second_secfpn_circlenms_4x8_cyclic_20e_nus_20220811_031844-191a3822.pth",
+                    "metadata": {
+                        "Training Memory (GB)": 4.6
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 48.7,
+                                "NDS": 59.62
+                            }
+                        }
+                    ]
+                },
+                {
+                    "config": "configs/centerpoint/centerpoint_pillar02_second_secfpn_head-dcn_8xb4-cyclic-20e_nus-3d.py",
+                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/centerpoint/centerpoint_02pillar_second_secfpn_dcn_4x8_cyclic_20e_nus/centerpoint_02pillar_second_secfpn_dcn_4x8_cyclic_20e_nus_20220811_045458-808e69ad.pth",
+                    "metadata": {
+                        "Training Memory (GB)": 4.9
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 48.38,
+                                "NDS": 59.79
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
