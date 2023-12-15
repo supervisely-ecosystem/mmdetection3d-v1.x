@@ -32,15 +32,42 @@ TODO:
 
 
 add_dummy_velocities:
-    centernet
+    - centerpoint
 sample_points:
-    point_rcnn
+    - point_rcnn
+What is bbox dim?
+    - It is controlled by "bbox_coder" in config
+    - DeltaXYZWLHRBBoxCoder has code_size=7 by default (mmdetection3d/mmdet3d/models/task_modules/coders/delta_xyzwhlr_bbox_coder.py)
+
+bbox_coder.code_size:
+    NuScences = 9
+    KITTI, LYFT, Waymo = 7
+
+What do we care about?
+- num_classes : меняем слой
+- lidar_dims : if pre-trained: add zeros, else: change in_channels
+- point_cloud_range : либо ставим константый, либо считаем статистику
+- voxel_size : point_cloud_range
+- num_points, sample_range : смотрим на model's pipeline
+- ?add_dummy_velocities : смотрим на bbox_coder.code_size либо дописываем нули, либо меняем слой
+- ?anchor_generator: z_axis
+
+voxel_size = [0.1, 0.1, 0.2]
+
+Как менять конфиг:
+- загружаем pre-trained конфиг
+- загружаем base_model конфиг
+- совпадают ли lidar_dims в pipeline и in_channels?
+- из какого конфига брать модель?
+    смотрим меняется ли model в pre-trained конфиг?
+    если да, то что именно?
+- меняется ли pipeline?
+- если мы не берем веса pre-trained, то можем кастомизировать как хотим. Иначе - берем все из pre-trained config
 
 
+
+- load your custom config
 - Make Serving App
-- Метрики плохо себя ведут (Nuscenes по нулям)
-    Train on kitti_sample with Kitti eval - ok
-    Train on kitti_sample with Nuscenes eval - zero metrics
 - Prepare model configs
     traverse over model-index.yml
         using mmdet3d.apis.Base3DInferencer
