@@ -59,6 +59,9 @@ def convert_pred_to_nusc_boxes(pred: List[Dict], id2class: dict = None) -> EvalB
 
         boxes = []
         for i in range(len(bboxes_3d)):
+            if labels_3d[i] not in id2class:
+                print(f"Skipping label {labels_3d[i]}")
+                continue
             box = DetectionBox(
                 sample_token = str(sample_idx),
                 translation = box_gravity_center[i],
