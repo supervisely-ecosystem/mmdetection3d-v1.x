@@ -23,11 +23,13 @@ class PcdDet3DInferencer(LidarDet3DInferencer):
         """Initialize the test pipeline."""
         pipeline_cfg = cfg.test_dataloader.dataset.pipeline
 
-        load_point_idx = self._get_transform_idx(pipeline_cfg,
-                                                 'LoadPointsFromFile')
+        load_point_idx = self._get_transform_idx(pipeline_cfg, 'LoadPointsFromFile')
+        if load_point_idx == -1:
+            load_point_idx = self._get_transform_idx(pipeline_cfg, 'LoadPointsFromPcdFile')
+        
         if load_point_idx == -1:
             raise ValueError(
-                'LoadPointsFromFile is not found in the test pipeline')
+                'LoadPointsFromFile/LoadPointsFromPcdFile is not found in the test pipeline')
 
         load_cfg = pipeline_cfg[load_point_idx]
         self.coord_type, self.load_dim = load_cfg['coord_type'], load_cfg[
