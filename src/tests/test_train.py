@@ -85,7 +85,7 @@ if __name__ == "__main__":
     # Dataset
     data_root = "kitti_sample"
     # data_root = "app_data/sly_project"
-    batch_size = 4
+    batch_size = 6
     num_workers = 4
     lidar_dims = 4
     point_cloud_range = [0, -39.68, -3, 69.12, 39.68, 1]  # PointPillars
@@ -93,18 +93,18 @@ if __name__ == "__main__":
     # TODO: voxel_size = [0.05, 0.05, 0.1]
     selected_classes = ['Pedestrian', 'Cyclist', 'Car']
     selected_classes = {x: i for i, x in enumerate(selected_classes)}
-    # num_points, sample_range = 16384, 40.0
-    num_points, sample_range = None, None
+    num_points, sample_range = 16384, 40.0
+    # num_points, sample_range = None, None
     aug_pipeline = detection3d.get_default_aug_pipeline()
 
     # Model
-    cfg_model = "mmdetection3d/configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py"
-    # cfg_model = "mmdetection3d/configs/point_rcnn/point-rcnn_8xb2_kitti-3d-3class.py"
+    # cfg_model = "mmdetection3d/configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py"
+    cfg_model = "mmdetection3d/configs/point_rcnn/point-rcnn_8xb2_kitti-3d-3class_custom.py"
     model_index = "mmdetection3d/model-index.yml"
-    weights_url = find_weights_url(model_index, cfg_model)
+    weights_url = find_weights_url(model_index, cfg_model.replace("_custom", ""))
     
     # Runner
-    max_epochs = 50
+    max_epochs = 80
     val_interval = 1
 
     # make config

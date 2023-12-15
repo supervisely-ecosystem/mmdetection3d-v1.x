@@ -25,13 +25,14 @@ is_bin = ext == ".bin"
 
 
 # Model
-weights_url = "app_data/work_dir/epoch_20-centerpoint.pth"
-cfg_model = "mmdetection3d/configs/centerpoint/centerpoint_voxel01_second_secfpn_head-circlenms_8xb4-cyclic-20e_nus-3d.py"
+weights_url = "app_data/work_dir/epoch_10-pointpillars.pth"
+# cfg_model = "mmdetection3d/configs/centerpoint/centerpoint_voxel01_second_secfpn_head-circlenms_8xb4-cyclic-20e_nus-3d.py"
+cfg_model = "app_data/work_dir/20231215_125044-pointpillars/vis_data/config.py"
 model_index = "mmdetection3d/model-index.yml"
 # weights_url = find_weights_url(model_index, re.sub("_custom.*\.py", ".py", cfg_model))
 
 # Make config
-# loading cfg_model is unsafe
+# loading existed 'cfg_model' is unsafe, because of inappropriate pipelines
 cfg = Config.fromfile(cfg_model)
 model_class_names = cfg.class_names
 print(f"Model class names: {model_class_names}")

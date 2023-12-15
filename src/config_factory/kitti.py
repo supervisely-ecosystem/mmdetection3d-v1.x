@@ -142,7 +142,7 @@ def configure_datasets(cfg: Config, data_root: str, batch_size: int, num_workers
     train_pipeline, test_pipeline = get_pipelines(lidar_dims, point_cloud_range, num_points, sample_range)
     train_pipeline = insert_aug_pipeline(train_pipeline, aug_pipeline)
     train_dataloader, val_dataloader = get_dataloaders(batch_size, num_workers, train_pipeline, test_pipeline, data_root)
-    val_evaluator = get_evaluator_nusc(data_root, selected_classes)
+    val_evaluator = get_evaluator(data_root, selected_classes)
     cfg.train_dataloader = train_dataloader
     cfg.val_dataloader = val_dataloader
     cfg.test_dataloader = val_dataloader
