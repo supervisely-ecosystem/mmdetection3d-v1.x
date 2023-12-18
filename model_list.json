@@ -161,32 +161,6 @@
                     ]
                 },
                 {
-                    "config": "configs/pointpillars/pointpillars_hv_secfpn_sbn-all_8xb4-amp-2x_nus-3d.py",
-                    "weights": "https://download.openmmlab.com/mmdetection3d/v0.1.0_models/fp16/hv_pointpillars_secfpn_sbn-all_fp16_2x8_2x_nus-3d/hv_pointpillars_secfpn_sbn-all_fp16_2x8_2x_nus-3d_20201020_222626-c3f0483e.pth",
-                    "metadata": {
-                        "Training Techniques": [
-                            "AdamW",
-                            "Mixed Precision Training"
-                        ],
-                        "Training Resources": "8x TITAN Xp",
-                        "Architecture": [
-                            "Hard Voxelization"
-                        ],
-                        "Training Data": "nuScenes",
-                        "Training Memory (GB)": 8.37
-                    },
-                    "results": [
-                        {
-                            "Task": "3D Object Detection",
-                            "Dataset": "nuScenes",
-                            "Metrics": {
-                                "mAP": 35.19,
-                                "NDS": 50.27
-                            }
-                        }
-                    ]
-                },
-                {
                     "config": "configs/pointpillars/pointpillars_hv_fpn_sbn-all_8xb4-2x_nus-3d.py",
                     "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/pointpillars/hv_pointpillars_fpn_sbn-all_4x8_2x_nus-3d/hv_pointpillars_fpn_sbn-all_4x8_2x_nus-3d_20210826_104936-fca299c1.pth",
                     "metadata": {
@@ -201,32 +175,6 @@
                             "Metrics": {
                                 "mAP": 39.71,
                                 "NDS": 53.15
-                            }
-                        }
-                    ]
-                },
-                {
-                    "config": "configs/pointpillars/pointpillars_hv_fpn_sbn-all_8xb4-amp-2x_nus-3d.py",
-                    "weights": "https://download.openmmlab.com/mmdetection3d/v0.1.0_models/fp16/hv_pointpillars_fpn_sbn-all_fp16_2x8_2x_nus-3d/hv_pointpillars_fpn_sbn-all_fp16_2x8_2x_nus-3d_20201021_120719-269f9dd6.pth",
-                    "metadata": {
-                        "Training Techniques": [
-                            "AdamW",
-                            "Mixed Precision Training"
-                        ],
-                        "Training Resources": "8x TITAN Xp",
-                        "Architecture": [
-                            "Hard Voxelization"
-                        ],
-                        "Training Data": "nuScenes",
-                        "Training Memory (GB)": 8.4
-                    },
-                    "results": [
-                        {
-                            "Task": "3D Object Detection",
-                            "Dataset": "nuScenes",
-                            "Metrics": {
-                                "mAP": 39.26,
-                                "NDS": 53.26
                             }
                         }
                     ]
@@ -265,27 +213,6 @@
                             "Metrics": {
                                 "Private Score": 14.0,
                                 "Public Score": 15.0
-                            }
-                        }
-                    ]
-                },
-                {
-                    "config": "configs/pointpillars/pointpillars_hv_secfpn_sbn_2x16_2x_waymoD5-3d-car.py",
-                    "weights": "https://download.openmmlab.com/mmdetection3d/v0.1.0_models/pointpillars/hv_pointpillars_secfpn_sbn_2x16_2x_waymoD5-3d-car/hv_pointpillars_secfpn_sbn_2x16_2x_waymoD5-3d-car_20200901_204315-302fc3e7.pth",
-                    "metadata": {
-                        "Training Data": "Waymo",
-                        "Training Memory (GB)": 7.76,
-                        "Training Resources": "8x GeForce GTX 1080 Ti"
-                    },
-                    "results": [
-                        {
-                            "Task": "3D Object Detection",
-                            "Dataset": "Waymo",
-                            "Metrics": {
-                                "mAP@L1": 70.2,
-                                "mAPH@L1": 69.6,
-                                "mAP@L2": 62.6,
-                                "mAPH@L2": 62.1
                             }
                         }
                     ]
@@ -396,24 +323,6 @@
                             "Metrics": {
                                 "Private Score": 17.5,
                                 "Public Score": 17.5
-                            }
-                        }
-                    ]
-                },
-                {
-                    "config": "configs/ssn/hv_ssn_regnet-400mf_secfpn_sbn-all_16xb1-2x_lyft-3d.py",
-                    "weights": "https://download.openmmlab.com/mmdetection3d/v1.0.0_models/ssn/hv_ssn_regnet-400mf_secfpn_sbn-all_1x16_2x_lyft-3d/hv_ssn_regnet-400mf_secfpn_sbn-all_1x16_2x_lyft-3d_20210829_122825-d93475a1.pth",
-                    "metadata": {
-                        "Training Data": "Lyft",
-                        "Training Memory (GB)": 7.4
-                    },
-                    "results": [
-                        {
-                            "Task": "3D Object Detection",
-                            "Dataset": "Lyft",
-                            "Metrics": {
-                                "Private Score": 17.9,
-                                "Public Score": 18.0
                             }
                         }
                     ]
