@@ -32,10 +32,16 @@ def configure_training_params(cfg: Config, max_epochs: int, val_interval: int):
     # ]
 
     # optimizer
-    cfg.optim_wrapper = dict(
-        type='OptimWrapper',
-        optimizer=dict(type='Adam', lr=2e-4))
-        # optimizer=dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001))
+    cfg.optim_wrapper = dict(type='OptimWrapper',
+        optimizer=dict(type='Adam', lr=2e-4),
+        # optimizer=dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)),
+        clip_grad=dict(max_norm=20, norm_type=2),
+    )
+
+
+def merge_default_runtime(cfg: Config):
+    default_runtime = Config.fromfile('src/config_factory/default_runtime.py')
+    cfg.merge_from_dict(default_runtime)
 
 
 def configure_init_weights_and_resume(cfg: Config, mmdet_checkpoint_path: str = None, supervisely_checkpoint_path: str = None, resume: bool = False):
