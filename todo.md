@@ -64,6 +64,56 @@ voxel_size = [0.1, 0.1, 0.2]
 - меняется ли pipeline?
 - если мы не берем веса pre-trained, то можем кастомизировать как хотим. Иначе - берем все из pre-trained config
 
+Input params (UI, advanced):
+- lidar_dims / in_channels
+- point_cloud_range
+- voxel_size (opt)
+- anchor_generator.z_axis (opt)
+- bbox_coder.code_size (opt)
+
+Общие идеи:
+- если в pre-trained config меняется то, что меняет веса модели, мы должны взять это из pre-trained
+- и поставить в UI соотвтствующий параметр на значение из pre-trained
+
+Что делать:
++ загружаем pre-trained/base конфиг
++ проставляем параметры в UI, Advanced
+    + if pre-trained конфиг, то дописать note: "этот параметр унаследован из конфига, меняя его, мы теряем веса"
+    + if pre-trained, то add_dummy_velocities = bool(bbox_coder.code_size == 9)
+    + if base_config, то add_dummy_velocities = False
++ Read into UI:
+    + optimizer, schedulers
+
+- Изучить все конфиги det3d моделей.
+    - скопировать все конфиги (pre_trained + base) в одну директорию
+    - посмотреть их глазами
+- вставляем все параметры из UI в конфиг.
+    write_params_to_config(p, num_classes, is_pre_trained)
+    cfg.model:
+    - num_classes - re.sub
+    - in_channels - re.sub
+    ? point_cloud_range - re.sub?
+    ? voxel_size
+    ? anchor_generator.z_axis
+    - if not is_pre_trained: меняем bbox_coder.code_size to 7
+    dataset:
+    - detection3d, classes...
+    optimizer, schedulers:
+    - from UI
+- build_model, train...
+
+
+
+Что делать (сложнее):
+- загружаем pre-trained конфиг
+- проставляем параметры в UI, Advanced
+- Есть ли захаодкоженные параметры? можем ли мы их поменять без потери весов?
+    Как узнать:
+    - Изучить а в каких конфигах вообще это встречается
+    - Захардкодить
+    - Проверять параметры например anchor_generator...
+- Если есть захаодкоженные, то берем из base_config
+
 
 
 - load your custom config
