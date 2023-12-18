@@ -85,7 +85,7 @@ Input params (UI, advanced):
     + optimizer, schedulers
 
 - Изучить все конфиги det3d моделей.
-    - скопировать все конфиги (pre_trained + base) в одну директорию
+    + скопировать все конфиги (pre_trained + base) в одну директорию
     - посмотреть их глазами
 - вставляем все параметры из UI в конфиг.
     write_params_to_config(p, num_classes, is_pre_trained)

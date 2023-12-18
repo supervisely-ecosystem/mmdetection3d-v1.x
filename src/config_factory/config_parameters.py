@@ -60,3 +60,62 @@ def find_recursive(d: Union[ConfigDict, dict, list, tuple], key: str):
             if res is not None:
                 return res
     return None
+
+
+def write_parameters_to_config(parameters: ConfigParameters, cfg: Config):
+    # 1. read text from config
+    # 2. substitute parameters in text
+    # 3. cfg = Config.fromtext(text)
+    # 4. (optional) update config recursively
+
+    # 1. read text from config
+    text = cfg.text
+    p = parameters
+    selected_classes = ["car", "pedestrian", "truck"]
+    num_classes = len(selected_classes)
+    
+    # 2. substitute parameters in text
+    search_res = re.search("in_channels\s*=\s*[0-6],", text)
+    if search_res:
+        text = re.sub("in_channels\s*=\s*[0-6],", f"in_channels={p.in_channels},", text, count=1)
+    else:
+        raise ValueError("in_channels not found in config")
+        
+    # substitute num_classes
+    search_res = re.search("num_classes\s*=\s*[0-9]+", text)
+    if search_res:
+        text = re.sub("num_classes\s*=\s*[0-9]+", f"num_classes={num_classes}", text)
+    else:
+        print("num_classes not found in config. It is ok if you are using CenterPoint.")
+
+    # code_size
+    search_res = re.search("code_size\s*=\s*[0-9]+", text)
+    if search_res:
+        text = re.sub("code_size\s*=\s*[0-9]+", f"code_size={p.bbox_code_size}", text)
+    else:
+        print("code_size not found in config")
+
+    # voxel_size
+    # there are 3 cases:
+    # voxel_size=[0.05, 0.05, 0.1],
+    # voxel_size=(0.05, 0.05, 0.1),
+    # voxel_size=[0.05, 0.05],
+    text = re.sub("voxel_size\s*=\s*\[[0-9.]+,\s*[0-9.]+,\s*[0-9.]+\]", f"voxel_size={p.voxel_size}", text)
+    text = re.sub("voxel_size\s*=\s*\([0-9.]+,\s*[0-9.]+,\s*[0-9.]+\)", f"voxel_size={tuple(p.voxel_size)}", text)
+    text = re.sub("voxel_size\s*=\s*\[[0-9.]+,\s*[0-9.]+\]", f"voxel_size={p.voxel_size[:2]}", text)
+    
+    # 3. cfg = Config.fromtext(text)
+    cfg = Config.fromstring(text)
+
+    # 4. (optional) update config recursively
+    # CenterPoint:
+    cfg.model.pts_bbox_head.tasks = [
+        dict(num_class=1, class_names=[cls])
+        for cls in selected_classes
+    ]
+    # PointRCNN:
+    cfg.model.rpn_head.bbox_coder.code_size = 8
+
+    # for SSN
+    # it is very hardcoded model, do not use.
+    return cfg
