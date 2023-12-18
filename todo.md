@@ -86,16 +86,18 @@ Input params (UI, advanced):
 
 - Изучить все конфиги det3d моделей.
     + скопировать все конфиги (pre_trained + base) в одну директорию
-    - посмотреть их глазами
+    + посмотреть их глазами
+    - CenterFormer?
 - вставляем все параметры из UI в конфиг.
+    - не работает на pre_trained configs
     write_params_to_config(p, num_classes, is_pre_trained)
     cfg.model:
-    - num_classes - re.sub
-    - in_channels - re.sub
-    ? point_cloud_range - re.sub?
-    ? voxel_size
+    + num_classes - re.sub
+    + in_channels - re.sub
+    + point_cloud_range - re.sub?
+    + voxel_size
     ? anchor_generator.z_axis
-    - if not is_pre_trained: меняем bbox_coder.code_size to 7
+    + if not is_pre_trained: меняем bbox_coder.code_size to 7
     dataset:
     - detection3d, classes...
     optimizer, schedulers:
