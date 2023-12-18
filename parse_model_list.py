@@ -56,6 +56,10 @@ for x in res:
             pre_trained_configs = []
             for model in pre_trained_models:
                 if model.get('Weights'):
+                    # check that config exists
+                    if not os.path.exists(f"{mim_dir}/{model['Config']}"):
+                        print(f"config doesn't exists: {model['Config']}")
+                        continue
                     metadata = model.get('Metadata') or model['metadata']
                     pre_trained_configs.append({
                         'config': model['Config'],
