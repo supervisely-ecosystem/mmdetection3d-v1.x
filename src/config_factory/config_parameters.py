@@ -36,7 +36,7 @@ class ConfigParameters:
         p.voxel_size = cfg.get("voxel_size")
 
         # bbox_code_size
-        bbox_coder = find_recursive(cfg.model, "bbox_coder")
+        bbox_coder = find_by_name(cfg.model, "bbox_coder")
         if bbox_coder is not None:
             p.bbox_code_size = bbox_coder.get('code_size')
 
@@ -56,20 +56,60 @@ class ConfigParameters:
         return p
 
 
-def find_recursive(d: Union[ConfigDict, dict, list, tuple], key: str):
-    if isinstance(d, dict):
+def find_by_name(d: Union[Config, ConfigDict, dict, list, tuple], key: str):
+    if isinstance(d, (dict, Config)):
         if d.get(key) is not None:
             return d[key]
         for k, v in d.items():
-            res = find_recursive(v, key)
+            res = find_by_name(v, key)
             if res is not None:
                 return res
     elif isinstance(d, (list, tuple)):
         for v in d:
-            res = find_recursive(v, key)
+            res = find_by_name(v, key)
             if res is not None:
                 return res
     return None
+
+
+def find_by_parameter(d: Union[Config, ConfigDict, dict, list, tuple], key: str):
+    if isinstance(d, (dict, Config)):
+        if d.get(key) is not None:
+            return d
+        for k, v in d.items():
+            res = find_by_parameter(v, key)
+            if res is not None:
+                return res
+    elif isinstance(d, (list, tuple)):
+        for v in d:
+            res = find_by_parameter(v, key)
+            if res is not None:
+                return res
+    return None
+
+
+def find_all_by_parameter(d: Union[Config, ConfigDict, dict, list, tuple], key: str) -> list:
+    found = []
+    if isinstance(d, (dict, Config)):
+        if d.get(key) is not None:
+            found.append(d)
+        for v in d.values():
+            found.extend(find_all_by_parameter(v, key))
+    elif isinstance(d, (list, tuple)):
+        for item in d:
+            found.extend(find_all_by_parameter(item, key))
+    return found
+
+
+def substitute_parameter(d, key, value):
+    if isinstance(d, ConfigDict):
+        if d.get(key) is not None:
+            d[key] = value
+        for k, v in d.items():
+            substitute_parameter(v, key, value)
+    elif isinstance(d, (list, tuple)):
+        for v in d:
+            substitute_parameter(v, key, value)
 
 
 def write_parameters_to_config(parameters: ConfigParameters, cfg: Config, selected_classes: list) -> Config:
@@ -137,7 +177,7 @@ def write_parameters_to_config(parameters: ConfigParameters, cfg: Config, select
     # 4. (optional) update config recursively
     # bbox_coder
     if has_bbox_coder:
-        bbox_coder = find_recursive(cfg.model, "bbox_coder")
+        bbox_coder = find_by_name(cfg.model, "bbox_coder")
         bbox_coder.code_size = p.bbox_code_size
 
     # code_weights
@@ -154,6 +194,73 @@ def write_parameters_to_config(parameters: ConfigParameters, cfg: Config, select
     # PointRCNN:
     if cfg.model.type == "PointRCNN":
         cfg.model.rpn_head.bbox_coder.code_size = 8
+
+    # SSN:
+    # it is very hardcoded model, do not use.
+    return cfg
+
+
+def write_parameters_to_config_2(parameters: ConfigParameters, cfg: Config, selected_classes: list) -> Config:
+    p = parameters
+    num_classes = len(selected_classes)
+    
+    cfg.class_names = selected_classes
+
+    # in_channels
+    d = find_by_parameter(cfg.model, "in_channels")
+    d.in_channels = p.in_channels
+        
+    # num_classes
+    substitute_parameter(cfg, "num_classes", num_classes)
+
+    # bbox_coder.code_size
+    bbox_coder = find_by_name(cfg.model, "bbox_coder")
+    if bbox_coder is not None:
+        bbox_coder.code_size = p.bbox_code_size
+
+    # voxel_size
+    found = find_all_by_parameter(cfg.model, "voxel_size")
+    for d in found:
+        k = len(d["voxel_size"])
+        d["voxel_size"] = p.voxel_size[:k]
+    cfg.voxel_size = p.voxel_size
+
+    # point_cloud_range
+    found = find_all_by_parameter(cfg.model, "point_cloud_range")
+    for d in found:
+        d["point_cloud_range"] = p.point_cloud_range
+    cfg.point_cloud_range = p.point_cloud_range
+    
+    # TODO: anchor_generator
+    # How to be with z_axis?
+    # anchor_generator = find_by_name(cfg.model, "anchor_generator")
+    # anchor_generator.ranges = [[-80, -80, -1.0715024, 80, 80, -1.0715024]]
+    # anchor_generator.sizes = [[4.75, 1.92, 1.71]]  # car
+    
+    # code_weights
+    weights = [1.0] * num_classes
+    train_cfg = cfg.model.get("train_cfg")
+    if train_cfg is not None:
+        train_cfg.code_weights = weights.copy()
+        train_cfg.code_weight = weights.copy()
+        train_cfg.pts.code_weights = weights.copy()
+        train_cfg.pts.code_weight = weights.copy()
+
+    # code_weights in test_cfg
+    test_cfg = cfg.model.get("test_cfg")
+    if test_cfg is not None:
+        test_cfg.code_weights = weights.copy()
+        test_cfg.code_weight = weights.copy()
+
+    # CenterPoint:
+    if cfg.model.type == "CenterPoint":
+        cfg.model.pts_bbox_head.tasks = [dict(num_class=1, class_names=[cls]) for cls in selected_classes]
+
+    # PointRCNN:
+    if cfg.model.type == "PointRCNN":
+        cfg.model.rpn_head.bbox_coder.code_size = 8
+    # it also has hardcoded bbox_head.num_classes=1
+    # ...
 
     # SSN:
     # it is very hardcoded model, do not use.
