@@ -19,7 +19,7 @@ for model_item in model_list:
     print(model_item)
 
     model_name = model_item['model_name']
-    base_configs = model_item['base_configs']
+    # base_configs = model_item['base_configs']
     pre_trained_configs = model_item['pre_trained_configs']
 
     # is_pre_trained = False
@@ -61,7 +61,7 @@ for model_item in model_list:
     # Input Parameters
     data_root = "app_data/lyft"
     selected_classes = ["car", "pedestrian", "truck"]
-    batch_size = 3
+    batch_size = 6
     num_workers = 3
     input_lidar_dims = 3
     input_point_cloud_range = [-55, -55, -5, 55, 55, 5]  # NuScenes
@@ -93,8 +93,9 @@ for model_item in model_list:
 
     # Training params
     max_epochs = 1
-    configure_training_params(cfg, max_epochs, 1)
-    cfg.param_scheduler = []
+    cfg.train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1)
+    # configure_training_params(cfg, max_epochs, 1)
+    # cfg.param_scheduler = []
 
     # Runner
     runner = build_runner(cfg, "app_data/work_dir", amp=False, auto_scale_lr=False)

@@ -238,23 +238,34 @@ def write_parameters_to_config_2(parameters: ConfigParameters, cfg: Config, sele
     # anchor_generator.sizes = [[4.75, 1.92, 1.71]]  # car
     
     # code_weights
-    weights = [1.0] * num_classes
-    train_cfg = cfg.model.get("train_cfg")
-    if train_cfg is not None:
-        train_cfg.code_weights = weights.copy()
-        train_cfg.code_weight = weights.copy()
-        train_cfg.pts.code_weights = weights.copy()
-        train_cfg.pts.code_weight = weights.copy()
+    # weights = [1.0] * num_classes
+    # train_cfg = cfg.model.get("train_cfg")
+    # if train_cfg is not None:
+    #     train_cfg.code_weights = weights.copy()
+    #     train_cfg.code_weight = weights.copy()
+    #     train_cfg.pts.code_weights = weights.copy()
+    #     train_cfg.pts.code_weight = weights.copy()
 
-    # code_weights in test_cfg
-    test_cfg = cfg.model.get("test_cfg")
-    if test_cfg is not None:
-        test_cfg.code_weights = weights.copy()
-        test_cfg.code_weight = weights.copy()
+    # # code_weights in test_cfg
+    # test_cfg = cfg.model.get("test_cfg")
+    # if test_cfg is not None:
+    #     test_cfg.code_weights = weights.copy()
+    #     test_cfg.code_weight = weights.copy()
 
     # CenterPoint:
     if cfg.model.type == "CenterPoint":
+        # tasks
         cfg.model.pts_bbox_head.tasks = [dict(num_class=1, class_names=[cls]) for cls in selected_classes]
+        
+        # code_weights
+        weights = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0]
+        train_cfg = cfg.model.get("train_cfg")
+        if train_cfg is not None:
+            train_cfg.code_weights = weights.copy()
+            train_cfg.code_weight = weights.copy()
+            train_cfg.pts.code_weights = weights.copy()
+            train_cfg.pts.code_weight = weights.copy()
+
 
     # PointRCNN:
     if cfg.model.type == "PointRCNN":
