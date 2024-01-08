@@ -32,11 +32,11 @@ def configure_training_params(cfg: Config, max_epochs: int, val_interval: int):
     # ]
 
     # optimizer
-    cfg.optim_wrapper = dict(type='OptimWrapper',
-        optimizer=dict(type='Adam', lr=2e-4),
-        # optimizer=dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)),
-        clip_grad=dict(max_norm=20, norm_type=2),
-    )
+    # cfg.optim_wrapper = dict(type='OptimWrapper',
+    #     optimizer=dict(type='Adam', lr=2e-4),
+    #     # optimizer=dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)),
+    #     clip_grad=dict(max_norm=20, norm_type=2),
+    # )
 
 
 def merge_default_runtime(cfg: Config):
@@ -71,38 +71,3 @@ def configure_init_weights_and_resume(cfg: Config, mmdet_checkpoint_path: str = 
     else:
         raise ValueError("Invalid combination of checkpoint paths")
     
-
-def build_runner(cfg: Config, work_dir: str, amp: bool, auto_scale_lr: bool = False) -> Runner:
-
-    cfg.work_dir = work_dir
-
-    # enable automatic-mixed-precision training
-    if amp is True:
-        optim_wrapper = cfg.optim_wrapper.type
-        if optim_wrapper == 'AmpOptimWrapper':
-            print_log(
-                'AMP training is already enabled in your config.',
-                logger='current',
-                level=logging.WARNING)
-        else:
-            assert optim_wrapper == 'OptimWrapper', (
-                '`--amp` is only supported when the optimizer wrapper type is '
-                f'`OptimWrapper` but got {optim_wrapper}.')
-            cfg.optim_wrapper.type = 'AmpOptimWrapper'
-            cfg.optim_wrapper.loss_scale = 'dynamic'
-
-    # enable automatically scaling LR (for multi-gpu training)
-    if auto_scale_lr:
-        if 'auto_scale_lr' in cfg and \
-                'enable' in cfg.auto_scale_lr and \
-                'base_batch_size' in cfg.auto_scale_lr:
-            cfg.auto_scale_lr.enable = True
-        else:
-            raise RuntimeError('Can not find "auto_scale_lr" or '
-                               '"auto_scale_lr.enable" or '
-                               '"auto_scale_lr.base_batch_size" in your'
-                               ' configuration file.')
-
-    runner = RUNNERS.build(cfg)
-    
-    return runner

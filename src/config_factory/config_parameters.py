@@ -215,7 +215,7 @@ def write_parameters_to_config_2(parameters: ConfigParameters, cfg: Config, sele
 
     # bbox_coder.code_size
     bbox_coder = find_by_name(cfg.model, "bbox_coder")
-    if bbox_coder is not None:
+    if bbox_coder is not None and p.bbox_code_size is not None:
         bbox_coder.code_size = p.bbox_code_size
 
     # voxel_size
@@ -226,10 +226,10 @@ def write_parameters_to_config_2(parameters: ConfigParameters, cfg: Config, sele
     cfg.voxel_size = p.voxel_size
 
     # point_cloud_range
-    found = find_all_by_parameter(cfg.model, "point_cloud_range")
-    for d in found:
-        d["point_cloud_range"] = p.point_cloud_range
-    cfg.point_cloud_range = p.point_cloud_range
+    # found = find_all_by_parameter(cfg.model, "point_cloud_range")
+    # for d in found:
+    #     d["point_cloud_range"] = p.point_cloud_range
+    # cfg.point_cloud_range = p.point_cloud_range
     
     # TODO: anchor_generator
     # How to be with z_axis?
@@ -254,6 +254,10 @@ def write_parameters_to_config_2(parameters: ConfigParameters, cfg: Config, sele
 
     # CenterPoint:
     if cfg.model.type == "CenterPoint":
+        # in_channaels
+        if cfg.model.get("pts_voxel_encoder") is not None:
+            cfg.model.pts_voxel_encoder.num_features = p.in_channels
+        
         # tasks
         cfg.model.pts_bbox_head.tasks = [dict(num_class=1, class_names=[cls]) for cls in selected_classes]
         
@@ -266,6 +270,25 @@ def write_parameters_to_config_2(parameters: ConfigParameters, cfg: Config, sele
             train_cfg.pts.code_weights = weights.copy()
             train_cfg.pts.code_weight = weights.copy()
 
+    # CenterFormer:
+    if cfg.model.type == "CenterFormer":
+        # tasks
+        tasks = [dict(num_class=len(selected_classes), class_names=selected_classes)]
+        cfg.model.backbone.tasks = tasks
+        cfg.model.bbox_head.tasks = tasks
+
+    # BEVFusion:
+    if cfg.model.type == "BEVFusion":
+        # in_channaels
+        if cfg.model.get("pts_voxel_encoder") is not None:
+            cfg.model.pts_voxel_encoder.num_features = p.in_channels
+        
+        # code_weights
+        weights = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0]
+        train_cfg = cfg.model.get("train_cfg")
+        if train_cfg is not None:
+            train_cfg.code_weights = weights.copy()
+            train_cfg.pts.code_weights = weights.copy()
 
     # PointRCNN:
     if cfg.model.type == "PointRCNN":
