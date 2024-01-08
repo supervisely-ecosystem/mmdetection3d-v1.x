@@ -8,6 +8,10 @@ default_hooks = dict(
     sampler_seed=dict(type='DistSamplerSeedHook'),
     visualization=dict(type='Det3DVisualizationHook'))
 
+custom_hooks = [
+    dict(type="SuperviselyHook", chart_update_interval=1),
+]
+
 env_cfg = dict(
     cudnn_benchmark=False,
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
