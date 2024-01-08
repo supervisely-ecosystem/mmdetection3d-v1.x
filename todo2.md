@@ -1,0 +1,7 @@
+- взять одну модель (CenterPoint)
+- Serve
+- train/val splits
+- visualization hooks
+- checkpoint hooks
+- param_scheduler
+- optimizer, lr, etc

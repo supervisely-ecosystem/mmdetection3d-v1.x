@@ -21,6 +21,8 @@ TODO:
     + проблема метрики была в разных системах координат в KITTI
 + дальше нужно сделать обучение на наших данных
 
+- BEVFusion requires CUDA 11.8
+
 - Test all detection models: 
     - hint: loading existed 'cfg_model' is unsafe, because of inappropriate pipelines
     - еще раз проверить pointpillars
@@ -163,7 +165,7 @@ LiDAR-based 3D Object Detection models:
     PV-RCNN (CVPR'2020)
     CenterPoint (CVPR'2021)
     CenterFormer (ECCV'2022)
-    BEVFusion (ICRA'2023) (in lidar-mode)
+    BEVFusion (ICRA'2023) (in lidar-mode) (requires cuda 11.8)
 
 Camera-based 3D Object Detection (Monocular 3D):
     ImVoxelNet (WACV'2022)
