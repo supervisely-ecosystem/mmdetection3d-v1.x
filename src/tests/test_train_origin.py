@@ -8,6 +8,7 @@ import re
 # cfg_model = "mmdetection3d/configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class_custom_nus_eval.py"
 # cfg_model = "mmdetection3d/configs/point_rcnn/point-rcnn_8xb2_kitti-3d-3class_custom.py"
 # cfg_model = "mmdetection3d/configs/pointpillars/pointpillars_hv_fpn_sbn-all_8xb4-2x_nus-3d_custom.py"
+cfg_model = "mmdetection3d/configs/centerpoint/centerpoint_voxel01_second_secfpn_8xb4-cyclic-20e_nus-3d.py"
 model_index = "mmdetection3d/model-index.yml"
 weights_url = find_weights_url(model_index, re.sub("_custom.*\.py", ".py", cfg_model))
 

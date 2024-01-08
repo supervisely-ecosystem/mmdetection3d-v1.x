@@ -14,7 +14,8 @@ from src.pcd_utils import convert_bin_to_pcd
 api = sly.Api()
 project_id = 32768
 dataset_id = 81541
-pcd_path = "app_data/lyft/LYFT/pointcloud/host-a005_lidar1_1231201454801395736.pcd"
+# pcd_path = "app_data/lyft/LYFT/pointcloud/host-a005_lidar1_1231201454801395736.pcd"
+pcd_path = "app_data/lyft/LYFT/pointcloud/host-a005_lidar1_1231201437602160096.pcd"
 # pcd_id = 28435493
 # dst_dir = "app_data/inference"
 project_meta = sly.ProjectMeta.from_json(api.project.get_meta(project_id))
