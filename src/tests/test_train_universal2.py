@@ -1,7 +1,7 @@
 from typing import Union
 from mmengine.config import Config, ConfigDict
 from src.config_factory import detection3d
-from src.config_factory.training_params import configure_init_weights_and_resume, build_runner, configure_training_params, merge_default_runtime
+from src.config_factory.training_params import configure_init_weights_and_resume, build_runner, configure_loops, merge_default_runtime
 from src.config_factory.config_parameters import ConfigParameters, write_parameters_to_config_2
 from src.tests.extract_weights_url import find_weights_url
 import re

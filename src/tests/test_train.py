@@ -110,7 +110,7 @@ if __name__ == "__main__":
     # make config
     cfg = Config.fromfile("src/config_factory/default_runtime.py")
     kitti.configure_datasets(cfg, data_root, batch_size, num_workers, lidar_dims, point_cloud_range, aug_pipeline, selected_classes, num_points=num_points, sample_range=sample_range)
-    training_params.configure_training_params(cfg, max_epochs, val_interval)
+    training_params.configure_loops(cfg, max_epochs, val_interval)
     configure_init_weights_and_resume(cfg, mmdet_checkpoint_path=weights_url)
     cfg_model = Config.fromfile(cfg_model)
     cfg.model = cfg_model.model

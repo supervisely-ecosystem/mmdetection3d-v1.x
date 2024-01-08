@@ -1,13 +1,11 @@
 import os
 import sys
-from typing import Union
-from mmengine.config import Config, ConfigDict
+from mmengine.config import Config
 from src.config_factory import detection3d
-from src.config_factory.training_params import configure_init_weights_and_resume, configure_training_params, merge_default_runtime
+import src.config_factory.training_params as config_factory
 from src.config_factory.config_parameters import ConfigParameters, write_parameters_to_config_2
 from src.tests.extract_weights_url import find_weights_url
-import re
-import json
+from src.train.train_parameters import TrainParameters
 import logging
 from multiprocessing import cpu_count
 from mmengine.config import Config
@@ -65,59 +63,59 @@ def build_runner(cfg: Config, work_dir: str, amp: bool, auto_scale_lr: bool = Fa
 def update_config(
         cfg: Config,
         config_path: str,
-        parameters: ConfigParameters,
-        data_root,
-        selected_classes,
-        batch_size,
-        epochs,
-        input_lidar_dims,
-        input_point_cloud_range,
-        load_weights,
+        config_params: ConfigParameters,
+        train_params: TrainParameters
         ):
     # Input Parameters
     is_pre_trained_config = True
-    num_workers = get_num_workers(batch_size)
-    input_point_cloud_range = parameters.point_cloud_range  # we won't let the user change this so far
-    input_voxel_size = parameters.voxel_size
-    point_sample = parameters.point_sample
+    train_params.num_workers = get_num_workers(train_params.batch_size_train)
+    train_params.point_cloud_range = config_params.point_cloud_range  # we won't let the user change this so far
+    voxel_size = config_params.voxel_size
+    point_sample = config_params.point_sample
+
     add_dummy_velocities = False
-    if is_pre_trained_config and parameters.bbox_code_size == 9:
+    if is_pre_trained_config and config_params.bbox_code_size == 9:
         add_dummy_velocities = True
 
-    # 3. Update parameters from UI
-    parameters.in_channels = input_lidar_dims
-    parameters.point_cloud_range = input_point_cloud_range
-    parameters.voxel_size = input_voxel_size
+    # Update parameters from UI
+    config_params.in_channels = train_params.lidar_dims
+    config_params.point_cloud_range = train_params.point_cloud_range
+    config_params.voxel_size = voxel_size
 
-    # 4. Write parameters to config file
-    cfg = write_parameters_to_config_2(parameters, cfg, selected_classes)
-    merge_default_runtime(cfg)
+    # Write parameters to config file
+    cfg = write_parameters_to_config_2(config_params, cfg, train_params.selected_classes)
+    config_factory.merge_default_runtime(cfg)
 
     # Model weights
     weights_url = None
-    if is_pre_trained_config and load_weights:
+    if is_pre_trained_config and train_params.load_weights:
         model_index = "mmdetection3d/model-index.yml"
-        weights_url = find_weights_url(model_index, re.sub("_custom.*\.py", ".py", config_path))
-    configure_init_weights_and_resume(cfg, mmdet_checkpoint_path=weights_url)
+        weights_url = find_weights_url(model_index, config_path)
+    config_factory.configure_init_weights_and_resume(cfg, mmdet_checkpoint_path=weights_url)
 
     # Make dataset config
     aug_pipeline = detection3d.get_default_aug_pipeline()
     detection3d.configure_datasets(
         cfg,
-        data_root,
-        batch_size,
-        num_workers,
-        input_lidar_dims,
-        input_point_cloud_range,
+        train_params.data_root,
+        train_params.batch_size_train,
+        train_params.num_workers,
+        train_params.lidar_dims,
+        train_params.point_cloud_range,
         aug_pipeline,
-        selected_classes,
+        train_params.selected_classes,
         point_sample=point_sample,
         add_dummy_velocities=add_dummy_velocities
         )
 
-    # Training params
-    configure_training_params(cfg, epochs, 1)
-    cfg.param_scheduler = []
+    # Training confg
+    config_factory.configure_loops(cfg, train_params.total_epochs, train_params.val_interval)
+    config_factory.configure_param_scheduler(cfg, train_params)
+    config_factory.configure_optimizer(cfg, train_params)
+
+    # Logs and Hooks
+    cfg.custom_hooks[0].chart_update_interval = train_params.chart_update_interval
+    cfg.log_processor.window_size = train_params.chart_update_interval
 
 
 def train(cfg: Config):

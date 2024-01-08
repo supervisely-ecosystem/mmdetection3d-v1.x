@@ -1,6 +1,6 @@
 from mmengine.config import Config
 from src.config_factory import detection3d, kitti
-from src.config_factory.training_params import configure_init_weights_and_resume, build_runner, configure_training_params
+from src.config_factory.training_params import configure_init_weights_and_resume, build_runner, configure_loops
 from src.tests.extract_weights_url import find_weights_url
 import re
 
