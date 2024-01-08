@@ -54,6 +54,16 @@ class ConfigParameters:
         p.schedulers = cfg.get("param_scheduler")
 
         return p
+    
+    def validate(self):
+        # Check parameters
+        assert self.in_channels is not None, "in_channels not found in config"
+        if self.bbox_code_size:
+            assert self.bbox_code_size in [7, 9], f"bbox_code_size should be 7 or 9, but got {self.bbox_code_size}"
+        assert self.point_cloud_range is not None
+        # if parameters.voxel_size is None:
+        #     parameters.voxel_size = [0.05, 0.05, 0.1]
+
 
 
 def find_by_name(d: Union[Config, ConfigDict, dict, list, tuple], key: str):

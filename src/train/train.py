@@ -72,8 +72,6 @@ def update_config(
         epochs,
         input_lidar_dims,
         input_point_cloud_range,
-        input_voxel_size,
-        point_sample,
         load_weights,
         ):
     # Input Parameters
