@@ -1,5 +1,6 @@
 - взять одну модель (CenterPoint)
 - Serve
+    Inference class in sdk
 - train/val splits
 - visualization hooks
 - checkpoint hooks
