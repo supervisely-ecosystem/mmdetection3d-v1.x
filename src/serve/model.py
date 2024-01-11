@@ -7,90 +7,103 @@ except:
 from typing import List, Any, Dict, Literal, Optional, Union
 from mmengine import Config
 import supervisely as sly
-from supervisely.nn.prediction_dto import PredictionBBox, PredictionMask
+from supervisely.nn.prediction_dto import PredictionCuboid3d
 from supervisely.nn.inference.object_detection_3d.object_detection_3d import ObjectDetection3D
+from supervisely.geometry.cuboid_3d import Cuboid3d
 from src.serve.gui import MMDetectionGUI
 from src.inference.pcd_inferencer import PcdDet3DInferencer
+from src.inference.functional import create_sly_annotation, up_bbox3d, filter_by_confidence, bbox_3d_to_cuboid3d, create_sly_annotation_from_prediction
+from src.sly_utils import upload_point_cloud
 
 
 model_list = sly.json.load_json_file('model_list.json')
+mmdetection3d_root = "mmdetection3d"
+
 
 class MMDetection3dModel(ObjectDetection3D):
     def load_model(self, cfg: Config, weights: str, device: str, palette: str = 'none'):
         # weights is either path or url
-        self.model = PcdDet3DInferencer(cfg, weights, device, palette=palette)
+        model = PcdDet3DInferencer(cfg, weights, device, palette=palette)
+        return model
 
     def load_on_device(
         self,
         model_dir: str,
         device: Literal["cpu", "cuda", "cuda:0", "cuda:1", "cuda:2", "cuda:3"] = "cpu",
     ):
+        self.model_name = None
+        self.checkpoint_name = None
+        self.dataset_name = None
+        self.task_type = None
         self.device = device
+
+        self.gui: MMDetectionGUI
         if self.gui is not None:
+            self.task_type = self.gui.get_task_type()
             model_source = self.gui.get_model_source()
             if model_source == "Pretrained models":
-                self.task_type = self.gui.get_task_type()
                 selected_model = self.gui.get_checkpoint_info()
-                # weights_path, config_path = 
+                idx = self.gui._models_table.get_selected_row_index()
+                model_info = self.gui.get_model_info()
+                model_name = list(model_info.keys())[0]
+                model_info = model_info[model_name]["configs"][idx]
+                config = selected_model["config"]
+                weights = model_info["weights"]
+                config_path = os.path.join(mmdetection3d_root, model_info["config"])
+                cfg = Config.fromfile(config_path)
+                classes = cfg.class_names
+                self.model_name = model_name
+                self.checkpoint_name = config
+                self.dataset_name = cfg.dataset_type
             elif model_source == "Custom models":
                 custom_weights_link = self.gui.get_custom_link()
                 weights_path, config_path = self.download_custom_files(
                     custom_weights_link, model_dir
                 )
                 self.checkpoint_name = os.path.basename(custom_weights_link)
+                cfg = Config.fromfile(config_path)
+                classes = cfg.train_dataloader.dataset.selected_classes
+                self.model_name = cfg.sly_metadata.architecture_name
+                self.dataset_name = cfg.sly_metadata.project_name
+                self.task_type = cfg.sly_metadata.task_type.replace("_", " ")
         else:
-            # for local debug without GUI only
-            self.task_type = task_type
+            # without GUI for local debug
             model_source = "Pretrained models"
-            weights_path, config_path = self.download_pretrained_files(
+            weights, config_path = self.download_pretrained_files(
                 selected_checkpoint, model_dir
             )
-        cfg = Config.fromfile(config_path)
-        if "pretrained" in cfg.model:
-            cfg.model.pretrained = None
-        elif "init_cfg" in cfg.model.backbone:
-            cfg.model.backbone.init_cfg = None
-        cfg.model.train_cfg = None
-        model = init_detector(cfg, checkpoint=weights_path, device=device, palette=[])
 
-        if model_source == "Custom models":
-            classes = cfg.train_dataloader.dataset.selected_classes
-            self.selected_model_name = cfg.sly_metadata.architecture_name
-            self.dataset_name = cfg.sly_metadata.project_name
-            self.task_type = cfg.sly_metadata.task_type.replace("_", " ")
-            if self.task_type == "instance segmentation":
-                obj_classes = [sly.ObjClass(name, sly.Bitmap) for name in classes]
-            elif self.task_type == "object detection":
-                obj_classes = [sly.ObjClass(name, sly.Rectangle) for name in classes]
-        elif model_source == "Pretrained models":
-            dataset_class_name = cfg.dataset_type
-            dataset_meta = DATASETS.module_dict[dataset_class_name].METAINFO
-            classes = dataset_meta["classes"]
-            if self.task_type == "object detection":
-                obj_classes = [sly.ObjClass(name, sly.Rectangle) for name in classes]
-            elif self.task_type == "instance segmentation":
-                obj_classes = [sly.ObjClass(name, sly.Bitmap) for name in classes]
-            if self.gui is not None:
-                self.selected_model_name = list(self.gui.get_model_info().keys())[0]
-                checkpoint_info = self.gui.get_checkpoint_info()
-                self.checkpoint_name = checkpoint_info["Name"]
-                self.dataset_name = checkpoint_info["Dataset"]
-            else:
-                self.selected_model_name = selected_model_name
-                self.checkpoint_name = selected_checkpoint["Name"]
-                self.dataset_name = dataset_name
-
-        self.model = self.load_model(cfg=cfg, weights=weights_path, device=device)
-        self.model.test_cfg["score_thr"] = 0.45  # default confidence_thresh
+        self.model = self.load_model(cfg=cfg, weights=weights, device=device)
         self.class_names = classes
         sly.logger.debug(f"classes={classes}")
 
+        if self.task_type == "detection_3d":
+            obj_classes = [sly.ObjClass(name, Cuboid3d) for name in classes]
+        else:
+            raise NotImplementedError("Only detection_3d task type is supported now")
         self._model_meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection(obj_classes))
         self._get_confidence_tag_meta()
-        print(f"✅ Model has been successfully loaded on {device.upper()} device")
 
         # TODO: debug
-        # self.predict("demo_data/image_01.jpg", {})
+        if False:
+            self._model_served = True
+            # globals    
+            api = sly.Api()
+            project_id = 32768
+            dataset_id = 81541
+            pcd_id = 29139134
+            project_meta = sly.ProjectMeta.from_json(api.project.get_meta(project_id))
+            pcd_path = "app_data/lyft/LYFT/pointcloud/host-a005_lidar1_1231201437602160096.pcd"
+
+            prediction = self._inference_pointcloud_id(api, pcd_id, {})
+            # Create annotation
+            ann = create_sly_annotation_from_prediction(prediction, project_meta)
+            # Upload pcd
+            name = "tmp_infer_"+sly.rand_str(8)+".pcd"
+            pcd_info = upload_point_cloud(api, dataset_id, pcd_path, name=name)
+            # Upload annotation
+            api.pointcloud.annotation.append(pcd_info.id, ann)
+            print(f"https://dev.supervise.ly/app/point-clouds/?datasetId={dataset_id}&pointCloudId={pcd_info.id}")
 
     def get_classes(self) -> List[str]:
         return self.class_names  # e.g. ["cat", "dog", ...]
@@ -98,7 +111,7 @@ class MMDetection3dModel(ObjectDetection3D):
     def get_info(self) -> dict:
         info = super().get_info()
         info["task type"] = self.task_type
-        info["model_name"] = self.selected_model_name
+        info["model_name"] = self.model_name
         info["checkpoint_name"] = self.checkpoint_name
         info["pretrained_on_dataset"] = self.dataset_name
         info["device"] = self.device
@@ -108,24 +121,34 @@ class MMDetection3dModel(ObjectDetection3D):
         all_models = {}
         for task in model_list:
             all_models[task] = {}
-            for model in model_list[task]:
+            for model in reversed(model_list[task]):
                 checkpoints = []
                 for pre_trained_config in model["pre_trained_configs"]:
+                    result = pre_trained_config["results"][0].copy()
+                    metrics = result.pop("Metrics")
+                    for m in metrics:
+                        result[m] = metrics[m]
+                    memory = pre_trained_config["metadata"].get("Training Memory (GB)")
+                    if memory is not None:
+                        result["Training Memory (GB)"] = memory
                     checkpoint = {
-                        "config_file": pre_trained_config["config"],
-                        "weights_file": pre_trained_config["weights"],
+                        "config": os.path.basename(pre_trained_config["config"]),
+                        **result,
                     }
                     checkpoints.append(checkpoint)
+                url = f"https://github.com/open-mmlab/mmdetection3d/tree/main/configs/{model['model_name']}"
                 model_item = {
                     "paper_from": model["paper"],
                     "year": model["year"],
-                    "config_url": model["model_name"],
+                    "model_name": model["model_name"],
+                    "configs": model["pre_trained_configs"],
+                    "config_url": url,
                     "checkpoints": checkpoints,
                 }
                 model_name = model["name"]
                 all_models[task][model_name] = model_item
         return all_models
-
+            
     def download_pretrained_files(self, selected_model: Dict[str, str], model_dir: str):
         gui: MMDetectionGUI
         task_type = self.gui.get_task_type()
@@ -184,55 +207,22 @@ class MMDetection3dModel(ObjectDetection3D):
             custom_model_link_type="file",
         )
 
-    def predict(
-        self, image_path: str, settings: Dict[str, Any]
-    ) -> List[Union[PredictionBBox, PredictionMask]]:
+    def predict(self, pcd_path: str, settings: Dict[str, Any]) -> List[PredictionCuboid3d]:
         # set confidence_thresh
         conf_tresh = settings.get("confidence_thresh", 0.45)
-        if conf_tresh:
-            # TODO: may be set recursively?
-            self.model.test_cfg["score_thr"] = conf_tresh
 
-        # set nms_iou_thresh
-        nms_tresh = settings.get("nms_iou_thresh", 0.65)
-        if nms_tresh:
-            test_cfg = self.model.test_cfg
-            if hasattr(test_cfg, "nms"):
-                test_cfg["nms"]["iou_threshold"] = nms_tresh
-            if hasattr(test_cfg, "rcnn") and hasattr(test_cfg["rcnn"], "nms"):
-                test_cfg["rcnn"]["nms"]["iou_threshold"] = nms_tresh
-            if hasattr(test_cfg, "rpn") and hasattr(test_cfg["rpn"], "nms"):
-                test_cfg["rpn"]["nms"]["iou_threshold"] = nms_tresh
+        results_dict = self.model(inputs=dict(points=pcd_path), no_save_vis=True)
 
-        # inference
-        result: DetDataSample = inference_detector(self.model, image_path)
-        preds = result.pred_instances.cpu().numpy()
-
-        # collect predictions
+        predictions = results_dict['predictions'][0]
+        bboxes_3d = predictions['bboxes_3d']
+        labels_3d = predictions['labels_3d']
+        scores_3d = predictions['scores_3d']
+        bboxes_3d, labels_3d, scores_3d = filter_by_confidence(bboxes_3d, labels_3d, scores_3d, threshold=conf_tresh)
+        bboxes_3d = [up_bbox3d(bbox3d) for bbox3d in bboxes_3d]
         predictions = []
-        for pred in preds:
-            pred: InstanceData
-            score = float(pred.scores[0])
-            if conf_tresh is not None and score < conf_tresh:
-                # filter by confidence
-                continue
-            class_name = self.class_names[pred.labels.astype(int)[0]]
-            if self.task_type == "object detection":
-                x1, y1, x2, y2 = pred.bboxes[0].astype(int).tolist()
-                tlbr = [y1, x1, y2, x2]
-                sly_pred = PredictionBBox(class_name=class_name, bbox_tlbr=tlbr, score=score)
-            else:
-                if pred.get("masks") is None:
-                    raise Exception(
-                        f'The model "{self.checkpoint_name}" can\'t predict masks. Please, try another model.'
-                    )
-                mask = pred.masks[0]
-                sly_pred = PredictionMask(class_name=class_name, mask=mask, score=score)
-            predictions.append(sly_pred)
-
-        # TODO: debug
-        # ann = self._predictions_to_annotation(image_path, predictions)
-        # img = sly.image.read(image_path)
-        # ann.draw_pretty(img, thickness=2, opacity=0.4, output_path="test.jpg")
+        for bbox3d, label3d, score3d in zip(bboxes_3d, labels_3d, scores_3d):
+            cuboid3d = bbox_3d_to_cuboid3d(bbox3d)
+            class_name = self.class_names[label3d]
+            pred = PredictionCuboid3d(class_name, cuboid3d, score3d)
+            predictions.append(pred)
         return predictions
-
