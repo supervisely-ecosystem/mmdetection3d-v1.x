@@ -1,5 +1,5 @@
 from typing import Dict, Optional, Sequence
-from mmdet.registry import HOOKS
+from mmdet3d.registry import HOOKS
 from mmengine.hooks import Hook  # LoggerHook, CheckpointHook
 from mmengine.hooks.hook import DATA_BATCH
 from mmengine.runner import Runner
@@ -27,7 +27,7 @@ class SuperviselyHook(Hook):
             sly.logger.warn("The loss is NaN.")
 
         # Update progress bars
-        self.iter_progress.update(1)
+        # self.iter_progress.update(1)
 
         # Update train charts
         if self.every_n_train_iters(runner, self.chart_update_interval):
