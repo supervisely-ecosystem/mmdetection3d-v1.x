@@ -33,3 +33,18 @@ def upload_point_cloud(api: sly.Api, dataset_id: int, pcd_path: str, name: str):
         # convert bin to pcd
         pass
     return api.pointcloud.upload_path(dataset_id, name, pcd_path)
+
+
+def add_classes_to_project_meta(api: sly.Api, project_meta: sly.ProjectMeta, project_id: int, classes: list):
+    # add classes to project meta
+    from supervisely.geometry.cuboid_3d import Cuboid3d
+    added_classes = []
+    for class_name in classes:
+        if project_meta.get_obj_class(class_name) is None:
+            project_meta = project_meta.add_obj_class(sly.ObjClass(class_name, Cuboid3d))
+            added_classes.append(class_name)
+    if added_classes:
+        api.project.update_meta(project_id, project_meta.to_json())
+        api.project.pull_meta_ids(project_id, project_meta)
+        print(f"Added classes to project meta: {added_classes}")
+    return project_meta
