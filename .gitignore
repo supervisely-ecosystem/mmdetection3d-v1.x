@@ -22,3 +22,4 @@ venv/
 /apply-det3d-to-project-dataset
 /app_mmdetection_3d
 /detection3d_configs
+*.pcd

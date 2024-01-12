@@ -16,10 +16,10 @@ class PCDLoader(BaseTransform):
       - box_mode_3d
     """
 
-    def __init__(self, coord_type='LIDAR', **kwargs) -> None:
+    def __init__(self, coord_type='LIDAR', zero_aux_dims: bool = False, **kwargs) -> None:
         super().__init__()
         self.from_file = TRANSFORMS.build(
-            dict(type='LoadPointsFromPcdFile', coord_type=coord_type, **kwargs))
+            dict(type='LoadPointsFromPcdFile', coord_type=coord_type, zero_aux_dims=zero_aux_dims, **kwargs))
         self.from_ndarray = TRANSFORMS.build(
             dict(type='LoadPointsFromDict', coord_type=coord_type, **kwargs))
         self.box_type_3d, self.box_mode_3d = get_box_type(coord_type)
