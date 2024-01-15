@@ -126,30 +126,29 @@ class MMDetection3dModel(ObjectDetection3D):
                 all_models[task][model_name] = model_item
         return all_models
             
-    def download_pretrained_files(self, selected_model: Dict[str, str], model_dir: str):
-        gui: MMDetectionGUI
-        task_type = self.gui.get_task_type()
-        models = self.get_models(add_links=True)[task_type]
-        if self.gui is not None:
-            model_name = list(self.gui.get_model_info().keys())[0]
-        else:
-            # for local debug without GUI only
-            model_name = selected_model_name
-        full_model_info = selected_model
-        for model_info in models[model_name]["checkpoints"]:
-            if model_info["Name"] == selected_model["Name"]:
-                full_model_info = model_info
-        weights_ext = sly.fs.get_file_ext(full_model_info["weights_file"])
-        config_ext = sly.fs.get_file_ext(full_model_info["config_file"])
-        weights_dst_path = os.path.join(model_dir, f"{selected_model['Name']}{weights_ext}")
-        if not sly.fs.file_exists(weights_dst_path):
-            self.download(src_path=full_model_info["weights_file"], dst_path=weights_dst_path)
-        config_path = self.download(
-            src_path=full_model_info["config_file"],
-            dst_path=os.path.join(model_dir, f"config{config_ext}"),
-        )
-
-        return weights_dst_path, config_path
+    # def download_pretrained_files(self, selected_model: Dict[str, str], model_dir: str):
+    #     gui: MMDetectionGUI
+    #     task_type = self.gui.get_task_type()
+    #     models = self.get_models(add_links=True)[task_type]
+    #     if self.gui is not None:
+    #         model_name = list(self.gui.get_model_info().keys())[0]
+    #     else:
+    #         # for local debug without GUI only
+    #         raise ValueError("Serveing without GUI is not supported")
+    #     full_model_info = selected_model
+    #     for model_info in models[model_name]["checkpoints"]:
+    #         if model_info["Name"] == selected_model["Name"]:
+    #             full_model_info = model_info
+    #     weights_ext = sly.fs.get_file_ext(full_model_info["weights_file"])
+    #     config_ext = sly.fs.get_file_ext(full_model_info["config_file"])
+    #     weights_dst_path = os.path.join(model_dir, f"{selected_model['Name']}{weights_ext}")
+    #     if not sly.fs.file_exists(weights_dst_path):
+    #         self.download(src_path=full_model_info["weights_file"], dst_path=weights_dst_path)
+    #     config_path = self.download(
+    #         src_path=full_model_info["config_file"],
+    #         dst_path=os.path.join(model_dir, f"config{config_ext}"),
+    #     )
+    #     return weights_dst_path, config_path
 
     def download_custom_files(self, custom_link: str, model_dir: str):
         # download weights (.pth)
