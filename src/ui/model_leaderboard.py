@@ -1,5 +1,5 @@
 import pandas as pd
-from src.utils import parse_yaml_metafile
+from src.sly_utils import parse_yaml_metafile
 
 from supervisely.app.widgets import Table, Card, Container
 

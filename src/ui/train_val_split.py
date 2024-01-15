@@ -1,6 +1,6 @@
 import supervisely as sly
 from supervisely.app.widgets import TrainValSplits, Card, Container, Button
-import src.sly_globals as g
+import src.globals as g
 
 select_btn = Button("Select")
 splits = TrainValSplits(project_id=g.PROJECT_ID)

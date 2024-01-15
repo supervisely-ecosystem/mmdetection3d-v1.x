@@ -15,19 +15,19 @@ from supervisely.app.widgets import (
     DoneLabel,
 )
 
-import src.sly_globals as g
-from src.train_parameters import TrainParameters
+import src.globals as g
+from src.train.train_parameters import TrainParameters
 from src.ui.task import task_selector
 from src.ui.train_val_split import dump_train_val_splits
 from src.ui.classes import classes
 import src.ui.models as models_ui
 from src import sly_utils
 from src.ui.hyperparameters import update_params_with_widgets
-from src.ui.augmentations import get_selected_aug
+# from src.ui.augmentations import get_selected_aug
 from src.ui.graphics import add_classwise_metric, monitoring
 
 # register modules (don't remove):
-from src import sly_dataset, sly_hook, sly_imgaugs
+# from src import sly_dataset, sly_hook, sly_imgaugs
 
 
 def get_task():

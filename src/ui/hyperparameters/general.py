@@ -11,7 +11,7 @@ from supervisely.app.widgets import (
 )
 
 from src.ui.utils import InputContainer, get_switch_value, set_switch_value, get_devices
-from src.train_parameters import TrainParameters
+from src.train.train_parameters import TrainParameters
 
 NUM_EPOCHS = 10
 # General

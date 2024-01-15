@@ -40,8 +40,8 @@ from src.ui.hyperparameters.lr_scheduler import (
     clear_btn,
 )
 
-from src.train_parameters import TrainParameters
-from src import visualize_scheduler
+from src.train.train_parameters import TrainParameters
+from src.train import visualize_scheduler
 from src.sly_utils import get_images_count
 from src.ui.hyperparameters import update_params_with_widgets
 

@@ -13,8 +13,8 @@ import src.ui.input_project as input_project
 import src.ui.task as task_ui
 
 from src import sly_utils
-from src.utils import parse_yaml_metafile
-from src.train_parameters import TrainParameters
+from src.sly_utils import parse_yaml_metafile
+from src.train.train_parameters import TrainParameters
 
 from src.ui import hyperparameters
 from src.ui import augmentations
@@ -28,7 +28,7 @@ all_widgets = [
     models.card,
     classes_ui.card,
     splits_ui.card,
-    augmentations.card,
+    # augmentations.card,
     hyperparameters.card,
     train.card,
 ]
@@ -44,7 +44,7 @@ train_start_callback = wrap_button_click(
         models.select_btn,
         classes_ui.select_btn,
         splits_ui.select_btn,
-        augmentations.select_btn,
+        # augmentations.select_btn,
         hyperparameters.select_btn,
     ],
     upd_params=False,
@@ -68,49 +68,49 @@ hyperparameters_select_callback = wrap_button_click(
     ],
 )
 
-augmentations_select_callback = wrap_button_click(
-    augmentations.select_btn,
-    cards_to_unlock=[hyperparameters.card],
-    widgets_to_disable=[augmentations.augments, augmentations.swithcer],
-    callback=hyperparameters_select_callback,
-)
+# augmentations_select_callback = wrap_button_click(
+#     augmentations.select_btn,
+#     cards_to_unlock=[hyperparameters.card],
+#     widgets_to_disable=[augmentations.augments, augmentations.swithcer],
+#     callback=hyperparameters_select_callback,
+# )
 
-splits_select_callback = wrap_button_click(
-    splits_ui.select_btn,
-    cards_to_unlock=[augmentations.card],
-    widgets_to_disable=[splits_ui.splits],
-    callback=augmentations_select_callback,
-)
+# splits_select_callback = wrap_button_click(
+#     splits_ui.select_btn,
+#     cards_to_unlock=[augmentations.card],
+#     widgets_to_disable=[splits_ui.splits],
+#     callback=augmentations_select_callback,
+# )
 
-classes_select_callback = wrap_button_click(
-    classes_ui.select_btn,
-    cards_to_unlock=[splits_ui.card],
-    widgets_to_disable=[
-        classes_ui.classes,
-        classes_ui.filter_images_without_gt_input,
-    ],
-    callback=splits_select_callback,
-)
+# classes_select_callback = wrap_button_click(
+#     classes_ui.select_btn,
+#     cards_to_unlock=[splits_ui.card],
+#     widgets_to_disable=[
+#         classes_ui.classes,
+#         classes_ui.filter_images_without_gt_input,
+#     ],
+#     callback=splits_select_callback,
+# )
 
-models_select_callback = wrap_button_click(
-    models.select_btn,
-    cards_to_unlock=[classes_ui.card],
-    widgets_to_disable=[
-        models.radio_tabs,
-        models.arch_select,
-        models.path_field,
-        models.table,
-        models.load_from,
-    ],
-    callback=classes_select_callback,
-)
+# models_select_callback = wrap_button_click(
+#     models.select_btn,
+#     cards_to_unlock=[classes_ui.card],
+#     widgets_to_disable=[
+#         models.radio_tabs,
+#         models.arch_select,
+#         models.path_field,
+#         models.table,
+#         models.load_from,
+#     ],
+#     callback=classes_select_callback,
+# )
 
-task_select_callback = wrap_button_click(
-    task_ui.select_btn,
-    [models.card, model_leaderboard.card],
-    [task_ui.task_selector],
-    models_select_callback,
-)
+# task_select_callback = wrap_button_click(
+#     task_ui.select_btn,
+#     [models.card, model_leaderboard.card],
+#     [task_ui.task_selector],
+#     models_select_callback,
+# )
 
 
 # TASK
@@ -120,24 +120,24 @@ def on_task_changed(selected_task):
     model_leaderboard.update_table(models.models_meta, selected_task)
 
 
-@task_ui.select_btn.click
-def select_task():
-    task_select_callback()
-    set_stepper_step(
-        stepper,
-        task_ui.select_btn,
-        next_pos=3,
-    )
+# @task_ui.select_btn.click
+# def select_task():
+#     task_select_callback()
+#     set_stepper_step(
+#         stepper,
+#         task_ui.select_btn,
+#         next_pos=3,
+#     )
 
-    if button_clicked[task_ui.select_btn.widget_id]:
-        on_task_changed(task_ui.task_selector.get_value())
-    else:
-        model_leaderboard.table.read_json(None)
-        model_leaderboard.table.sort(0)
+#     if button_clicked[task_ui.select_btn.widget_id]:
+#         on_task_changed(task_ui.task_selector.get_value())
+#     else:
+#         model_leaderboard.table.read_json(None)
+#         model_leaderboard.table.sort(0)
 
 
 # MODELS
-models.update_architecture(task_ui.task_selector.get_value())
+# models.update_architecture(task_ui.task_selector.get_value())
 
 
 @models.arch_select.value_changed
@@ -214,25 +214,25 @@ def select_classes():
     )
 
 
-@splits_ui.select_btn.click
-def select_splits():
-    splits_select_callback()
-    set_stepper_step(
-        stepper,
-        splits_ui.select_btn,
-        next_pos=6,
-    )
+# @splits_ui.select_btn.click
+# def select_splits():
+#     splits_select_callback()
+#     set_stepper_step(
+#         stepper,
+#         splits_ui.select_btn,
+#         next_pos=6,
+#     )
 
 
-@augmentations.select_btn.click
-def select_augs():
-    augmentations_select_callback()
-    stepper.set_active_step(7)
-    set_stepper_step(
-        stepper,
-        augmentations.select_btn,
-        next_pos=7,
-    )
+# @augmentations.select_btn.click
+# def select_augs():
+#     augmentations_select_callback()
+#     stepper.set_active_step(7)
+#     set_stepper_step(
+#         stepper,
+#         augmentations.select_btn,
+#         next_pos=7,
+#     )
 
 
 @hyperparameters.select_btn.click

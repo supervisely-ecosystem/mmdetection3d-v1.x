@@ -3,7 +3,7 @@ import supervisely as sly
 from dotenv import load_dotenv
 # from src.state import State
 
-# from src.train_parameters import TrainParameters
+# from src.train.train_parameters import TrainParameters
 
 if sly.is_development():
     load_dotenv(os.path.expanduser("~/supervisely.env"))
@@ -24,6 +24,7 @@ TEAMFILES_UPLOAD_DIR = "mmdetection3d-v1.x"
 STATIC_DIR = app_dir + "/static"
 os.makedirs(STATIC_DIR, exist_ok=True)
 
+COCO_MTERIC_KEYS = ["mAP", "mAP_50", "mAP_75"]
 # params
 # MAX_CLASSES_FOR_PERCLASS_METRICS = 10
 

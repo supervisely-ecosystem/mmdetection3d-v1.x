@@ -15,8 +15,8 @@ from supervisely.app.widgets import (
 
 from src.ui.task import task_selector
 from src.ui.utils import update_custom_params
-from src.sly_globals import TEAM_ID
-from src.utils import parse_yaml_metafile
+from src.globals import TEAM_ID
+from src.sly_utils import parse_yaml_metafile
 
 
 def _load_models_meta(task: str):

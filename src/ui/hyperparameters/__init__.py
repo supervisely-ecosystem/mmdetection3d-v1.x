@@ -17,7 +17,7 @@ from src.ui.hyperparameters.lr_scheduler import (
     enable_warmup_input,
     select_scheduler,
 )
-from src.train_parameters import TrainParameters
+from src.train.train_parameters import TrainParameters
 
 from src.ui.hyperparameters import general
 from src.ui.hyperparameters import checkpoints

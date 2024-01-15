@@ -1,7 +1,7 @@
 from supervisely.app.widgets import ClassesTable, Card, Container, Button, Switch, Field
 from supervisely.app.content import StateJson
 
-from src.sly_globals import PROJECT_ID
+from src.globals import PROJECT_ID
 
 
 def select_all(cls_tbl: ClassesTable):

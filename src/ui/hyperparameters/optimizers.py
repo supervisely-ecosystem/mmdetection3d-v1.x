@@ -2,7 +2,7 @@ from typing import Optional, Tuple
 from supervisely.app.widgets import SelectString, InputNumber, Switch, Field, Container
 
 from src.ui.utils import OrderedWidgetWrapper, get_switch_value, set_switch_value
-from src.train_parameters import TrainParameters
+from src.train.train_parameters import TrainParameters
 
 
 optimizers_names = []

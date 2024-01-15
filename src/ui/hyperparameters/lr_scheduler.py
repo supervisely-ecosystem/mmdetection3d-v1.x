@@ -18,7 +18,7 @@ from src.ui.utils import (
     get_switch_value,
     create_linked_getter,
 )
-from src.train_parameters import TrainParameters
+from src.train.train_parameters import TrainParameters
 
 schedulers = [("empty", "Without scheduler")]
 

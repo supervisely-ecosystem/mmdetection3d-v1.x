@@ -5,7 +5,7 @@ from collections import OrderedDict
 from supervisely.app.widgets import GridPlot, Container, Field, Empty
 from supervisely.app.content import StateJson, DataJson
 
-import src.sly_globals as g
+import src.globals as g
 
 NumT = Union[int, float]
 
