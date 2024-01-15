@@ -2,10 +2,10 @@ import os
 import sys
 from mmengine.config import Config
 from src.config_factory import detection3d
-import src.config_factory.training_params as config_factory
 from src.config_factory.config_parameters import ConfigParameters, write_parameters_to_config_2
 from src.tests.extract_weights_url import find_weights_url
 from src.train.train_parameters import TrainParameters
+import src.train.train_parameters as config_factory
 import logging
 from multiprocessing import cpu_count
 from mmengine.config import Config
@@ -83,7 +83,7 @@ def update_config(
     config_params.voxel_size = voxel_size
 
     # Write parameters to config file
-    cfg = write_parameters_to_config_2(config_params, cfg, train_params.selected_classes)
+    write_parameters_to_config_2(config_params, cfg, train_params.selected_classes)
     config_factory.merge_default_runtime(cfg)
 
     # Model weights
@@ -112,10 +112,9 @@ def update_config(
     config_factory.configure_loops(cfg, train_params.total_epochs, train_params.val_interval)
     config_factory.configure_param_scheduler(cfg, train_params)
     config_factory.configure_optimizer(cfg, train_params)
-
-    # Logs and Hooks
-    cfg.custom_hooks[0].chart_update_interval = train_params.chart_update_interval
-    cfg.log_processor.window_size = train_params.chart_update_interval
+    config_factory.add_sly_metadata(cfg, train_params)
+    config_factory.configure_checkpoints(cfg, train_params)
+    config_factory.configure_logs_and_hooks(cfg, train_params)
 
 
 def train(cfg: Config):
