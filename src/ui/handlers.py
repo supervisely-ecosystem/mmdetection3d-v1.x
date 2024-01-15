@@ -75,42 +75,42 @@ hyperparameters_select_callback = wrap_button_click(
 #     callback=hyperparameters_select_callback,
 # )
 
-# splits_select_callback = wrap_button_click(
-#     splits_ui.select_btn,
-#     cards_to_unlock=[augmentations.card],
-#     widgets_to_disable=[splits_ui.splits],
-#     callback=augmentations_select_callback,
-# )
+splits_select_callback = wrap_button_click(
+    splits_ui.select_btn,
+    cards_to_unlock=[],#augmentations.card],
+    widgets_to_disable=[splits_ui.splits],
+    # callback=augmentations_select_callback,
+)
 
-# classes_select_callback = wrap_button_click(
-#     classes_ui.select_btn,
-#     cards_to_unlock=[splits_ui.card],
-#     widgets_to_disable=[
-#         classes_ui.classes,
-#         classes_ui.filter_images_without_gt_input,
-#     ],
-#     callback=splits_select_callback,
-# )
+classes_select_callback = wrap_button_click(
+    classes_ui.select_btn,
+    cards_to_unlock=[splits_ui.card],
+    widgets_to_disable=[
+        classes_ui.classes,
+        classes_ui.filter_images_without_gt_input,
+    ],
+    callback=splits_select_callback,
+)
 
-# models_select_callback = wrap_button_click(
-#     models.select_btn,
-#     cards_to_unlock=[classes_ui.card],
-#     widgets_to_disable=[
-#         models.radio_tabs,
-#         models.arch_select,
-#         models.path_field,
-#         models.table,
-#         models.load_from,
-#     ],
-#     callback=classes_select_callback,
-# )
+models_select_callback = wrap_button_click(
+    models.select_btn,
+    cards_to_unlock=[classes_ui.card],
+    widgets_to_disable=[
+        models.radio_tabs,
+        models.arch_select,
+        models.path_field,
+        models.table,
+        models.load_from,
+    ],
+    callback=classes_select_callback,
+)
 
-# task_select_callback = wrap_button_click(
-#     task_ui.select_btn,
-#     [models.card, model_leaderboard.card],
-#     [task_ui.task_selector],
-#     models_select_callback,
-# )
+task_select_callback = wrap_button_click(
+    task_ui.select_btn,
+    [models.card, model_leaderboard.card],
+    [task_ui.task_selector],
+    models_select_callback,
+)
 
 
 # TASK
@@ -120,20 +120,20 @@ def on_task_changed(selected_task):
     model_leaderboard.update_table(models.models_meta, selected_task)
 
 
-# @task_ui.select_btn.click
-# def select_task():
-#     task_select_callback()
-#     set_stepper_step(
-#         stepper,
-#         task_ui.select_btn,
-#         next_pos=3,
-#     )
+@task_ui.select_btn.click
+def select_task():
+    task_select_callback()
+    set_stepper_step(
+        stepper,
+        task_ui.select_btn,
+        next_pos=3,
+    )
 
-#     if button_clicked[task_ui.select_btn.widget_id]:
-#         on_task_changed(task_ui.task_selector.get_value())
-#     else:
-#         model_leaderboard.table.read_json(None)
-#         model_leaderboard.table.sort(0)
+    if button_clicked[task_ui.select_btn.widget_id]:
+        on_task_changed(task_ui.task_selector.get_value())
+    else:
+        model_leaderboard.table.read_json(None)
+        model_leaderboard.table.sort(0)
 
 
 # MODELS
