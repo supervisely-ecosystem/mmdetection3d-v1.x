@@ -536,6 +536,32 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "CenterFormer",
+            "paper": "ECCV",
+            "year": 2022,
+            "model_name": "centerformer",
+            "base_configs": [],
+            "pre_trained_configs": [
+                {
+                    "config": "projects/CenterFormer/configs/centerformer_voxel01_second-attn_secfpn-attn_4xb4-cyclic-20e_waymoD5-3d-3class.py",
+                    "weights": null,
+                    "metadata": {
+                        "Training Memory (GB)": 14.8
+                    },
+                    "results": [
+                        {
+                            "Task": "3D Object Detection",
+                            "Dataset": "nuScenes",
+                            "Metrics": {
+                                "mAP": 62.7,
+                                "NDS": 68.0
+                            }
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

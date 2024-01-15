@@ -27,18 +27,18 @@ class MMDetectionGUI(GUI.InferenceGUI):
             custom_model_link_type=custom_model_link_type,
         )
 
-        self._task_infobox = Widgets.NotificationBox(
-            title="INFO: How to select task?",
-            description="At this step you should select deep learning problem that you want to solve. Outputs of object detection models - only bounding boxes with confidence. Outputs of instance segmentation models in addition contain object masks. Selected task at this step defines models list to choose. If you want to serve model based on already trained custom model, choose the appropriate task.",
-            box_type='info',
-        )
+        # self._task_infobox = Widgets.NotificationBox(
+        #     title="INFO: How to select task?",
+        #     description="At this step you should select deep learning problem that you want to solve. Outputs of object detection models - only bounding boxes with confidence. Outputs of instance segmentation models in addition contain object masks. Selected task at this step defines models list to choose. If you want to serve model based on already trained custom model, choose the appropriate task.",
+        #     box_type='info',
+        # )
         self._select_task_radio = Widgets.RadioGroup(
             [
                 Widgets.RadioGroup.Item(
                     value="detection_3d"
                 ),
                 Widgets.RadioGroup.Item(
-                    value="instance segmentation"
+                    value="segmentation_3d (Coming soon)"
                 ),
             ]
         )
@@ -64,13 +64,13 @@ class MMDetectionGUI(GUI.InferenceGUI):
         self._reselect_task_button.hide()
 
         self._task_card = Widgets.Card(
-            title="MMDetection task",
+            title="MMDetection3D task",
             description="Select task from the list below",
             collapsable=True,
             content=Widgets.Container([
-                self._task_infobox,
+                # self._task_infobox,
                 self._select_task_field,
-                self._select_task_button,
+                # self._select_task_button,
                 self._task_loading_text,
                 self._reselect_task_button,
             ], gap=5)
@@ -85,7 +85,6 @@ class MMDetectionGUI(GUI.InferenceGUI):
         )
         self._models_card.collapse()
         self._models_card.lock()
-
 
         @self._select_task_button.click
         def reload_models():
@@ -110,6 +109,10 @@ class MMDetectionGUI(GUI.InferenceGUI):
             self._select_task_button.show()
             self._models_card.lock()
             self._models_card.collapse()
+
+        # temporary skeep the need of selecting task
+        reload_models()
+        self._select_task_button.hide()
 
     def get_task_type(self) -> str:
         return self._select_task_radio.get_value()

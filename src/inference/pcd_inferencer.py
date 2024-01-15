@@ -10,8 +10,11 @@ class PcdDet3DInferencer(LidarDet3DInferencer):
                  model: Union[str, None] = None,
                  weights: Optional[str] = None,
                  device: Optional[str] = None,
+                 zero_aux_dims: bool = False,
                  scope: str = 'mmdet3d',
-                 palette: str = 'none') -> None:
+                 palette: str = 'none',
+                 ) -> None:
+        self.zero_aux_dims = zero_aux_dims
         super().__init__(
             model=model,
             weights=weights,
@@ -38,4 +41,8 @@ class PcdDet3DInferencer(LidarDet3DInferencer):
             load_cfg['use_dim'], int) else load_cfg['use_dim']
 
         pipeline_cfg[load_point_idx]['type'] = 'PCDLoader'
+        pipeline_cfg[load_point_idx]['zero_aux_dims'] = self.zero_aux_dims
         return Compose(pipeline_cfg)
+
+    def _init_visualizer(self, cfg: ConfigType):
+        return None
