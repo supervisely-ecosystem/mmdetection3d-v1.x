@@ -58,24 +58,18 @@ class MMDetection3dModel(ObjectDetection3D):
                 self.dataset_name = cfg.dataset_type
             elif model_source == "Custom models":
                 custom_weights_link = self.gui.get_custom_link()
-                weights_path, config_path = self.download_custom_files(
-                    custom_weights_link, model_dir
-                )
-                self.checkpoint_name = os.path.basename(custom_weights_link)
+                weights, config_path = self.download_custom_files(custom_weights_link, model_dir)
                 cfg = Config.fromfile(config_path)
                 zero_aux_dims = False
                 classes = cfg.train_dataloader.dataset.selected_classes
-                self.model_name = cfg.sly_metadata.architecture_name
+                self.model_name = cfg.model.type
+                self.checkpoint_name = os.path.basename(custom_weights_link)
                 self.dataset_name = cfg.sly_metadata.project_name
                 self.task_type = cfg.sly_metadata.task_type.replace("_", " ")
             else:
                 raise ValueError(f"Model source {model_source} is not supported")
         else:
-            # without GUI for local debug
-            model_source = "Pretrained models"
-            weights, config_path = self.download_pretrained_files(
-                selected_checkpoint, model_dir
-            )
+            raise ValueError("Serveing without GUI is not supported")
 
         self.model = self.load_model(cfg, weights, device, zero_aux_dims=zero_aux_dims)
         self.class_names = classes
@@ -87,27 +81,6 @@ class MMDetection3dModel(ObjectDetection3D):
             raise NotImplementedError("Only detection_3d task type is supported now")
         self._model_meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection(obj_classes))
         self._get_confidence_tag_meta()
-
-        # TODO: debug
-        if False:
-            self._model_served = True
-            # globals    
-            api = sly.Api()
-            project_id = 32768
-            dataset_id = 81541
-            pcd_id = 29139134
-            project_meta = sly.ProjectMeta.from_json(api.project.get_meta(project_id))
-            pcd_path = "app_data/lyft/LYFT/pointcloud/host-a005_lidar1_1231201437602160096.pcd"
-
-            prediction = self._inference_pointcloud_id(api, pcd_id, {})
-            # Create annotation
-            ann = create_sly_annotation_from_prediction(prediction, project_meta)
-            # Upload pcd
-            name = "tmp_infer_"+sly.rand_str(8)+".pcd"
-            pcd_info = upload_point_cloud(api, dataset_id, pcd_path, name=name)
-            # Upload annotation
-            api.pointcloud.annotation.append(pcd_info.id, ann)
-            print(f"https://dev.supervise.ly/app/point-clouds/?datasetId={dataset_id}&pointCloudId={pcd_info.id}")
 
     def get_classes(self) -> List[str]:
         return self.class_names  # e.g. ["cat", "dog", ...]
