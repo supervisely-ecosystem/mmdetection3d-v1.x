@@ -112,6 +112,7 @@ class MMDetectionGUI(GUI.InferenceGUI):
 
         # temporary skeep the need of selecting task
         reload_models()
+        self._select_task_button.hide()
 
     def get_task_type(self) -> str:
         return self._select_task_radio.get_value()

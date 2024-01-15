@@ -10,9 +10,9 @@ class PcdDet3DInferencer(LidarDet3DInferencer):
                  model: Union[str, None] = None,
                  weights: Optional[str] = None,
                  device: Optional[str] = None,
+                 zero_aux_dims: bool = False,
                  scope: str = 'mmdet3d',
                  palette: str = 'none',
-                 zero_aux_dims: bool = False
                  ) -> None:
         self.zero_aux_dims = zero_aux_dims
         super().__init__(

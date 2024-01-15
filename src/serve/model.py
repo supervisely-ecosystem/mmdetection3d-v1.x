@@ -21,9 +21,9 @@ mmdetection3d_root = "mmdetection3d"
 
 
 class MMDetection3dModel(ObjectDetection3D):
-    def load_model(self, cfg: Config, weights: str, device: str, palette: str = 'none'):
+    def load_model(self, cfg: Config, weights: str, device: str, zero_aux_dims: bool = False, palette: str = 'none'):
         # weights is either path or url
-        model = PcdDet3DInferencer(cfg, weights, device, palette=palette)
+        model = PcdDet3DInferencer(cfg, weights, device, zero_aux_dims=zero_aux_dims, palette=palette)
         return model
 
     def load_on_device(
@@ -51,6 +51,7 @@ class MMDetection3dModel(ObjectDetection3D):
                 weights = model_info["weights"]
                 config_path = os.path.join(mmdetection3d_root, model_info["config"])
                 cfg = Config.fromfile(config_path)
+                zero_aux_dims = cfg.dataset_type == "KittiDataset"
                 classes = cfg.class_names
                 self.model_name = model_name
                 self.checkpoint_name = config
@@ -62,10 +63,13 @@ class MMDetection3dModel(ObjectDetection3D):
                 )
                 self.checkpoint_name = os.path.basename(custom_weights_link)
                 cfg = Config.fromfile(config_path)
+                zero_aux_dims = False
                 classes = cfg.train_dataloader.dataset.selected_classes
                 self.model_name = cfg.sly_metadata.architecture_name
                 self.dataset_name = cfg.sly_metadata.project_name
                 self.task_type = cfg.sly_metadata.task_type.replace("_", " ")
+            else:
+                raise ValueError(f"Model source {model_source} is not supported")
         else:
             # without GUI for local debug
             model_source = "Pretrained models"
@@ -73,7 +77,7 @@ class MMDetection3dModel(ObjectDetection3D):
                 selected_checkpoint, model_dir
             )
 
-        self.model = self.load_model(cfg=cfg, weights=weights, device=device)
+        self.model = self.load_model(cfg, weights, device, zero_aux_dims=zero_aux_dims)
         self.class_names = classes
         sly.logger.debug(f"classes={classes}")
 
