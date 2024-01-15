@@ -14,8 +14,8 @@ info = NotificationBox(title="INFO: How to select the task?", description=msg, b
 
 task_selector = RadioGroup(
     items=[
-        RadioGroup.Item(value="Object detection", label="3D object detection"),
-        RadioGroup.Item(value="Instance segmentation", label="3D instance segmentation (upcoming in the future updates)"),
+        RadioGroup.Item(value="3D object detection", label="3D object detection"),
+        RadioGroup.Item(value="3D instance segmentation", label="3D instance segmentation (upcoming in the future updates)"),
     ],
     direction="vertical",
 )

@@ -137,7 +137,7 @@ def select_task():
 
 
 # MODELS
-# models.update_architecture(task_ui.task_selector.get_value())
+models.update_architecture(task_ui.task_selector.get_value())
 
 
 @models.arch_select.value_changed

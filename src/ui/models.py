@@ -20,16 +20,17 @@ from src.sly_utils import parse_yaml_metafile
 
 
 def _load_models_meta(task: str):
-    if "segmentation" in task.lower():
-        models_meta = sly.json.load_json_file("models/instance_segmentation_meta.json")
-    else:
-        models_meta = sly.json.load_json_file("models/detection_meta.json")
-    models_meta = {m["model_name"]: m for m in models_meta}
+    if "detection" in task.lower():
+        models_meta = sly.json.load_json_file("./model_list.json")
+
+    models_meta = {m["name"]: m for m in models_meta['detection_3d']}
     return models_meta
 
 
 def _get_architecture_list(models_meta: dict):
     arch_names = list(models_meta.keys())
+
+    arch_names = [n for n in arch_names if n in ('PointPillars', 'CenterFormer', 'CenterPoint')]
 
     labels = []
     right_texts = []
