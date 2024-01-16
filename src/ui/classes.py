@@ -15,12 +15,12 @@ def select_all(cls_tbl: ClassesTable):
 classes = ClassesTable(project_id=PROJECT_ID)
 select_all(classes)
 
-filter_images_without_gt_input = Switch(True)
-filter_images_without_gt_field = Field(
-    filter_images_without_gt_input,
-    title="Filter images without annotations",
-    description="After selecting classes, some images may not have any annotations. Whether to remove them?",
-)
+# filter_images_without_gt_input = Switch(True)
+# filter_images_without_gt_field = Field(
+#     filter_images_without_gt_input,
+#     title="Filter images without annotations",
+#     description="After selecting classes, some images may not have any annotations. Whether to remove them?",
+# )
 
 select_btn = Button("Select")
 card = Card(
@@ -29,7 +29,7 @@ card = Card(
         "Select classes that will be used for training. "
         "Supported shapes are Bitmap, Polygon, Rectangle."
     ),
-    content=Container([classes, filter_images_without_gt_field, select_btn]),
+    content=Container([classes, select_btn]),
 )
 card.lock("Select model to unlock.")
 

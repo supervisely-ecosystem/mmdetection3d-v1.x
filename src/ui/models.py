@@ -22,19 +22,23 @@ from src.sly_utils import parse_yaml_metafile
 def _load_models_meta(task: str):
     if "detection" in task.lower():
         models_meta = sly.json.load_json_file("./model_list.json")
+    else:
+        raise NotImplementedError("Instance Segmentation")
 
-    models_meta = {m["name"]: m for m in models_meta['detection_3d']}
+    models_meta = {m["name"]: m for m in models_meta['detection_3d'] if m["name"] in ('PointPillars',  'CenterPoint')} #'CenterFormer',}
     return models_meta
 
 
 def _get_architecture_list(models_meta: dict):
     arch_names = list(models_meta.keys())
 
-    arch_names = [n for n in arch_names if n in ('PointPillars', 'CenterFormer', 'CenterPoint')]
+    # arch_names = [n for n in arch_names if n in ('PointPillars',  'CenterPoint')] #'CenterFormer',
 
     labels = []
     right_texts = []
-    for name, item in models_meta.items():
+
+    tmp = [x for x in models_meta.items()]# if x[0] in arch_names]
+    for name, item in tmp:
         if item.get("paper_from") and item.get("year"):
             label = f"{name}"
             r_text = f"({item.get('paper_from')} {item.get('year')})"
@@ -45,24 +49,40 @@ def _get_architecture_list(models_meta: dict):
         right_texts.append(r_text)
 
     # links to README.md in mmdetection repo
-    base_url = "https://github.com/open-mmlab/mmdetection/tree/main/configs/"
-    links = [base_url + m["yml_file"].split("/")[0] for m in models_meta.values()]
+    base_url = "https://github.com/open-mmlab/mmdetection3d/tree/main/configs/" 
+    links = [base_url + m["model_name"] for m in models_meta.values()]# if m["name"] in arch_names]
 
     return arch_names, labels, right_texts, links
 
 
 def _get_models_by_architecture(task: str, models_meta: dict, selected_arch_name: str):
     # parse metafile.yml
-    metafile_path = "configs/" + models_meta[selected_arch_name]["yml_file"]
-    exclude = models_meta[selected_arch_name].get("exclude")
-    _, models = parse_yaml_metafile(metafile_path, exclude)
+    # metafile_path = "configs/" + models_meta[selected_arch_name]["yml_file"]
+    # exclude = models_meta[selected_arch_name].get("exclude")
+    # _, models = parse_yaml_metafile(metafile_path, exclude)
+
+    _models = models_meta[selected_arch_name]['pre_trained_configs']
+    models = []
+
+    for m in _models:
+        tmp = {
+            'config': sly.fs.get_file_name_with_ext(m['config']),
+            'name': selected_arch_name,
+            'dataset': m['results'][0].get("Dataset", "-"),
+            'inference_time': '-',
+            "train_memory": m['metadata'].get("Training Memory (GB)", "-"),
+            "box_mAP": m['results'][0]['Metrics'].get('mAP', "-"),
+            "NDS": m['results'][0]['Metrics'].get('NDS', "-"),
+        }
+        models.append(tmp)
+
 
     # filter models by task
     if "segmentation" in task.lower():
-        task_name = "Instance Segmentation"
+        task_name = "3D Instance Segmentation"
     else:
-        task_name = "Object Detection"
-    models = [m for m in models if task_name in m["tasks"]]
+        task_name = "3D Object Detection"
+    # models = [m for m in models if task_name in m["tasks"]]
     return models
 
 
@@ -73,15 +93,17 @@ def _get_table_data(task: str, models: list):
         "Dataset",
         "Inference Time (ms/im)",
         "Training Memory (GB)",
-        "box AP",
+        "box mAP",
+        "NDS",
     ]
     keys = [
+        "config",
         "name",
-        "method",
         "dataset",
         "inference_time",
         "train_memory",
-        "box AP",
+        "box_mAP",
+        "NDS"
     ]
     if "segmentation" in task.lower():
         columns.append("mask AP")

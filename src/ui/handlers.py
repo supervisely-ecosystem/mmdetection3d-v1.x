@@ -87,7 +87,7 @@ classes_select_callback = wrap_button_click(
     cards_to_unlock=[splits_ui.card],
     widgets_to_disable=[
         classes_ui.classes,
-        classes_ui.filter_images_without_gt_input,
+        # classes_ui.filter_images_without_gt_input,
     ],
     callback=splits_select_callback,
 )
