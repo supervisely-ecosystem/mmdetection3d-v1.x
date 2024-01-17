@@ -29,3 +29,6 @@ COCO_MTERIC_KEYS = ["mAP", "mAP_50", "mAP_75"]
 # MAX_CLASSES_FOR_PERCLASS_METRICS = 10
 
 # state = State()
+IMAGES_COUNT = api.project.get_info_by_id(PROJECT_ID).items_count
+
+stop_training = False

@@ -12,8 +12,10 @@ from supervisely.app.widgets import (
 
 from src.ui.utils import InputContainer, get_switch_value, set_switch_value, get_devices
 from src.train.train_parameters import TrainParameters
+from src.config_factory.config_parameters import ConfigParameters
 
 NUM_EPOCHS = 10
+NUM_CHANNELS = 5
 # General
 general_params = InputContainer()
 
@@ -35,38 +37,42 @@ epochs_input = InputNumber(NUM_EPOCHS, min=1)
 epochs_field = Field(epochs_input, "Number of epochs")
 general_params.add_input("total_epochs", epochs_input)
 
+channels_input = InputNumber(NUM_CHANNELS, min=3)
+channels_field = Field(channels_input, "Number of channels")
+general_params.add_input("input channels (lidar dims)", channels_input)
+
 
 def size_and_prop(inp: BindedInputNumber) -> Tuple[Tuple[int, int], bool]:
     return inp.get_value(), inp.proportional
 
 
-bigger_size_input = InputNumber(1333, 1)
-bigger_size = Field(bigger_size_input, "Longer edge")
-smaller_size_input = InputNumber(800, 1)
-smaller_size = Field(smaller_size_input, "Shorter edge")
-general_params.add_input("bigger_size", bigger_size_input)
-general_params.add_input("smaller_size", smaller_size_input)
-general_params.set("smaller_size", 800)
+# bigger_size_input = InputNumber(1333, 1)
+# bigger_size = Field(bigger_size_input, "Longer edge")
+# smaller_size_input = InputNumber(800, 1)
+# smaller_size = Field(smaller_size_input, "Shorter edge")
+# general_params.add_input("bigger_size", bigger_size_input)
+# general_params.add_input("smaller_size", smaller_size_input)
+# general_params.set("smaller_size", 800)
 
-size_input = Container(
-    [bigger_size, smaller_size, Empty()], direction="horizontal", fractions=[1, 1, 5]
-)
+# size_input = Container(
+#     [bigger_size, smaller_size, Empty()], direction="horizontal", fractions=[1, 1, 5]
+# )
 
-size_field = Field(
-    size_input,
-    title="Input size",
-    description="Images will be scaled approximately to the specified sizes while keeping the aspect ratio "
-    "(internally, the sizes are passed as 'scale' parameter of the 'Resize' transform in mmcv).",
-)
+# size_field = Field(
+#     size_input,
+#     title="Input size",
+#     description="Images will be scaled approximately to the specified sizes while keeping the aspect ratio "
+#     "(internally, the sizes are passed as 'scale' parameter of the 'Resize' transform in mmcv).",
+# )
 
 
 bs_train_input = InputNumber(1, 1)
 bs_train_field = Field(bs_train_input, "Train batch size")
 general_params.add_input("batch_size_train", bs_train_input)
 
-bs_val_input = InputNumber(1, 1)
-bs_val_field = Field(bs_val_input, "Validation batch size")
-general_params.add_input("batch_size_val", bs_val_input)
+# bs_val_input = InputNumber(1, 1)
+# bs_val_field = Field(bs_val_input, "Validation batch size")
+# general_params.add_input("batch_size_val", bs_val_input)
 
 
 validation_input = InputNumber(1, 1, general_params.total_epochs)
@@ -106,9 +112,10 @@ general_tab = Container(
     [
         # device_field,
         epochs_field,
-        size_field,
+        channels_field,
+        # size_field,
         bs_train_field,
-        bs_val_field,
+        # bs_val_field,
         validation_field,
         chart_update_field,
     ]
@@ -117,11 +124,12 @@ general_tab = Container(
 
 def update_general_widgets_with_params(params: TrainParameters):
     general_params.set("total_epochs", params.total_epochs)
+    general_params.set("input channels (lidar dims)", params.lidar_dims)
     general_params.set("val_interval", params.val_interval)
     general_params.set("batch_size_train", params.batch_size_train)
-    general_params.set("batch_size_val", params.batch_size_val)
-    general_params.set("bigger_size", max(params.input_size))
-    general_params.set("smaller_size", min(params.input_size))
+    # general_params.set("batch_size_val", params.batch_size_val)
+    # general_params.set("bigger_size", max(params.input_size))
+    # general_params.set("smaller_size", min(params.input_size))
     general_params.set("chart_update_interval", params.chart_update_interval)
 
     chart_update_text.text = f"Update chart every {params.chart_update_interval} iterations"

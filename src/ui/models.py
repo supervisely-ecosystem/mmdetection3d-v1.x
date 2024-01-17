@@ -73,6 +73,7 @@ def _get_models_by_architecture(task: str, models_meta: dict, selected_arch_name
             "train_memory": m['metadata'].get("Training Memory (GB)", "-"),
             "box_mAP": m['results'][0]['Metrics'].get('mAP', "-"),
             "NDS": m['results'][0]['Metrics'].get('NDS', "-"),
+            "weights": m["weights"],
         }
         models.append(tmp)
 

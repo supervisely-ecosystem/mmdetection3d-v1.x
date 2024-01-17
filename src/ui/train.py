@@ -1,9 +1,15 @@
 import os
+import mmengine
 from mmengine import Config, ConfigDict
 from mmdet.registry import RUNNERS
 from mmengine.visualization import Visualizer
 from mmdet.visualization import DetLocalVisualizer
-
+from src.train.train import update_config
+from src.train.train import train as _train
+from src.config_factory.config_parameters import ConfigParameters
+from src.ui.classes import classes
+import shutil
+import src.dataset.make_infos as make_infos 
 import supervisely as sly
 from supervisely.app.widgets import (
     Card,
@@ -48,11 +54,14 @@ def set_device_env(device_name: str):
 def get_train_params(cfg) -> TrainParameters:
     task = get_task()
     selected_classes = classes.get_selected_classes()
-    augs_config_path = get_selected_aug()
+    # augs_config_path = get_selected_aug()
 
     # create params from config
-    params = TrainParameters.from_config(cfg)
-    params.init(task, selected_classes, augs_config_path, g.app_dir)
+    # params = TrainParameters.from_config(cfg)
+    # params.init(task, selected_classes, augs_config_path, g.app_dir)
+
+    config_params = ConfigParameters.read_parameters_from_config(cfg)
+    params = TrainParameters.from_config_params(config_params)
 
     # update params with UI
     update_params_with_widgets(params)
@@ -65,7 +74,17 @@ def prepare_model():
     # returns config path and weights path
     if models_ui.is_pretrained_model_selected():
         selected_model = models_ui.get_selected_pretrained_model()
+        from mmdet3d.apis import Base3DInferencer
+        mim_dir = Base3DInferencer._get_repo_or_mim_dir('mmdet3d')
+        cfgs_path = set(sly.fs.list_dir_recursively(mim_dir+"/configs"))
         config_path = selected_model["config"]
+        
+        for path in cfgs_path:
+            if config_path in path:
+                config_path = os.path.join(mim_dir, 'configs', path)
+                break 
+
+        # config_path = selected_model["config"]
         weights_path_or_url = selected_model["weights"]
     else:
         remote_weights_path = models_ui.get_selected_custom_path()
@@ -104,11 +123,20 @@ def add_metadata(cfg: Config):
 
 
 def train():
+    project_dir = f"{g.app_dir}/supervisely_project"
+    
+    
     # download dataset
-    project_dir = sly_utils.download_project(iter_progress)
+    sly.logger.info("Starting downloading dataset")
+    sly_utils.download_project(g.api, g.PROJECT_ID, is_episodes=True, dst_project_dir=project_dir)
+    sly.logger.info("Dataset finished")
 
     # prepare split files
-    dump_train_val_splits(project_dir)
+    
+    # dump_train_val_splits(project_dir, is_episodes=True)
+        
+    mmdet3d_info = make_infos.collect_mmdet3d_info(project_dir, "detection")
+    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")    
 
     # prepare model files
     iter_progress(message="Preparing the model...", total=1)
@@ -116,7 +144,13 @@ def train():
 
     # create config
     cfg = Config.fromfile(config_path)
-    params = get_train_params(cfg)
+    # params = get_train_params(cfg)
+    config_params = ConfigParameters.read_parameters_from_config(cfg)
+    params = TrainParameters.from_config_params(config_params)
+
+    params.data_root = project_dir    
+    params.selected_classes = classes.get_selected_classes()
+    params.weights_path_or_url = weights_path_or_url
 
     # set device
     # set_device_env(params.device_name)
@@ -136,14 +170,20 @@ def train():
     DetLocalVisualizer._instance_dict.clear()
 
     # create config from params
-    train_cfg = params.update_config(cfg)
+    # train_cfg = params.update_config(cfg)
+    update_config(
+        cfg,
+        config_path,
+        config_params,
+        params,
+    )
 
     # update load_from with custom_weights_path
-    if params.load_from and weights_path_or_url:
-        train_cfg.load_from = weights_path_or_url
+    # if train_params.load_from and weights_path_or_url:
+    #     train_cfg.load_from = weights_path_or_url
 
     # add sly_metadata
-    add_metadata(train_cfg)
+    # add_metadata(train_cfg)
 
     # show classwise chart
     if params.add_classwise_metric:
@@ -151,13 +191,13 @@ def train():
         sly.logger.debug("Added classwise metrics")
 
     # update globals
-    config_name = config_path.split("/")[-1]
-    g.config_name = config_name
-    g.params = params
+    # config_name = config_path.split("/")[-1]
+    # g.config_name = config_name
+    # g.params = params
 
     # clean work_dir
-    if sly.fs.dir_exists(params.work_dir):
-        sly.fs.remove_dir(params.work_dir)
+    # if sly.fs.dir_exists(params.data_root):
+    #     sly.fs.remove_dir(params.data_root)
 
     # TODO: debug
     # train_cfg.dump("debug_config.py")
@@ -165,10 +205,11 @@ def train():
     iter_progress(message="Preparing the model...", total=1)
 
     # Its grace, the Runner!
-    runner = RUNNERS.build(train_cfg)
+    # runner = RUNNERS.build(train_cfg)
 
     with g.app.handle_stop():
-        runner.train()
+        _train(cfg)
+        # runner.train()
 
     if g.stop_training is True:
         sly.logger.info("The training is stopped.")
@@ -177,12 +218,12 @@ def train():
 
     # uploading checkpoints and data
     # TODO: params.experiment_name
-    if params.augs_config_path is not None:
-        sly_utils.save_augs_config(params.augs_config_path, params.work_dir)
+    # if params.augs_config_path is not None:
+    #     sly_utils.save_augs_config(params.augs_config_path, params.data_root)
     if g.api.task_id is not None:
-        sly_utils.save_open_app_lnk(params.work_dir)
+        sly_utils.save_open_app_lnk(params.data_root)
     out_path = sly_utils.upload_artifacts(
-        params.work_dir,
+        params.data_root,
         params.experiment_name,
         iter_progress,
     )
@@ -257,6 +298,7 @@ def start_train():
     # epoch_progress.show()
     iter_progress.show()
     train()
+
 
 
 def stop_train():

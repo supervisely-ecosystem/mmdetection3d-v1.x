@@ -14,9 +14,13 @@ card = Card(
 card.lock("Confirm selected classes.")
 
 
-def dump_train_val_splits(project_dir):
+def dump_train_val_splits(project_dir, is_episodes):
     # splits._project_id = None
-    splits._project_fs = sly.Project(project_dir, sly.OpenMode.READ)
+    if is_episodes:
+        splits._project_fs = sly.PointcloudEpisodeProject(project_dir, sly.OpenMode.READ)
+    else:
+        raise NotImplementedError()
+
     train_split, val_split = splits.get_splits()
     app_dir = g.app_dir
     sly.json.dump_json_file(train_split, f"{app_dir}/train_split.json")

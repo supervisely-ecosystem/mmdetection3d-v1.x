@@ -33,12 +33,12 @@ card = Card(
 )
 card.lock("Select model to unlock.")
 
-# @classes.value_changed
-# def confirmation_message(selected_classes):
-#     selected_num = len(selected_classes)
-#     if selected_num == 0:
-#         select_btn.disable()
-#         select_btn.text = "Select classes"
-#     else:
-#         select_btn.enable()
-#         select_btn.text = f"Use {selected_num} selected classes"
+@classes.value_changed
+def confirmation_message(selected_classes):
+    selected_num = len(selected_classes)
+    if selected_num == 0:
+        select_btn.disable()
+        select_btn.text = "Select classes"
+    else:
+        select_btn.enable()
+        select_btn.text = f"Use {selected_num} selected classes"

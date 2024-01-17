@@ -65,7 +65,7 @@ def update_config(
         config_path: str,
         config_params: ConfigParameters,
         train_params: TrainParameters
-        ):
+    ):
     # Input Parameters
     is_pre_trained_config = True
     train_params.num_workers = get_num_workers(train_params.batch_size_train)
@@ -88,7 +88,9 @@ def update_config(
 
     # Model weights
     weights_url = None
-    if is_pre_trained_config and train_params.load_weights:
+    if train_params.weights_path_or_url is not None:
+        weights_url = train_params.weights_path_or_url
+    elif is_pre_trained_config and train_params.load_weights:
         model_index = "mmdetection3d/model-index.yml"
         weights_url = find_weights_url(model_index, config_path)
     config_factory.configure_init_weights_and_resume(cfg, mmdet_checkpoint_path=weights_url)

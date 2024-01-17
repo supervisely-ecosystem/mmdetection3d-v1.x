@@ -1,7 +1,8 @@
 from mmengine.config import Config
 from src.config_factory.config_parameters import ConfigParameters
 from src.train.train_parameters import TrainParameters
-from src.train.train import update_config, train
+from src.train.train import update_config
+from src.train.train import train as _train
 import json
 import torch
 
@@ -23,11 +24,11 @@ config_params = ConfigParameters.read_parameters_from_config(cfg)
 
 
 # 3. Update parameters in UI
-print(f"parameters.in_channels: {config_params.in_channels}")
+print(f"parameters.in_channels: {config_params.in_channels}") # vhangeble
 print(f"parameters.point_cloud_range: {config_params.point_cloud_range}")
 print(f"parameters.voxel_size: {config_params.voxel_size}")
-print(f"parameters.optimizer: {config_params.optimizer}")
-print(f"parameters.clip_grad: {config_params.clip_grad}")
+print(f"parameters.optimizer: {config_params.optimizer}") # changeble
+print(f"parameters.clip_grad: {config_params.clip_grad}") # changeble
 print(f"parameters.schedulers: {config_params.schedulers}")
 
 
@@ -38,7 +39,7 @@ train_params.selected_classes = ["car", "pedestrian", "truck"]
 train_params.total_epochs = 40
 train_params.batch_size_train = 4
 train_params.lidar_dims = 5
-train_params.point_cloud_range = [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]
+train_params.point_cloud_range = [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0] # copy from configs see update_config
 train_params.load_weights = True
 # optimizer
 # param_scheduler

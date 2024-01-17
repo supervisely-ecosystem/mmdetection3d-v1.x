@@ -1,5 +1,5 @@
 from mmengine.config import Config
-
+from src.config_factory.config_parameters import ConfigParameters
 
 class TrainParameters:
     def __init__(self):
@@ -20,7 +20,9 @@ class TrainParameters:
         self.chart_update_interval = 1
         self.filter_empty_gt = True
         self.experiment_name = None
-        self.add_classwise_metric = True
+        self.add_classwise_metric = True     
+        
+        self.weights_path_or_url = None
 
         # checkpoints
         self.checkpoint_interval = 1
@@ -44,6 +46,22 @@ class TrainParameters:
         self.project_name = None
         self.project_id = None
         self.task_type = None
+
+    @classmethod
+    def from_config_params(cls, config_params: ConfigParameters):
+        self = cls()
+        self.lidar_dims = config_params.in_channels
+        self.point_cloud_range = config_params.point_cloud_range
+        self.optimizer = config_params.optimizer
+        self.clip_grad_norm = config_params.clip_grad['max_norm']
+        
+        # self.scheduler = config_params.schedulers[0] #TODO
+        return self
+
+
+
+
+
 
 
 def _get_train_cfgs(max_epochs: int, val_interval: int):
@@ -134,3 +152,14 @@ def configure_init_weights_and_resume(cfg: Config, mmdet_checkpoint_path: str = 
     else:
         raise ValueError("Invalid combination of checkpoint paths")
     
+def try_get_size_from_config(config: Config):
+    try:
+        pipeline = (
+            getattr(config, "train_pipeline", None) or config.train_dataloader.dataset.pipeline
+        )
+        for transform in pipeline:
+            if transform["type"] == "Resize":
+                return transform["scale"]
+    except Exception as exc:
+        print(f"can't get size from config: {exc}")
+    return None

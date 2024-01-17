@@ -1,10 +1,11 @@
 import supervisely as sly
+import src.globals as g
 
 def parse_yaml_metafile():
     raise NotImplementedError()
 
 def get_images_count():
-    raise NotImplementedError()
+    return g.IMAGES_COUNT
 
 def is_episodes(project_type: str):
     if project_type.lower() == str(sly.ProjectType.POINT_CLOUD_EPISODES).lower():

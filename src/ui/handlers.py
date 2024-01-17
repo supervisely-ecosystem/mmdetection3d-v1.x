@@ -1,8 +1,10 @@
 import os
 import supervisely as sly
-from mmengine import Config
+# from mmengine import Config
 from supervisely.app import StateJson
 from supervisely.app.widgets import Stepper, Container
+from mmengine.config import Config
+from src.config_factory.config_parameters import ConfigParameters
 
 import src.ui.train as train
 import src.ui.classes as classes_ui
@@ -77,9 +79,10 @@ hyperparameters_select_callback = wrap_button_click(
 
 splits_select_callback = wrap_button_click(
     splits_ui.select_btn,
-    cards_to_unlock=[],#augmentations.card],
+    cards_to_unlock=[hyperparameters.card], #augmentations.card],
     widgets_to_disable=[splits_ui.splits],
     # callback=augmentations_select_callback,
+    callback=hyperparameters_select_callback,
 )
 
 classes_select_callback = wrap_button_click(
@@ -116,7 +119,7 @@ task_select_callback = wrap_button_click(
 # TASK
 def on_task_changed(selected_task):
     models.update_architecture(selected_task)
-    augmentations.update_task(selected_task)
+    # augmentations.update_task(selected_task)
     model_leaderboard.update_table(models.models_meta, selected_task)
 
 
@@ -165,7 +168,15 @@ def on_model_selected():
 
     if is_pretrained_model:
         selected_model = models.get_selected_pretrained_model()
+        from mmdet3d.apis import Base3DInferencer
+        mim_dir = Base3DInferencer._get_repo_or_mim_dir('mmdet3d')
+        cfgs_path = set(sly.fs.list_dir_recursively(mim_dir+"/configs"))
         config_path = selected_model["config"]
+        
+        for path in cfgs_path:
+            if config_path in path:
+                config_path = os.path.join(mim_dir, 'configs', path)
+                break 
     else:
         remote_weights_path = models.get_selected_custom_path()
         assert os.path.splitext(remote_weights_path)[1].startswith(
@@ -173,23 +184,31 @@ def on_model_selected():
         ), "Please, select checkpoint file with model weights (.pth)"
         config_path = sly_utils.download_custom_config(remote_weights_path)
 
-    cfg = Config.fromfile(config_path)
-    if not is_pretrained_model:
-        # check task type is correct
-        model_task = cfg.train_dataloader.dataset.task
-        selected_task = train.get_task()
-        assert (
-            model_task == selected_task
-        ), f"The selected model was trained in {model_task} task, but you've selected the {selected_task} task. Please, check your selected task."
-        # check if config is from mmdet v3.0
-        assert hasattr(
-            cfg, "optim_wrapper"
-        ), "Missing some parameters in config. Please, check if your custom model was trained in mmdetection v3.0."
+    # cfg = Config.fromfile(config_path)
+    # if not is_pretrained_model:
+    #     # check task type is correct
+    #     model_task = cfg.train_dataloader.dataset.task
+    #     selected_task = train.get_task()
+    #     assert (
+    #         model_task == selected_task
+    #     ), f"The selected model was trained in {model_task} task, but you've selected the {selected_task} task. Please, check your selected task."
+    #     # check if config is from mmdet v3.0
+    #     assert hasattr(
+    #         cfg, "optim_wrapper"
+    #     ), "Missing some parameters in config. Please, check if your custom model was trained in mmdetection v3.0."
 
-    params = TrainParameters.from_config(cfg)
-    if params.warmup_iters:
-        params.warmup_iters = sly_utils.get_images_count() // 2
-    hyperparameters.update_widgets_with_params(params)
+    # from src.train import update_config
+
+    # 2. Read parameters from config file
+    cfg = Config.fromfile(config_path)
+    config_params = ConfigParameters.read_parameters_from_config(cfg)
+    train_params = TrainParameters.from_config_params(config_params)
+    
+    hyperparameters.update_widgets_with_params(train_params)
+
+    # if params.warmup_iters:
+    #     params.warmup_iters = sly_utils.get_images_count() // 2
+    # hyperparameters.update_widgets_with_params(params)
 
     # unlock cards
     sly.logger.debug(f"State {classes_ui.card.widget_id}: {StateJson()[classes_ui.card.widget_id]}")
@@ -214,14 +233,14 @@ def select_classes():
     )
 
 
-# @splits_ui.select_btn.click
-# def select_splits():
-#     splits_select_callback()
-#     set_stepper_step(
-#         stepper,
-#         splits_ui.select_btn,
-#         next_pos=6,
-#     )
+@splits_ui.select_btn.click
+def select_splits():
+    splits_select_callback()
+    set_stepper_step(
+        stepper,
+        splits_ui.select_btn,
+        next_pos=6,
+    )
 
 
 # @augmentations.select_btn.click

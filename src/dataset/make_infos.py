@@ -157,3 +157,7 @@ if __name__ == "__main__":
     project_dir = "app_data/sly_project_episodes"
     mmdet3d_info = collect_mmdet3d_info(project_dir, "detection")
     mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")
+
+    project_dir = "app_data/supervisely_project"
+    mmdet3d_info = collect_mmdet3d_info(project_dir, "detection")
+    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")    

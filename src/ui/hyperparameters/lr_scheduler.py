@@ -524,9 +524,9 @@ def update_scheduler_widgets_with_params(params: TrainParameters):
         name = params.scheduler["type"]
         select_scheduler.set_value(name)
 
-        for param, value in select_scheduler.items():
+        for param_ in select_scheduler.get_items():
             if param in schedulers_params[name].get_params():
-                schedulers_params[name].set(param, value)
+                schedulers_params[name].set(param, param_.value)
 
     # warmup
     if params.warmup_iters:

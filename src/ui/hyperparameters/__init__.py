@@ -18,6 +18,8 @@ from src.ui.hyperparameters.lr_scheduler import (
     select_scheduler,
 )
 from src.train.train_parameters import TrainParameters
+from src.config_factory.config_parameters import ConfigParameters
+
 
 from src.ui.hyperparameters import general
 from src.ui.hyperparameters import checkpoints
