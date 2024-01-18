@@ -4,6 +4,7 @@ __pycache__/
 .venv
 env/
 venv/
+supervisely
 *.pth
 /preds*
 /app_data

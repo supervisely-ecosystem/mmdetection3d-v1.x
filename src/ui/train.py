@@ -125,45 +125,30 @@ def add_metadata(cfg: Config):
 def train():
     project_dir = f"{g.app_dir}/supervisely_project"
     
-    
     # download dataset
     sly.logger.info("Starting downloading dataset")
     sly_utils.download_project(g.api, g.PROJECT_ID, is_episodes=True, dst_project_dir=project_dir)
     sly.logger.info("Dataset finished")
 
-    # prepare split files
-    
-    # dump_train_val_splits(project_dir, is_episodes=True)
+    # prepare split files    
+    train_split, val_split = dump_train_val_splits(project_dir)
         
     mmdet3d_info = make_infos.collect_mmdet3d_info(project_dir, "detection")
-    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")    
+    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")  
+    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_val.pkl")    
 
     # prepare model files
     iter_progress(message="Preparing the model...", total=1)
     config_path, weights_path_or_url = prepare_model()
 
     # create config
-    cfg = Config.fromfile(config_path)
-    # params = get_train_params(cfg)
+    cfg = Config.fromfile(config_path)    
     config_params = ConfigParameters.read_parameters_from_config(cfg)
     params = TrainParameters.from_config_params(config_params)
 
     params.data_root = project_dir    
     params.selected_classes = classes.get_selected_classes()
     params.weights_path_or_url = weights_path_or_url
-
-    # set device
-    # set_device_env(params.device_name)
-    # doesn't work :(
-    # maybe because of torch has been imported earlier and it already read CUDA_VISIBLE_DEVICES
-
-    ### TODO: debug
-    # params.checkpoint_interval = 5
-    # params.save_best = False
-    # params.val_interval = 1
-    # params.num_workers = 0
-    # params.input_size = (409, 640)
-    ###
 
     # If we won't do this, restarting the training will throw a error
     Visualizer._instance_dict.clear()
@@ -179,7 +164,7 @@ def train():
     )
 
     # update load_from with custom_weights_path
-    # if train_params.load_from and weights_path_or_url:
+    # if params.load_from and weights_path_or_url:
     #     train_cfg.load_from = weights_path_or_url
 
     # add sly_metadata
@@ -204,12 +189,10 @@ def train():
 
     iter_progress(message="Preparing the model...", total=1)
 
-    # Its grace, the Runner!
     # runner = RUNNERS.build(train_cfg)
 
     with g.app.handle_stop():
         _train(cfg)
-        # runner.train()
 
     if g.stop_training is True:
         sly.logger.info("The training is stopped.")
@@ -220,6 +203,7 @@ def train():
     # TODO: params.experiment_name
     # if params.augs_config_path is not None:
     #     sly_utils.save_augs_config(params.augs_config_path, params.data_root)
+
     if g.api.task_id is not None:
         sly_utils.save_open_app_lnk(params.data_root)
     out_path = sly_utils.upload_artifacts(

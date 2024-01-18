@@ -20,13 +20,13 @@ from src.train.train_parameters import TrainParameters
 
 from src.ui import hyperparameters
 from src.ui import augmentations
-from src.ui import model_leaderboard
+# from src.ui import model_leaderboard
 from src.ui.utils import wrap_button_click, button_clicked, set_stepper_step
 
 
 all_widgets = [
     input_project.card,
-    Container(widgets=[task_ui.card, model_leaderboard.card]),
+    Container(widgets=[task_ui.card]), #, model_leaderboard.card]),
     models.card,
     classes_ui.card,
     splits_ui.card,
@@ -110,7 +110,7 @@ models_select_callback = wrap_button_click(
 
 task_select_callback = wrap_button_click(
     task_ui.select_btn,
-    [models.card, model_leaderboard.card],
+    [models.card],#, model_leaderboard.card],
     [task_ui.task_selector],
     models_select_callback,
 )
@@ -120,7 +120,7 @@ task_select_callback = wrap_button_click(
 def on_task_changed(selected_task):
     models.update_architecture(selected_task)
     # augmentations.update_task(selected_task)
-    model_leaderboard.update_table(models.models_meta, selected_task)
+    # model_leaderboard.update_table(models.models_meta, selected_task)
 
 
 @task_ui.select_btn.click
@@ -135,8 +135,9 @@ def select_task():
     if button_clicked[task_ui.select_btn.widget_id]:
         on_task_changed(task_ui.task_selector.get_value())
     else:
-        model_leaderboard.table.read_json(None)
-        model_leaderboard.table.sort(0)
+        #model_leaderboard.table.read_json(None)
+        #model_leaderboard.table.sort(0)
+        pass
 
 
 # MODELS

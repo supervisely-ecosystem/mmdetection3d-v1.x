@@ -160,4 +160,6 @@ if __name__ == "__main__":
 
     project_dir = "app_data/supervisely_project"
     mmdet3d_info = collect_mmdet3d_info(project_dir, "detection")
-    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")    
+    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")   
+
+    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_val.pkl")    
