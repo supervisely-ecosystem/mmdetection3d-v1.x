@@ -10,13 +10,24 @@ def is_episodes(project_type: str):
         raise ValueError(f"Project type {project_type} is not supported.")
 
 
-def download_project(api, project_id, is_episodes, dst_project_dir, progress_cb=None):
+# def download_project(api, project_id, is_episodes, dst_project_dir, progress_cb=None):
+#     if not sly.fs.dir_exists(dst_project_dir):
+#         sly.fs.mkdir(dst_project_dir)
+#         if is_episodes:
+#             sly.download_pointcloud_episode_project(
+#                 api, project_id, dst_project_dir, progress_cb=progress_cb
+#             )
+#         else:
+#             sly.download_pointcloud_project(
+#                 api, project_id, dst_project_dir, progress_cb=progress_cb
+#             )
+
+
+def download_project(api, project_info, dst_project_dir, progress_cb=None):
     if not sly.fs.dir_exists(dst_project_dir):
         sly.fs.mkdir(dst_project_dir)
-        if is_episodes:
-            sly.download_pointcloud_episode_project(api, project_id, dst_project_dir, progress_cb=progress_cb)
-        else:
-            sly.download_pointcloud_project(api, project_id, dst_project_dir, progress_cb=progress_cb)
+        cls = sly.get_project_class(project_info.type)
+        cls.download(api, project_info.id, dst_project_dir, progress_cb=progress_cb)
 
 
 def download_point_cloud(api: sly.Api, pcd_id: int, dst_dir: str):
@@ -35,9 +46,12 @@ def upload_point_cloud(api: sly.Api, dataset_id: int, pcd_path: str, name: str):
     return api.pointcloud.upload_path(dataset_id, name, pcd_path)
 
 
-def add_classes_to_project_meta(api: sly.Api, project_meta: sly.ProjectMeta, project_id: int, classes: list):
+def add_classes_to_project_meta(
+    api: sly.Api, project_meta: sly.ProjectMeta, project_id: int, classes: list
+):
     # add classes to project meta
     from supervisely.geometry.cuboid_3d import Cuboid3d
+
     added_classes = []
     for class_name in classes:
         if project_meta.get_obj_class(class_name) is None:
