@@ -135,9 +135,14 @@ def train():
     # prepare split files
     train_split, val_split = dump_train_val_splits(project_dir)
 
-    mmdet3d_info = make_infos.collect_mmdet3d_info(project_dir, "detection")
-    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")
-    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_val.pkl")
+    mmdet3d_info_train = make_infos.collect_mmdet3d_info_from_splits(
+        project_dir, [(i.dataset_name, i.name) for i in train_split], "detection"
+    )
+    mmengine.dump(mmdet3d_info_train, f"{project_dir}/infos_train.pkl")
+    mmdet3d_info_val = make_infos.collect_mmdet3d_info_from_splits(
+        project_dir, [(i.dataset_name, i.name) for i in val_split], "detection"
+    )
+    mmengine.dump(mmdet3d_info_val, f"{project_dir}/infos_val.pkl")
 
     # prepare model files
     iter_progress(message="Preparing the model...", total=1)
