@@ -1,5 +1,6 @@
 import os
 import supervisely as sly
+
 # from mmengine import Config
 from supervisely.app import StateJson
 from supervisely.app.widgets import Stepper, Container
@@ -20,13 +21,14 @@ from src.train.train_parameters import TrainParameters
 
 from src.ui import hyperparameters
 from src.ui import augmentations
+
 # from src.ui import model_leaderboard
 from src.ui.utils import wrap_button_click, button_clicked, set_stepper_step
 
 
 all_widgets = [
     input_project.card,
-    Container(widgets=[task_ui.card]), #, model_leaderboard.card]),
+    Container(widgets=[task_ui.card]),  # , model_leaderboard.card]),
     models.card,
     classes_ui.card,
     splits_ui.card,
@@ -79,7 +81,7 @@ hyperparameters_select_callback = wrap_button_click(
 
 splits_select_callback = wrap_button_click(
     splits_ui.select_btn,
-    cards_to_unlock=[hyperparameters.card], #augmentations.card],
+    cards_to_unlock=[hyperparameters.card],  # augmentations.card],
     widgets_to_disable=[splits_ui.splits],
     # callback=augmentations_select_callback,
     callback=hyperparameters_select_callback,
@@ -110,7 +112,7 @@ models_select_callback = wrap_button_click(
 
 task_select_callback = wrap_button_click(
     task_ui.select_btn,
-    [models.card],#, model_leaderboard.card],
+    [models.card],  # , model_leaderboard.card],
     [task_ui.task_selector],
     models_select_callback,
 )
@@ -135,8 +137,8 @@ def select_task():
     if button_clicked[task_ui.select_btn.widget_id]:
         on_task_changed(task_ui.task_selector.get_value())
     else:
-        #model_leaderboard.table.read_json(None)
-        #model_leaderboard.table.sort(0)
+        # model_leaderboard.table.read_json(None)
+        # model_leaderboard.table.sort(0)
         pass
 
 
@@ -170,14 +172,15 @@ def on_model_selected():
     if is_pretrained_model:
         selected_model = models.get_selected_pretrained_model()
         from mmdet3d.apis import Base3DInferencer
-        mim_dir = Base3DInferencer._get_repo_or_mim_dir('mmdet3d')
-        cfgs_path = set(sly.fs.list_dir_recursively(mim_dir+"/configs"))
+
+        mim_dir = Base3DInferencer._get_repo_or_mim_dir("mmdet3d")
+        cfgs_path = set(sly.fs.list_dir_recursively(mim_dir + "/configs"))
         config_path = selected_model["config"]
-        
+
         for path in cfgs_path:
             if config_path in path:
-                config_path = os.path.join(mim_dir, 'configs', path)
-                break 
+                config_path = os.path.join(mim_dir, "configs", path)
+                break
     else:
         remote_weights_path = models.get_selected_custom_path()
         assert os.path.splitext(remote_weights_path)[1].startswith(
@@ -204,7 +207,7 @@ def on_model_selected():
     cfg = Config.fromfile(config_path)
     config_params = ConfigParameters.read_parameters_from_config(cfg)
     train_params = TrainParameters.from_config_params(config_params)
-    
+
     hyperparameters.update_widgets_with_params(train_params)
 
     # if params.warmup_iters:

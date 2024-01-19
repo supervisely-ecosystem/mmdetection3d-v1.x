@@ -9,7 +9,7 @@ from src.train.train import train as _train
 from src.config_factory.config_parameters import ConfigParameters
 from src.ui.classes import classes
 import shutil
-import src.dataset.make_infos as make_infos 
+import src.dataset.make_infos as make_infos
 import supervisely as sly
 from supervisely.app.widgets import (
     Card,
@@ -29,6 +29,7 @@ from src.ui.classes import classes
 import src.ui.models as models_ui
 from src import sly_utils
 from src.ui.hyperparameters import update_params_with_widgets
+
 # from src.ui.augmentations import get_selected_aug
 from src.ui.graphics import add_classwise_metric, monitoring
 
@@ -75,14 +76,15 @@ def prepare_model():
     if models_ui.is_pretrained_model_selected():
         selected_model = models_ui.get_selected_pretrained_model()
         from mmdet3d.apis import Base3DInferencer
-        mim_dir = Base3DInferencer._get_repo_or_mim_dir('mmdet3d')
-        cfgs_path = set(sly.fs.list_dir_recursively(mim_dir+"/configs"))
+
+        mim_dir = Base3DInferencer._get_repo_or_mim_dir("mmdet3d")
+        cfgs_path = set(sly.fs.list_dir_recursively(mim_dir + "/configs"))
         config_path = selected_model["config"]
-        
+
         for path in cfgs_path:
             if config_path in path:
-                config_path = os.path.join(mim_dir, 'configs', path)
-                break 
+                config_path = os.path.join(mim_dir, "configs", path)
+                break
 
         # config_path = selected_model["config"]
         weights_path_or_url = selected_model["weights"]
@@ -123,30 +125,30 @@ def add_metadata(cfg: Config):
 
 
 def train():
-    project_dir = f"{g.app_dir}/supervisely_project"
-    
+    project_dir = g.PROJECT_DIR
+
     # download dataset
     sly.logger.info("Starting downloading dataset")
-    sly_utils.download_project(g.api, g.PROJECT_ID, is_episodes=True, dst_project_dir=project_dir)
+    sly_utils.download_project(g.api, g.PROJECT_INFO, project_dir)
     sly.logger.info("Dataset finished")
 
-    # prepare split files    
+    # prepare split files
     train_split, val_split = dump_train_val_splits(project_dir)
-        
+
     mmdet3d_info = make_infos.collect_mmdet3d_info(project_dir, "detection")
-    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")  
-    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_val.pkl")    
+    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")
+    mmengine.dump(mmdet3d_info, f"{project_dir}/infos_val.pkl")
 
     # prepare model files
     iter_progress(message="Preparing the model...", total=1)
     config_path, weights_path_or_url = prepare_model()
 
     # create config
-    cfg = Config.fromfile(config_path)    
+    cfg = Config.fromfile(config_path)
     config_params = ConfigParameters.read_parameters_from_config(cfg)
     params = TrainParameters.from_config_params(config_params)
 
-    params.data_root = project_dir    
+    params.data_root = project_dir
     params.selected_classes = classes.get_selected_classes()
     params.weights_path_or_url = weights_path_or_url
 
@@ -282,7 +284,6 @@ def start_train():
     # epoch_progress.show()
     iter_progress.show()
     train()
-
 
 
 def stop_train():

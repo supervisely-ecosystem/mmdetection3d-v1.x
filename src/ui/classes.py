@@ -27,11 +27,12 @@ card = Card(
     title="Training classes",
     description=(
         "Select classes that will be used for training. "
-        "Supported shapes are Bitmap, Polygon, Rectangle."
+        "Supported shapes are Cuboid 3D and Mask 3D."
     ),
     content=Container([classes, select_btn]),
 )
 card.lock("Select model to unlock.")
+
 
 @classes.value_changed
 def confirmation_message(selected_classes):
