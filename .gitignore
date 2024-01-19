@@ -24,3 +24,4 @@ supervisely
 /app_mmdetection_3d
 /detection3d_configs
 *.pcd
+supervisely
