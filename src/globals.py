@@ -29,7 +29,7 @@ TEAMFILES_UPLOAD_DIR = "mmdetection3d-v1.x"
 STATIC_DIR = app_dir + "/static"
 os.makedirs(STATIC_DIR, exist_ok=True)
 
-COCO_MTERIC_KEYS = ["mAP", "mAP_50", "mAP_75"]
+NUSCENES_METRIC_KEYS = ["mAP", "NDS"]
 # params
 # MAX_CLASSES_FOR_PERCLASS_METRICS = 10
 

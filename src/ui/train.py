@@ -2,9 +2,9 @@ import os
 import mmengine
 import src.train.train as t
 from mmengine import Config, ConfigDict
-from mmdet.registry import RUNNERS
+from mmdet3d.registry import RUNNERS
 from mmengine.visualization import Visualizer
-from mmdet.visualization import DetLocalVisualizer
+from mmdet3d.visualization import Det3DLocalVisualizer
 from src.train.train import update_config
 from src.train.train import train as _train
 from src.config_factory.config_parameters import ConfigParameters
@@ -160,7 +160,7 @@ def train():
 
     # If we won't do this, restarting the training will throw a error
     Visualizer._instance_dict.clear()
-    DetLocalVisualizer._instance_dict.clear()
+    Det3DLocalVisualizer._instance_dict.clear()
 
     # create config from params
     # train_cfg = params.update_config(cfg)
@@ -184,9 +184,9 @@ def train():
         sly.logger.debug("Added classwise metrics")
 
     # update globals
-    # config_name = config_path.split("/")[-1]
-    # g.config_name = config_name
-    # g.params = params
+    config_name = config_path.split("/")[-1]
+    g.config_name = config_name
+    g.params = params
 
     # clean work_dir
     # if sly.fs.dir_exists(params.data_root):
@@ -216,7 +216,7 @@ def train():
     if g.api.task_id is not None:
         sly_utils.save_open_app_lnk(params.data_root)
     out_path = sly_utils.upload_artifacts(
-        params.data_root,
+        g.WORK_DIR,
         params.experiment_name,
         iter_progress,
     )

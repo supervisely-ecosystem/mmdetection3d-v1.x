@@ -80,8 +80,9 @@ class SuperviselyHook(Hook):
             return
 
         # Add mAP metrics
-        metric_keys = [f"coco/{self.task}_{metric}" for metric in g.COCO_MTERIC_KEYS]
-        for metric_key, metric_name in zip(metric_keys, g.COCO_MTERIC_KEYS):
+        # TODO метрики по классам 'per class'
+        metric_keys = [f"NuScenes metric/{metric}" for metric in g.NUSCENES_METRIC_KEYS]
+        for metric_key, metric_name in zip(metric_keys, g.NUSCENES_METRIC_KEYS):
             value = metrics[metric_key]
             monitoring.add_scalar("val", "Metrics", metric_name, runner.epoch, value)
 

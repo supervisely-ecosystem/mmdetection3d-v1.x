@@ -112,7 +112,7 @@ train_stage.create_metric("Loss", ["loss"])
 train_stage.create_metric("Learning Rate", ["lr"], decimals_in_float=6)
 
 val_stage = StageMonitoring("val", "Validation")
-val_stage.create_metric("Metrics", g.COCO_MTERIC_KEYS)
+val_stage.create_metric("Metrics", g.NUSCENES_METRIC_KEYS)
 val_stage.create_metric("Classwise mAP")
 
 
