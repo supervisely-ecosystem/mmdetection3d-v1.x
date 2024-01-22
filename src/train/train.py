@@ -13,6 +13,7 @@ from mmengine.logging import print_log
 from mmdet3d.registry import RUNNERS
 from mmengine.runner import Runner
 
+import src.globals as g
 
 sys.path.append(os.path.abspath("mmdetection3d"))
 
@@ -24,52 +25,60 @@ def get_num_workers(batch_size: int):
     return num_workers
 
 
-def build_runner(cfg: Config, work_dir: str, amp: bool, auto_scale_lr: bool = False) -> Runner:
-
+def build_runner_cfg(cfg: Config, work_dir: str, amp: bool, auto_scale_lr: bool = False) -> Config:
     cfg.work_dir = work_dir
 
     # enable automatic-mixed-precision training
     if amp is True:
         optim_wrapper = cfg.optim_wrapper.type
-        if optim_wrapper == 'AmpOptimWrapper':
+        if optim_wrapper == "AmpOptimWrapper":
             print_log(
-                'AMP training is already enabled in your config.',
-                logger='current',
-                level=logging.WARNING)
+                "AMP training is already enabled in your config.",
+                logger="current",
+                level=logging.WARNING,
+            )
         else:
-            assert optim_wrapper == 'OptimWrapper', (
-                '`--amp` is only supported when the optimizer wrapper type is '
-                f'`OptimWrapper` but got {optim_wrapper}.')
-            cfg.optim_wrapper.type = 'AmpOptimWrapper'
-            cfg.optim_wrapper.loss_scale = 'dynamic'
+            assert optim_wrapper == "OptimWrapper", (
+                "`--amp` is only supported when the optimizer wrapper type is "
+                f"`OptimWrapper` but got {optim_wrapper}."
+            )
+            cfg.optim_wrapper.type = "AmpOptimWrapper"
+            cfg.optim_wrapper.loss_scale = "dynamic"
 
     # enable automatically scaling LR (for multi-gpu training)
     if auto_scale_lr:
-        if 'auto_scale_lr' in cfg and \
-                'enable' in cfg.auto_scale_lr and \
-                'base_batch_size' in cfg.auto_scale_lr:
+        if (
+            "auto_scale_lr" in cfg
+            and "enable" in cfg.auto_scale_lr
+            and "base_batch_size" in cfg.auto_scale_lr
+        ):
             cfg.auto_scale_lr.enable = True
         else:
-            raise RuntimeError('Can not find "auto_scale_lr" or '
-                               '"auto_scale_lr.enable" or '
-                               '"auto_scale_lr.base_batch_size" in your'
-                               ' configuration file.')
+            raise RuntimeError(
+                'Can not find "auto_scale_lr" or '
+                '"auto_scale_lr.enable" or '
+                '"auto_scale_lr.base_batch_size" in your'
+                " configuration file."
+            )
 
+    return cfg
+
+
+def build_runner(cfg: Config, work_dir: str, amp: bool, auto_scale_lr: bool = False) -> Runner:
+    cfg = build_runner_cfg(cfg, work_dir, amp, auto_scale_lr)
     runner = RUNNERS.build(cfg)
-    
     return runner
 
 
 def update_config(
-        cfg: Config,
-        config_path: str,
-        config_params: ConfigParameters,
-        train_params: TrainParameters
-    ):
+    cfg: Config, config_path: str, config_params: ConfigParameters, train_params: TrainParameters
+):
     # Input Parameters
     is_pre_trained_config = True
     train_params.num_workers = get_num_workers(train_params.batch_size_train)
-    train_params.point_cloud_range = config_params.point_cloud_range  # we won't let the user change this so far
+    train_params.point_cloud_range = (
+        config_params.point_cloud_range
+    )  # we won't let the user change this so far
     voxel_size = config_params.voxel_size
     point_sample = config_params.point_sample
 
@@ -107,8 +116,8 @@ def update_config(
         aug_pipeline,
         train_params.selected_classes,
         point_sample=point_sample,
-        add_dummy_velocities=add_dummy_velocities
-        )
+        add_dummy_velocities=add_dummy_velocities,
+    )
 
     # Training confg
     config_factory.configure_loops(cfg, train_params.total_epochs, train_params.val_interval)

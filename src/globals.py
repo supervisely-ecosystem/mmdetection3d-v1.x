@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 # from src.state import State
 
-# from src.train.train_parameters import TrainParameters
+from src.train.train_parameters import TrainParameters
 
 if sly.is_development():
     load_dotenv(os.path.expanduser("~/supervisely.env"))
@@ -13,6 +13,10 @@ if sly.is_development():
 api = sly.Api.from_env()
 app_dir = sly.app.get_synced_data_dir()
 app: sly.Application = None
+
+stop_training = False
+config_name: str = None
+params: TrainParameters = None
 
 PROJECT_ID = sly.env.project_id()
 TEAM_ID = sly.env.team_id()

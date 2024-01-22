@@ -1,5 +1,6 @@
 import os
 import mmengine
+import src.train.train as t
 from mmengine import Config, ConfigDict
 from mmdet.registry import RUNNERS
 from mmengine.visualization import Visualizer
@@ -196,10 +197,11 @@ def train():
 
     iter_progress(message="Preparing the model...", total=1)
 
-    # runner = RUNNERS.build(train_cfg)
+    cfg = t.build_runner_cfg(cfg, "app_data/work_dir", amp=False, auto_scale_lr=False)
+    runner = RUNNERS.build(cfg)
 
     with g.app.handle_stop():
-        _train(cfg)
+        runner.train()
 
     if g.stop_training is True:
         sly.logger.info("The training is stopped.")
