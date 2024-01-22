@@ -5,7 +5,7 @@ from mmengine.evaluator import BaseMetric
 from mmdet3d.registry import METRICS
 import supervisely as sly
 
-from src.evaluation import nusecnes_eval
+from src.evaluation import nuscenes_eval
 
 
 @METRICS.register_module()
@@ -83,7 +83,7 @@ class CustomNuScenesMetric(BaseMetric):
         self.selected_classes = self._parse_selected_classes(selected_classes, classes)
         if self.selected_classes != self.classes:
             self._filter_annotations_by_selected_classes(self.annotations, self.selected_classes)
-        nusecnes_eval.override_constants(self.selected_classes, ["dummy_attr"])
+        nuscenes_eval.override_constants(self.selected_classes, ["dummy_attr"])
 
     def process(self, data_batch: dict, data_samples: Sequence[dict]) -> None:
         """Process one batch of data samples and predictions.
@@ -119,24 +119,24 @@ class CustomNuScenesMetric(BaseMetric):
             Dict[str, float]: The computed metrics. The keys are the names of
             the metrics, and the values are corresponding results.
         """
-        pred_nusc_boxes = nusecnes_eval.convert_pred_to_nusc_boxes(
+        pred_nusc_boxes = nuscenes_eval.convert_pred_to_nusc_boxes(
             results, self.map_pred_label_to_class_name
         )
 
         if self.gt_is_kitti:
-            gt_nusc_boxes = nusecnes_eval.convert_gt_kitti_to_nusc_boxes(
+            gt_nusc_boxes = nuscenes_eval.convert_gt_kitti_to_nusc_boxes(
                 self.annotations["data_list"], self.map_gt_label_to_class_name
             )
         else:
-            gt_nusc_boxes = nusecnes_eval.convert_gt_to_nusc_boxes(
+            gt_nusc_boxes = nuscenes_eval.convert_gt_to_nusc_boxes(
                 self.annotations["data_list"], self.map_gt_label_to_class_name
             )
 
-        eval = nusecnes_eval.CustomNuScenesEval(pred_nusc_boxes, gt_nusc_boxes, verbose=True)
+        eval = nuscenes_eval.CustomNuScenesEval(pred_nusc_boxes, gt_nusc_boxes, verbose=True)
         metrics, metric_data_list = eval.evaluate()
 
         metrics_summary = metrics.serialize()
-        nusecnes_eval.print_metrics_summary(metrics_summary)
+        nuscenes_eval.print_metrics_summary(metrics_summary)
 
         return {
             "mAP": metrics_summary["mean_ap"],
