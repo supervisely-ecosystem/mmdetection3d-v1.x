@@ -32,7 +32,7 @@ from src import sly_utils
 from src.ui.hyperparameters import update_params_with_widgets
 
 # from src.ui.augmentations import get_selected_aug
-from src.ui.graphics import add_classwise_metric, monitoring
+from src.ui.graphics import add_classwise_metric, monitoring, add_3d_errors_metric
 
 # register modules (don't remove):
 # from src import sly_dataset, sly_hook, sly_imgaugs
@@ -177,6 +177,11 @@ def train():
 
     # add sly_metadata
     # add_metadata(train_cfg)
+
+    # show 3D errors chart
+    if params.add_3d_errors_metric:
+        add_3d_errors_metric()
+        sly.logger.debug("Added 3D error metrics")
 
     # show classwise chart
     if params.add_classwise_metric:

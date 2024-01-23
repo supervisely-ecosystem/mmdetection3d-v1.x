@@ -30,6 +30,7 @@ STATIC_DIR = app_dir + "/static"
 os.makedirs(STATIC_DIR, exist_ok=True)
 
 NUSCENES_METRIC_KEYS = ["mAP", "NDS"]
+
 # params
 # MAX_CLASSES_FOR_PERCLASS_METRICS = 10
 

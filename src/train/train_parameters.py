@@ -1,6 +1,7 @@
 from mmengine.config import Config
 from src.config_factory.config_parameters import ConfigParameters
 
+
 class TrainParameters:
     def __init__(self):
         # general
@@ -20,8 +21,9 @@ class TrainParameters:
         self.chart_update_interval = 1
         self.filter_empty_gt = True
         self.experiment_name = None
-        self.add_classwise_metric = True     
-        
+        self.add_classwise_metric = True
+        self.add_3d_errors_metric = True
+
         self.weights_path_or_url = None
 
         # checkpoints
@@ -53,21 +55,16 @@ class TrainParameters:
         self.lidar_dims = config_params.in_channels
         self.point_cloud_range = config_params.point_cloud_range
         self.optimizer = config_params.optimizer
-        self.clip_grad_norm = config_params.clip_grad['max_norm']
-        
+        self.clip_grad_norm = config_params.clip_grad["max_norm"]
+
         # self.scheduler = config_params.schedulers[0] #TODO
         return self
 
 
-
-
-
-
-
 def _get_train_cfgs(max_epochs: int, val_interval: int):
-    train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=val_interval)
-    val_cfg = dict(type='ValLoop')
-    test_cfg = dict(type='TestLoop')
+    train_cfg = dict(type="EpochBasedTrainLoop", max_epochs=max_epochs, val_interval=val_interval)
+    val_cfg = dict(type="ValLoop")
+    test_cfg = dict(type="TestLoop")
     return train_cfg, val_cfg, test_cfg
 
 
@@ -102,7 +99,7 @@ def configure_optimizer(cfg: Config, train_params: TrainParameters):
 
 
 def merge_default_runtime(cfg: Config):
-    default_runtime = Config.fromfile('src/config_factory/default_runtime.py')
+    default_runtime = Config.fromfile("src/config_factory/default_runtime.py")
     cfg.merge_from_dict(default_runtime)
 
 
@@ -132,7 +129,12 @@ def configure_logs_and_hooks(cfg: Config, train_params: TrainParameters):
     cfg.log_processor.window_size = train_params.chart_update_interval
 
 
-def configure_init_weights_and_resume(cfg: Config, mmdet_checkpoint_path: str = None, supervisely_checkpoint_path: str = None, resume: bool = False):
+def configure_init_weights_and_resume(
+    cfg: Config,
+    mmdet_checkpoint_path: str = None,
+    supervisely_checkpoint_path: str = None,
+    resume: bool = False,
+):
     # 1. init weights from zero
     if mmdet_checkpoint_path is None and supervisely_checkpoint_path is None:
         cfg.resume = False
@@ -142,16 +144,23 @@ def configure_init_weights_and_resume(cfg: Config, mmdet_checkpoint_path: str = 
         cfg.resume = False
         cfg.load_from = mmdet_checkpoint_path
     # 3. load checkpoint trained in Supervisely (don't resume training)
-    elif mmdet_checkpoint_path is None and supervisely_checkpoint_path is not None and resume is False:
+    elif (
+        mmdet_checkpoint_path is None
+        and supervisely_checkpoint_path is not None
+        and resume is False
+    ):
         cfg.resume = False
         cfg.load_from = supervisely_checkpoint_path
     # 4. load checkpoint trained in Supervisely and resume training
-    elif mmdet_checkpoint_path is None and supervisely_checkpoint_path is not None and resume is True:
+    elif (
+        mmdet_checkpoint_path is None and supervisely_checkpoint_path is not None and resume is True
+    ):
         cfg.resume = True
         cfg.load_from = supervisely_checkpoint_path
     else:
         raise ValueError("Invalid combination of checkpoint paths")
-    
+
+
 def try_get_size_from_config(config: Config):
     try:
         pipeline = (

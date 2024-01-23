@@ -80,11 +80,11 @@ class Monitoring(object):
         self,
         stage_id: str,
         metric_name: str,
-        serise_name: str,
+        series_name: str,
         x: NumT,
         y: NumT,
     ):
-        self._stages[stage_id]["raw"].add_scalar(f"{metric_name}/{serise_name}", y, x)
+        self._stages[stage_id]["raw"].add_scalar(f"{metric_name}/{series_name}", y, x)
 
     def add_scalars(
         self,
@@ -113,12 +113,18 @@ train_stage.create_metric("Learning Rate", ["lr"], decimals_in_float=6)
 
 val_stage = StageMonitoring("val", "Validation")
 val_stage.create_metric("Metrics", g.NUSCENES_METRIC_KEYS)
-val_stage.create_metric("Classwise mAP")
+val_stage.create_metric("3D Errors")
+val_stage.create_metric("Class-Wise AP")
+
+
+def add_3d_errors_metric():
+    gp: GridPlot = monitoring._stages["val"]["raw"]
+    gp._widgets["3D Errors"].show()
 
 
 def add_classwise_metric(selected_classes):
     gp: GridPlot = monitoring._stages["val"]["raw"]
-    gp._widgets["Classwise mAP"].show()
+    gp._widgets["Class-Wise AP"].show()
 
 
 monitoring = Monitoring()
@@ -129,4 +135,7 @@ monitoring.add_stage(val_stage, True)
 # add_btn = Button("add")
 
 gp: GridPlot = monitoring._stages["val"]["raw"]
-gp._widgets["Classwise mAP"].hide()
+gp._widgets["Class-Wise AP"].hide()
+
+gp: GridPlot = monitoring._stages["val"]["raw"]
+gp._widgets["3D Errors"].hide()

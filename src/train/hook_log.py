@@ -86,13 +86,15 @@ class SuperviselyHook(Hook):
             value = metrics[metric_key]
             monitoring.add_scalar("val", "Metrics", metric_name, runner.epoch, value)
 
+        # Add 3d Errors
+        if g.params.add_3d_errors_metric:
+            metrics_3d = metrics.get("NuScenes metric/3d_err", {})
+            for metric_name, value in metrics_3d.items():
+                monitoring.add_scalar("val", "3D Errors", metric_name, runner.epoch, value)
+
         # Add classwise metrics
         if g.params.add_classwise_metric:
-            # colors = runner.val_dataloader.dataset.metainfo["palette"]
-            classwise_metrics = {
-                k.split("_precision")[0][5:]: v
-                for k, v in metrics.items()
-                if k.endswith("_precision")
-            }
+            colors = runner.val_dataloader.dataset.metainfo["palette"]
+            classwise_metrics = metrics.get("NuScenes metric/cls_AP", {})
             for class_name, value in classwise_metrics.items():
-                monitoring.add_scalar("val", "Classwise mAP", class_name, runner.epoch, value)
+                monitoring.add_scalar("val", "Class-Wise AP", class_name, runner.epoch, value)

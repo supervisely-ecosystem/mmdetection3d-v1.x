@@ -138,9 +138,21 @@ class CustomNuScenesMetric(BaseMetric):
         metrics_summary = metrics.serialize()
         nuscenes_eval.print_metrics_summary(metrics_summary)
 
+        err_name_mapping = {
+            "trans_err": "Translation Error (mATE)",
+            "scale_err": "Scale Error (mASE)",
+            "orient_err": "Orientation Error (mAOE)",
+        }
+        err_3d = {}
+        for tp_name, tp_val in metrics_summary["tp_errors"].items():
+            if tp_name in err_name_mapping:
+                err_3d[err_name_mapping[tp_name]] = tp_val
+
         return {
             "mAP": metrics_summary["mean_ap"],
             "NDS": metrics_summary["nd_score"],
+            "cls_AP": metrics_summary["mean_dist_aps"],
+            "3d_err": err_3d,
             # TODO per-class метрики
             # TODO ate ase aoe
         }
