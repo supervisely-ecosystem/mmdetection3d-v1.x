@@ -119,7 +119,7 @@ def update_config(
         add_dummy_velocities=add_dummy_velocities,
     )
 
-    # Training confg
+    # Training config
     config_factory.configure_loops(cfg, train_params.total_epochs, train_params.val_interval)
     config_factory.configure_param_scheduler(cfg, train_params)
     config_factory.configure_optimizer(cfg, train_params)

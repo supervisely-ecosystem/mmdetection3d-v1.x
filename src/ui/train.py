@@ -52,7 +52,7 @@ def set_device_env(device_name: str):
         os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)
 
 
-def get_train_params(cfg: Config) -> TrainParameters:
+def get_train_params(cfg: Config) -> (ConfigParameters, TrainParameters):
     task = get_task()
     selected_classes = classes.get_selected_classes()
     # augs_config_path = get_selected_aug()
@@ -64,6 +64,7 @@ def get_train_params(cfg: Config) -> TrainParameters:
     train_params.init(task, selected_classes, augs_config_path, g.app_dir, g.WORK_DIR)
 
     # update params with UI
+    update_params_with_widgets(config_params)
     update_params_with_widgets(train_params)
     if len(selected_classes) > g.MAX_CLASSES_TO_SHOW_CLASSWISE_METRIC:
         train_params.add_classwise_metric = False
@@ -130,7 +131,7 @@ def add_metadata(cfg: Config) -> Config:
 
 
 def train():
-    project_dir = sly_utils.download_project(iter_progress)
+    project_dir = sly_utils.download_project(iter_progress, skip_at_debug=True)
 
     # prepare split files
     train_split, val_split = dump_train_val_splits(project_dir)
@@ -151,6 +152,7 @@ def train():
     cfg = Config.fromfile(config_path)
     config_params, train_params = get_train_params(cfg)
 
+    train_params: TrainParameters
     train_params.data_root = project_dir
     train_params.selected_classes = classes.get_selected_classes()
     train_params.weights_path_or_url = weights_path_or_url
@@ -160,7 +162,7 @@ def train():
     Det3DLocalVisualizer._instance_dict.clear()
 
     # create config from params
-    # train_cfg = params.update_config(cfg)
+    # train_cfg = train_params.update_config(cfg)
     cfg = update_config(
         cfg,
         config_path,
@@ -173,7 +175,7 @@ def train():
     #     train_cfg.load_from = weights_path_or_url
 
     # add sly_metadata
-    cfg = add_metadata(cfg)
+    # cfg = add_metadata(cfg)
 
     # show 3D errors chart
     if train_params.add_3d_errors_metric:
@@ -195,8 +197,8 @@ def train():
     #     sly.fs.remove_dir(train_params.data_root)
 
     iter_progress(message="Preparing the model...", total=1)
-    cfg = t.build_runner_cfg(cfg, train_params.work_dir, amp=False, auto_scale_lr=False)
-    runner = RUNNERS.build(cfg)
+    runner_cfg = t.build_runner_cfg(cfg, train_params.work_dir, amp=False, auto_scale_lr=False)
+    runner = RUNNERS.build(runner_cfg)
 
     with g.app.handle_stop():
         runner.train()
@@ -236,7 +238,7 @@ def train():
     if sly.is_production():
         # set link to artifacts in ws tasks
         g.api.task.set_output_directory(g.api.task_id, file_info.id, out_path)
-    g.app.stop()
+        g.app.stop()
 
 
 start_train_btn = Button("Train")

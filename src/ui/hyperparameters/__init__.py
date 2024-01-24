@@ -1,5 +1,5 @@
 from supervisely.app.widgets import Tabs, Card, Button, Container
-
+from typing import Union
 from src.ui.hyperparameters.checkpoints import checkpoints_tab, checkpoint_params
 from src.ui.hyperparameters.general import general_tab, general_params
 from src.ui.hyperparameters.optimizers import (
@@ -57,7 +57,7 @@ def update_widgets_with_params(params: TrainParameters):
     lr_scheduler.update_scheduler_widgets_with_params(params)
 
 
-def update_params_with_widgets(params: TrainParameters):
+def update_params_with_widgets(params: Union[ConfigParameters, TrainParameters]):
     general.update_general_params_with_widgets(params)
     checkpoints.update_checkpoint_params_with_widgets(params)
     optimizers.update_optimizer_params_with_widgets(params)

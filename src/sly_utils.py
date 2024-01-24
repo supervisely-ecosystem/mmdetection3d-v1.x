@@ -39,11 +39,15 @@ def is_episodes(project_type: str):
 #             )
 
 
-def download_project(progress_widget):
+def download_project(progress_widget, skip_at_debug=False):
     project_dir = g.PROJECT_DIR
 
-    # if sly.fs.dir_exists(project_dir):
-    #     sly.fs.remove_dir(project_dir)
+    if sly.is_development() is True and skip_at_debug is True:
+        if sly.fs.dir_exists(project_dir):
+            return project_dir
+
+    if sly.fs.dir_exists(project_dir):
+        sly.fs.remove_dir(project_dir)
 
     n = get_images_count()
     with progress_widget(message="Downloading project...", total=n) as pbar:
