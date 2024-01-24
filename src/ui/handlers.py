@@ -188,31 +188,27 @@ def on_model_selected():
         ), "Please, select checkpoint file with model weights (.pth)"
         config_path = sly_utils.download_custom_config(remote_weights_path)
 
-    # cfg = Config.fromfile(config_path)
-    # if not is_pretrained_model:
-    #     # check task type is correct
-    #     model_task = cfg.train_dataloader.dataset.task
-    #     selected_task = train.get_task()
-    #     assert (
-    #         model_task == selected_task
-    #     ), f"The selected model was trained in {model_task} task, but you've selected the {selected_task} task. Please, check your selected task."
-    #     # check if config is from mmdet v3.0
-    #     assert hasattr(
-    #         cfg, "optim_wrapper"
-    #     ), "Missing some parameters in config. Please, check if your custom model was trained in mmdetection v3.0."
+    cfg = Config.fromfile(config_path)
+    if not is_pretrained_model:
+        # check task type is correct
+        model_task = cfg.train_dataloader.dataset.task
+        selected_task = train.get_task()
+        assert (
+            model_task == selected_task
+        ), f"The selected model was trained in {model_task} task, but you've selected the {selected_task} task. Please, check your selected task."
+        # check if config is from mmdet v3.0
+        assert hasattr(
+            cfg, "optim_wrapper"
+        ), "Missing some parameters in config. Please, check if your custom model was trained in mmdetection v3.0."
 
     # from src.train import update_config
 
-    # 2. Read parameters from config file
-    cfg = Config.fromfile(config_path)
     config_params = ConfigParameters.read_parameters_from_config(cfg)
     train_params = TrainParameters.from_config_params(config_params)
 
+    if train_params.warmup_iters:
+        train_params.warmup_iters = sly_utils.get_images_count() // 2
     hyperparameters.update_widgets_with_params(train_params)
-
-    # if params.warmup_iters:
-    #     params.warmup_iters = sly_utils.get_images_count() // 2
-    # hyperparameters.update_widgets_with_params(params)
 
     # unlock cards
     sly.logger.debug(f"State {classes_ui.card.widget_id}: {StateJson()[classes_ui.card.widget_id]}")

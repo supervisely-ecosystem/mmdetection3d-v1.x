@@ -39,11 +39,17 @@ def is_episodes(project_type: str):
 #             )
 
 
-def download_project(api, project_info, dst_project_dir, progress_cb=None):
-    if not sly.fs.dir_exists(dst_project_dir):
-        sly.fs.mkdir(dst_project_dir)
-        cls = sly.get_project_class(project_info.type)
-        cls.download(api, project_info.id, dst_project_dir, progress_cb=progress_cb)
+def download_project(progress_widget):
+    project_dir = g.PROJECT_DIR
+
+    # if sly.fs.dir_exists(project_dir):
+    #     sly.fs.remove_dir(project_dir)
+
+    n = get_images_count()
+    with progress_widget(message="Downloading project...", total=n) as pbar:
+        sly.download(g.api, g.PROJECT_ID, project_dir, progress_cb=pbar.update)
+
+    return project_dir
 
 
 def download_point_cloud(api: sly.Api, pcd_id: int, dst_dir: str):
@@ -83,12 +89,8 @@ def add_classes_to_project_meta(
 def upload_artifacts(work_dir: str, experiment_name: str = None, progress_widget: Progress = None):
     task_id = g.api.task_id or ""
     paths = [path for path in os.listdir(work_dir) if path.endswith(".py")]
-    for p in paths:
-        if "/config.py" in p:
-            os.remove(p)
-
     assert len(paths) > 0, "Can't find config file saved during training."
-    assert len(paths) == 1, "Found more than 1 .py file"
+    # assert len(paths) == 1, "Found more than 1 .py file"
     cfg_path = f"{work_dir}/{paths[0]}"
     shutil.move(cfg_path, f"{work_dir}/config.py")
 

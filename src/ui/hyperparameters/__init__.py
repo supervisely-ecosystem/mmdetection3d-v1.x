@@ -63,4 +63,4 @@ def update_params_with_widgets(params: TrainParameters):
     optimizers.update_optimizer_params_with_widgets(params)
     lr_scheduler.update_scheduler_params_with_widgets(params)
     params.load_from = models.load_from.is_switched()
-    params.filter_images_without_gt = classes.filter_images_without_gt_input.is_switched()
+    # params.filter_empty_gt = classes.filter_images_without_gt_input.is_switched()

@@ -46,10 +46,10 @@ def collect_instances(
     for figure in ann_frame.figures:
         class_name = get_class_name(figure)
         class_id = class2id[class_name]
-        if cv_task == "detection" and isinstance(figure.geometry, Cuboid3d):
+        if cv_task == "detection3d" and isinstance(figure.geometry, Cuboid3d):
             bbox_3d = convert_figure_to_bbox3d(figure)
             instances.append({"bbox_3d": bbox_3d, "bbox_label_3d": class_id})
-        elif cv_task == "segmentation" and isinstance(figure.geometry, Mask3D):
+        elif cv_task == "segmentation3d" and isinstance(figure.geometry, Mask3D):
             raise NotImplementedError()
         else:
             # skip other geometries
@@ -94,10 +94,10 @@ def get_data_sample(
     return data_sample
 
 
-def collect_mmdet3d_info_from_splits(
+def from_splits(
     project_dir: str,
     split_names: List[Tuple[str, str]],
-    cv_task: Literal["detection", "segmentation"],
+    cv_task: Literal["detection3d", "segmentation3d"],
 ):
     project_meta = sly.ProjectMeta.from_json(sly.json.load_json_file(f"{project_dir}/meta.json"))
     is_episodes = sly_utils.is_episodes(project_meta.project_type)
@@ -150,7 +150,7 @@ def collect_mmdet3d_info_from_splits(
 
 
 def collect_mmdet3d_info(project_dir, cv_task: str):
-    assert cv_task in ["detection", "segmentation"]
+    assert cv_task in ["detection3d", "segmentation3d"]
 
     project_meta = sly.ProjectMeta.from_json(sly.json.load_json_file(f"{project_dir}/meta.json"))
     is_episodes = sly_utils.is_episodes(project_meta.project_type)
@@ -205,15 +205,15 @@ if __name__ == "__main__":
     import mmengine
 
     project_dir = "app_data/sly_project"
-    mmdet3d_info = collect_mmdet3d_info(project_dir, "detection")
+    mmdet3d_info = collect_mmdet3d_info(project_dir, "detection3d")
     mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")
 
     project_dir = "app_data/sly_project_episodes"
-    mmdet3d_info = collect_mmdet3d_info(project_dir, "detection")
+    mmdet3d_info = collect_mmdet3d_info(project_dir, "detection3d")
     mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")
 
     project_dir = "app_data/supervisely_project"
-    mmdet3d_info = collect_mmdet3d_info(project_dir, "detection")
+    mmdet3d_info = collect_mmdet3d_info(project_dir, "detection3d")
     mmengine.dump(mmdet3d_info, f"{project_dir}/infos_train.pkl")
 
     mmengine.dump(mmdet3d_info, f"{project_dir}/infos_val.pkl")

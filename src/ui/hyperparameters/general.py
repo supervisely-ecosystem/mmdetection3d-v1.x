@@ -70,9 +70,9 @@ bs_train_input = InputNumber(1, 1)
 bs_train_field = Field(bs_train_input, "Train batch size")
 general_params.add_input("batch_size_train", bs_train_input)
 
-# bs_val_input = InputNumber(1, 1)
-# bs_val_field = Field(bs_val_input, "Validation batch size")
-# general_params.add_input("batch_size_val", bs_val_input)
+bs_val_input = InputNumber(1, 1)
+bs_val_field = Field(bs_val_input, "Validation batch size")
+general_params.add_input("batch_size_val", bs_val_input)
 
 
 validation_input = InputNumber(1, 1, general_params.total_epochs)
@@ -141,6 +141,6 @@ def update_general_params_with_widgets(params: TrainParameters):
     params.val_interval = general_params.val_interval
     params.batch_size_train = general_params.batch_size_train
     params.batch_size_val = general_params.batch_size_val
-    params.input_size = (general_params.bigger_size, general_params.smaller_size)
+    # params.input_size = (general_params.bigger_size, general_params.smaller_size)
     params.chart_update_interval = general_params.chart_update_interval
     # params.device_name = general_params.device

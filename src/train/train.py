@@ -72,7 +72,7 @@ def build_runner(cfg: Config, work_dir: str, amp: bool, auto_scale_lr: bool = Fa
 
 def update_config(
     cfg: Config, config_path: str, config_params: ConfigParameters, train_params: TrainParameters
-):
+) -> Config:
     # Input Parameters
     is_pre_trained_config = True
     train_params.num_workers = get_num_workers(train_params.batch_size_train)
@@ -126,6 +126,8 @@ def update_config(
     config_factory.add_sly_metadata(cfg, train_params)
     config_factory.configure_checkpoints(cfg, train_params)
     config_factory.configure_logs_and_hooks(cfg, train_params)
+
+    return cfg
 
 
 def train(cfg: Config):

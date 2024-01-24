@@ -12,7 +12,7 @@
 #     if "segmentation" in task.lower():
 #         task = "segmentation"
 #     else:
-#         task = "detection"
+#         task = "detection3d"
 #     return task
 
 

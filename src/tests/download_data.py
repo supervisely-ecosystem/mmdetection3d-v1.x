@@ -7,7 +7,7 @@ api = sly.Api()
 project_id = 31906
 is_episodes = True
 data_dir = "app_data/lyft"
-cv_task = "detection"
+cv_task = "detection3d"
 
 download_project(api, project_id, data_dir)
 mmdet3d_info = collect_mmdet3d_info(data_dir, cv_task)

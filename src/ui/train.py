@@ -6,7 +6,6 @@ from mmdet3d.registry import RUNNERS
 from mmengine.visualization import Visualizer
 from mmdet3d.visualization import Det3DLocalVisualizer
 from src.train.train import update_config
-from src.train.train import train as _train
 from src.config_factory.config_parameters import ConfigParameters
 from src.ui.classes import classes
 import shutil
@@ -40,9 +39,9 @@ from src.ui.graphics import add_classwise_metric, monitoring, add_3d_errors_metr
 
 def get_task():
     if "segmentation" in task_selector.get_value().lower():
-        return "instance_segmentation"
+        return "segmentation3d"
     else:
-        return "object_detection"
+        return "detection3d"
 
 
 def set_device_env(device_name: str):
@@ -53,22 +52,25 @@ def set_device_env(device_name: str):
         os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)
 
 
-def get_train_params(cfg) -> TrainParameters:
+def get_train_params(cfg: Config) -> TrainParameters:
     task = get_task()
     selected_classes = classes.get_selected_classes()
     # augs_config_path = get_selected_aug()
+    augs_config_path = None
 
     # create params from config
-    # params = TrainParameters.from_config(cfg)
-    # params.init(task, selected_classes, augs_config_path, g.app_dir)
-
     config_params = ConfigParameters.read_parameters_from_config(cfg)
-    params = TrainParameters.from_config_params(config_params)
+    train_params = TrainParameters.from_config_params(config_params)
+    train_params.init(task, selected_classes, augs_config_path, g.app_dir, g.WORK_DIR)
 
     # update params with UI
-    update_params_with_widgets(params)
-    params.add_classwise_metric = len(selected_classes) <= g.MAX_CLASSES_TO_SHOW_CLASSWISE_METRIC
-    return params
+    update_params_with_widgets(train_params)
+    if len(selected_classes) > g.MAX_CLASSES_TO_SHOW_CLASSWISE_METRIC:
+        train_params.add_classwise_metric = False
+        sly.logger.warn(
+            f"Your project has more than {g.MAX_CLASSES_TO_SHOW_CLASSWISE_METRIC} classes. Skipping class-wise chart building."
+        )
+    return config_params, train_params
 
 
 def prepare_model():
@@ -95,7 +97,7 @@ def prepare_model():
     return config_path, weights_path_or_url
 
 
-def add_metadata(cfg: Config):
+def add_metadata(cfg: Config) -> Config:
     is_pretrained = models_ui.is_pretrained_model_selected()
 
     if not is_pretrained and not hasattr(cfg, "sly_metadata"):
@@ -124,25 +126,21 @@ def add_metadata(cfg: Config):
 
     cfg.sly_metadata = ConfigDict(metadata)
 
+    return cfg
+
 
 def train():
-    project_dir = g.PROJECT_DIR
-
-    # download dataset
-    sly.logger.info("Starting downloading dataset")
-    sly_utils.download_project(g.api, g.PROJECT_INFO, project_dir)
-    sly.logger.info("Dataset finished")
+    project_dir = sly_utils.download_project(iter_progress)
 
     # prepare split files
     train_split, val_split = dump_train_val_splits(project_dir)
 
-    mmdet3d_info_train = make_infos.collect_mmdet3d_info_from_splits(
-        project_dir, [(i.dataset_name, i.name) for i in train_split], "detection"
-    )
+    split_names = [(i.dataset_name, i.name) for i in train_split]
+    mmdet3d_info_train = make_infos.from_splits(project_dir, split_names, get_task())
     mmengine.dump(mmdet3d_info_train, f"{project_dir}/infos_train.pkl")
-    mmdet3d_info_val = make_infos.collect_mmdet3d_info_from_splits(
-        project_dir, [(i.dataset_name, i.name) for i in val_split], "detection"
-    )
+
+    split_names = [(i.dataset_name, i.name) for i in val_split]
+    mmdet3d_info_val = make_infos.from_splits(project_dir, split_names, get_task())
     mmengine.dump(mmdet3d_info_val, f"{project_dir}/infos_val.pkl")
 
     # prepare model files
@@ -151,12 +149,11 @@ def train():
 
     # create config
     cfg = Config.fromfile(config_path)
-    config_params = ConfigParameters.read_parameters_from_config(cfg)
-    params = TrainParameters.from_config_params(config_params)
+    config_params, train_params = get_train_params(cfg)
 
-    params.data_root = project_dir
-    params.selected_classes = classes.get_selected_classes()
-    params.weights_path_or_url = weights_path_or_url
+    train_params.data_root = project_dir
+    train_params.selected_classes = classes.get_selected_classes()
+    train_params.weights_path_or_url = weights_path_or_url
 
     # If we won't do this, restarting the training will throw a error
     Visualizer._instance_dict.clear()
@@ -164,11 +161,11 @@ def train():
 
     # create config from params
     # train_cfg = params.update_config(cfg)
-    update_config(
+    cfg = update_config(
         cfg,
         config_path,
         config_params,
-        params,
+        train_params,
     )
 
     # update load_from with custom_weights_path
@@ -176,33 +173,29 @@ def train():
     #     train_cfg.load_from = weights_path_or_url
 
     # add sly_metadata
-    # add_metadata(train_cfg)
+    cfg = add_metadata(cfg)
 
     # show 3D errors chart
-    if params.add_3d_errors_metric:
+    if train_params.add_3d_errors_metric:
         add_3d_errors_metric()
         sly.logger.debug("Added 3D error metrics")
 
     # show classwise chart
-    if params.add_classwise_metric:
+    if train_params.add_classwise_metric:
         add_classwise_metric(classes.get_selected_classes())
         sly.logger.debug("Added classwise metrics")
 
     # update globals
     config_name = config_path.split("/")[-1]
     g.config_name = config_name
-    g.params = params
+    g.params = train_params
 
     # clean work_dir
-    # if sly.fs.dir_exists(params.data_root):
-    #     sly.fs.remove_dir(params.data_root)
-
-    # TODO: debug
-    # train_cfg.dump("debug_config.py")
+    # if sly.fs.dir_exists(train_params.data_root):
+    #     sly.fs.remove_dir(train_params.data_root)
 
     iter_progress(message="Preparing the model...", total=1)
-
-    cfg = t.build_runner_cfg(cfg, "app_data/work_dir", amp=False, auto_scale_lr=False)
+    cfg = t.build_runner_cfg(cfg, train_params.work_dir, amp=False, auto_scale_lr=False)
     runner = RUNNERS.build(cfg)
 
     with g.app.handle_stop():
@@ -219,31 +212,31 @@ def train():
     #     sly_utils.save_augs_config(params.augs_config_path, params.data_root)
 
     if g.api.task_id is not None:
-        sly_utils.save_open_app_lnk(params.data_root)
+        sly_utils.save_open_app_lnk(train_params.data_root)
     out_path = sly_utils.upload_artifacts(
         g.WORK_DIR,
-        params.experiment_name,
+        train_params.experiment_name,
         iter_progress,
     )
 
     # set task results
+    file_info = g.api.file.get_info_by_path(g.TEAM_ID, out_path + "/config.py")
+
+    # add link to artifacts
+    folder_thumb.set(info=file_info)
+    folder_thumb.show()
+
+    # show success message
+    success_msg.show()
+
+    # disable buttons after training
+    start_train_btn.hide()
+    stop_train_btn.hide()
+
     if sly.is_production():
-        file_info = g.api.file.get_info_by_path(g.TEAM_ID, out_path + "/config.py")
-
-        # add link to artifacts
-        folder_thumb.set(info=file_info)
-        folder_thumb.show()
-
-        # show success message
-        success_msg.show()
-
-        # disable buttons after training
-        start_train_btn.hide()
-        stop_train_btn.hide()
-
         # set link to artifacts in ws tasks
         g.api.task.set_output_directory(g.api.task_id, file_info.id, out_path)
-        g.app.stop()
+    g.app.stop()
 
 
 start_train_btn = Button("Train")
