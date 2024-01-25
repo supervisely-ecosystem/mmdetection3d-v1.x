@@ -174,6 +174,7 @@ class CustomNuScenesMetric(BaseMetric):
             self.label_mapping = {i: selected_classes.get(x, -1) for i, x in enumerate(classes)}
 
     def _filter_annotations_by_selected_classes(self, annotations: dict, selected_classes: List[str]):
+        class_names = set(selected_classes)
         for info in annotations["data_list"]:
-            info["instances"] = [x for x in info["instances"] if x["bbox_label_3d"] in set(selected_classes)]
+            info["instances"] = [x for x in info["instances"] if self.map_gt_label_to_class_name[x["bbox_label_3d"]] in class_names]
         return annotations
