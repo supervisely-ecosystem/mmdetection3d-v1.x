@@ -193,8 +193,8 @@ def train():
     g.params = train_params
 
     # clean work_dir
-    # if sly.fs.dir_exists(train_params.data_root):
-    #     sly.fs.remove_dir(train_params.data_root)
+    if sly.fs.dir_exists(train_params.work_dir):
+        sly.fs.remove_dir(train_params.work_dir)
 
     iter_progress(message="Preparing the model...", total=1)
     runner_cfg = t.build_runner_cfg(cfg, train_params.work_dir, amp=False, auto_scale_lr=False)

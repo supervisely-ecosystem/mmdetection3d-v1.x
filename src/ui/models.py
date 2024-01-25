@@ -25,7 +25,11 @@ def _load_models_meta(task: str):
     else:
         raise NotImplementedError("Instance Segmentation")
 
-    models_meta = {m["name"]: m for m in models_meta['detection_3d'] if m["name"] in ('PointPillars',  'CenterPoint')} #'CenterFormer',}
+    models_meta = {
+        m["name"]: m
+        for m in models_meta["detection_3d"]
+        if m["name"] in ("PointPillars", "CenterPoint")
+    }  #'CenterFormer',}
     return models_meta
 
 
@@ -37,7 +41,7 @@ def _get_architecture_list(models_meta: dict):
     labels = []
     right_texts = []
 
-    tmp = [x for x in models_meta.items()]# if x[0] in arch_names]
+    tmp = [x for x in models_meta.items()]  # if x[0] in arch_names]
     for name, item in tmp:
         if item.get("paper_from") and item.get("year"):
             label = f"{name}"
@@ -49,8 +53,10 @@ def _get_architecture_list(models_meta: dict):
         right_texts.append(r_text)
 
     # links to README.md in mmdetection repo
-    base_url = "https://github.com/open-mmlab/mmdetection3d/tree/main/configs/" 
-    links = [base_url + m["model_name"] for m in models_meta.values()]# if m["name"] in arch_names]
+    base_url = "https://github.com/open-mmlab/mmdetection3d/tree/main/configs/"
+    links = [
+        base_url + m["model_name"] for m in models_meta.values()
+    ]  # if m["name"] in arch_names]
 
     return arch_names, labels, right_texts, links
 
@@ -61,22 +67,21 @@ def _get_models_by_architecture(task: str, models_meta: dict, selected_arch_name
     # exclude = models_meta[selected_arch_name].get("exclude")
     # _, models = parse_yaml_metafile(metafile_path, exclude)
 
-    _models = models_meta[selected_arch_name]['pre_trained_configs']
+    _models = models_meta[selected_arch_name]["pre_trained_configs"]
     models = []
 
     for m in _models:
         tmp = {
-            'config': sly.fs.get_file_name_with_ext(m['config']),
-            'name': selected_arch_name,
-            'dataset': m['results'][0].get("Dataset", "-"),
-            'inference_time': '-',
-            "train_memory": m['metadata'].get("Training Memory (GB)", "-"),
-            "box_mAP": m['results'][0]['Metrics'].get('mAP', "-"),
-            "NDS": m['results'][0]['Metrics'].get('NDS', "-"),
+            "config": sly.fs.get_file_name_with_ext(m["config"]),
+            "name": selected_arch_name,
+            "dataset": m["results"][0].get("Dataset", "-"),
+            "inference_time": "-",
+            "train_memory": m["metadata"].get("Training Memory (GB)", "-"),
+            "box_mAP": m["results"][0]["Metrics"].get("mAP", "-"),
+            "NDS": m["results"][0]["Metrics"].get("NDS", "-"),
             "weights": m["weights"],
         }
         models.append(tmp)
-
 
     # filter models by task
     if "segmentation" in task.lower():
@@ -97,15 +102,7 @@ def _get_table_data(task: str, models: list):
         "box mAP",
         "NDS",
     ]
-    keys = [
-        "config",
-        "name",
-        "dataset",
-        "inference_time",
-        "train_memory",
-        "box_mAP",
-        "NDS"
-    ]
+    keys = ["config", "name", "dataset", "inference_time", "train_memory", "box_mAP", "NDS"]
     if "segmentation" in task.lower():
         columns.append("mask AP")
         keys.append("mask AP")
@@ -176,6 +173,11 @@ load_from_field = Field(
     "Download pre-trained model",
     "Whether to download pre-trained weights and finetune the model or train it from scratch.",
 )
+load_from.disable()
+
+tmp_txt = Text(
+    "Training from scratch will be available once GPU support is enabled.", status="info"
+)
 
 input_file = TeamFilesSelector(TEAM_ID, selection_file_type="file")
 path_field = Field(
@@ -187,7 +189,7 @@ path_field = Field(
 radio_tabs = RadioTabs(
     titles=["Pretrained models", "Custom weights"],
     contents=[
-        Container(widgets=[arch_select, table, text, load_from_field]),
+        Container(widgets=[arch_select, table, text, load_from_field, tmp_txt]),
         path_field,
     ],
 )

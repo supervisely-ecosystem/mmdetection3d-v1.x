@@ -94,7 +94,7 @@ def upload_artifacts(work_dir: str, experiment_name: str = None, progress_widget
     task_id = g.api.task_id or ""
     paths = [path for path in os.listdir(work_dir) if path.endswith(".py")]
     assert len(paths) > 0, "Can't find config file saved during training."
-    # assert len(paths) == 1, "Found more than 1 .py file"
+    assert len(paths) == 1, "Found more than 1 .py file"
     cfg_path = f"{work_dir}/{paths[0]}"
     shutil.move(cfg_path, f"{work_dir}/config.py")
 
