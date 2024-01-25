@@ -1,3 +1,4 @@
+- fix nuscenes_metric._filter_annotations_by_selected_classes
 - поддержка Episodes
 - Serve
     + Inference class in sdk
