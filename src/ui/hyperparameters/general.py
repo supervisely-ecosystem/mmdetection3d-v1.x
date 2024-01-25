@@ -139,6 +139,7 @@ def update_general_widgets_with_params(params: TrainParameters):
 def update_general_params_with_widgets(params: TrainParameters):
     params.total_epochs = general_params.total_epochs
     params.val_interval = general_params.val_interval
+    # params.lidar_dims = general_params.lidar_dims #TODO
     params.batch_size_train = general_params.batch_size_train
     params.batch_size_val = general_params.batch_size_val
     # params.input_size = (general_params.bigger_size, general_params.smaller_size)

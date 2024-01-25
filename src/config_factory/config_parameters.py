@@ -38,15 +38,15 @@ class ConfigParameters:
         # bbox_code_size
         bbox_coder = find_by_name(cfg.model, "bbox_coder")
         if bbox_coder is not None:
-            p.bbox_code_size = bbox_coder.get('code_size')
+            p.bbox_code_size = bbox_coder.get("code_size")
 
         # PointSample
         train_pipeline = cfg.get("train_pipeline", [])
         for i, transform in enumerate(train_pipeline):
-            if transform['type'] == "PointSample":
+            if transform["type"] == "PointSample":
                 p.point_sample = {
-                    "num_points": transform.get('num_points'),
-                    "sample_range": transform.get('sample_range'),
+                    "num_points": transform.get("num_points"),
+                    "sample_range": transform.get("sample_range"),
                 }
 
         p.optimizer = cfg.get("optim_wrapper", {}).get("optimizer")
@@ -54,16 +54,18 @@ class ConfigParameters:
         p.schedulers = cfg.get("param_scheduler")
 
         return p
-    
+
     def validate(self):
         # Check parameters
         assert self.in_channels is not None, "in_channels not found in config"
         if self.bbox_code_size:
-            assert self.bbox_code_size in [7, 9], f"bbox_code_size should be 7 or 9, but got {self.bbox_code_size}"
+            assert self.bbox_code_size in [
+                7,
+                9,
+            ], f"bbox_code_size should be 7 or 9, but got {self.bbox_code_size}"
         assert self.point_cloud_range is not None
         # if parameters.voxel_size is None:
         #     parameters.voxel_size = [0.05, 0.05, 0.1]
-
 
 
 def find_by_name(d: Union[Config, ConfigDict, dict, list, tuple], key: str):
@@ -112,7 +114,7 @@ def find_all_by_parameter(d: Union[Config, ConfigDict, dict, list, tuple], key: 
 
 
 def substitute_parameter(d, key, value):
-    if isinstance(d, ConfigDict):
+    if isinstance(d, (ConfigDict, Config)):
         if d.get(key) is not None:
             d[key] = value
         for k, v in d.items():
@@ -122,7 +124,9 @@ def substitute_parameter(d, key, value):
             substitute_parameter(v, key, value)
 
 
-def write_parameters_to_config(parameters: ConfigParameters, cfg: Config, selected_classes: list) -> Config:
+def write_parameters_to_config(
+    parameters: ConfigParameters, cfg: Config, selected_classes: list
+) -> Config:
     # 1. read text from config
     # 2. substitute parameters in text
     # 3. cfg = Config.fromtext(text)
@@ -132,7 +136,7 @@ def write_parameters_to_config(parameters: ConfigParameters, cfg: Config, select
     text = cfg.text
     p = parameters
     num_classes = len(selected_classes)
-    
+
     # 2. Substitute parameters in text
     # in_channels
     search_res = re.search("in_channels\s*=\s*[0-6],", text)
@@ -140,7 +144,7 @@ def write_parameters_to_config(parameters: ConfigParameters, cfg: Config, select
         text = re.sub("in_channels\s*=\s*[0-6],", f"in_channels={p.in_channels},", text, count=1)
     else:
         raise ValueError("in_channels not found in config")
-        
+
     # num_classes
     search_res = re.search("num_classes\s*=\s*[0-9]+", text)
     if search_res:
@@ -159,7 +163,12 @@ def write_parameters_to_config(parameters: ConfigParameters, cfg: Config, select
     # voxel_size
     search_res = re.search("voxel_size\s*=\s*\[[0-9.]+,\s*[0-9.]+,\s*[0-9.]+\]", text)
     if search_res:
-        text = re.sub("voxel_size\s*=\s*\[[0-9.]+,\s*[0-9.]+,\s*[0-9.]+\]", f"voxel_size={p.voxel_size}", text, count=1)
+        text = re.sub(
+            "voxel_size\s*=\s*\[[0-9.]+,\s*[0-9.]+,\s*[0-9.]+\]",
+            f"voxel_size={p.voxel_size}",
+            text,
+            count=1,
+        )
     else:
         print("voxel_size not found in config")
 
@@ -167,15 +176,19 @@ def write_parameters_to_config(parameters: ConfigParameters, cfg: Config, select
     # substitute "point_cloud_range = [-50, -50.1, -5, 50, 50, 3]"
     search_res = re.search(r"point_cloud_range\s*=\s*\[[-\d.,\s]+\]", text)
     if search_res:
-        text = re.sub(r"point_cloud_range\s*=\s*\[[-\d.,\s]+\]", f"point_cloud_range={p.point_cloud_range}", text)
+        text = re.sub(
+            r"point_cloud_range\s*=\s*\[[-\d.,\s]+\]",
+            f"point_cloud_range={p.point_cloud_range}",
+            text,
+        )
     else:
         print("point_cloud_range not found in config")
-    
+
     # TODO: anchor_generator
     has_anchor_generator = re.search("anchor_generator\s*=", text)
     # anchor_generator.ranges = [[-80, -80, -1.0715024, 80, 80, -1.0715024]]
     # anchor_generator.sizes = [[4.75, 1.92, 1.71]]  # car
-            
+
     # Remove first string in text, as it is a path to config file
     first_string = re.search("^.*\n", text).group(0)
     if os.path.exists(first_string.strip()):
@@ -198,7 +211,9 @@ def write_parameters_to_config(parameters: ConfigParameters, cfg: Config, select
 
     # CenterPoint:
     if cfg.model.type == "CenterPoint":
-        cfg.model.pts_bbox_head.tasks = [dict(num_class=1, class_names=[cls]) for cls in selected_classes]
+        cfg.model.pts_bbox_head.tasks = [
+            dict(num_class=1, class_names=[cls]) for cls in selected_classes
+        ]
         cfg.model.pts_voxel_encoder.voxel_size = p.voxel_size  # this was hardcoded in CenterPoint
 
     # PointRCNN:
@@ -210,16 +225,18 @@ def write_parameters_to_config(parameters: ConfigParameters, cfg: Config, select
     return cfg
 
 
-def write_parameters_to_config_2(parameters: ConfigParameters, cfg: Config, selected_classes: list) -> Config:
+def write_parameters_to_config_2(
+    parameters: ConfigParameters, cfg: Config, selected_classes: list
+) -> Config:
     p = parameters
     num_classes = len(selected_classes)
-    
+
     cfg.class_names = selected_classes
 
     # in_channels
     d = find_by_parameter(cfg.model, "in_channels")
     d.in_channels = p.in_channels
-        
+
     # num_classes
     substitute_parameter(cfg, "num_classes", num_classes)
 
@@ -240,13 +257,13 @@ def write_parameters_to_config_2(parameters: ConfigParameters, cfg: Config, sele
     # for d in found:
     #     d["point_cloud_range"] = p.point_cloud_range
     # cfg.point_cloud_range = p.point_cloud_range
-    
+
     # TODO: anchor_generator
     # How to be with z_axis?
     # anchor_generator = find_by_name(cfg.model, "anchor_generator")
     # anchor_generator.ranges = [[-80, -80, -1.0715024, 80, 80, -1.0715024]]
     # anchor_generator.sizes = [[4.75, 1.92, 1.71]]  # car
-    
+
     # code_weights
     # weights = [1.0] * num_classes
     # train_cfg = cfg.model.get("train_cfg")
@@ -267,10 +284,12 @@ def write_parameters_to_config_2(parameters: ConfigParameters, cfg: Config, sele
         # in_channaels
         if cfg.model.get("pts_voxel_encoder") is not None:
             cfg.model.pts_voxel_encoder.num_features = p.in_channels
-        
+
         # tasks
-        cfg.model.pts_bbox_head.tasks = [dict(num_class=1, class_names=[cls]) for cls in selected_classes]
-        
+        cfg.model.pts_bbox_head.tasks = [
+            dict(num_class=1, class_names=[cls]) for cls in selected_classes
+        ]
+
         # code_weights
         weights = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0]
         train_cfg = cfg.model.get("train_cfg")
@@ -292,7 +311,7 @@ def write_parameters_to_config_2(parameters: ConfigParameters, cfg: Config, sele
         # in_channaels
         if cfg.model.get("pts_voxel_encoder") is not None:
             cfg.model.pts_voxel_encoder.num_features = p.in_channels
-        
+
         # code_weights
         weights = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0]
         train_cfg = cfg.model.get("train_cfg")

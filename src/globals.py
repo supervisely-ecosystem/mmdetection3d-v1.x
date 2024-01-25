@@ -1,6 +1,7 @@
 import os
 import supervisely as sly
 from dotenv import load_dotenv
+from pathlib import Path
 
 # from src.state import State
 
@@ -26,7 +27,8 @@ PROJECT_INFO = api.project.get_info_by_id(PROJECT_ID)
 PROJECT_DIR = app_dir + "/sly_project"
 WORK_DIR = app_dir + "/work_dir"
 TEAMFILES_UPLOAD_DIR = "mmdetection3d-v1.x"
-STATIC_DIR = app_dir + "/static"
+# STATIC_DIR = app_dir + "/static"
+STATIC_DIR = Path(app_dir + "/static")
 os.makedirs(STATIC_DIR, exist_ok=True)
 
 NUSCENES_METRIC_KEYS = ["mAP", "NDS"]

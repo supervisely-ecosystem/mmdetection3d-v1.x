@@ -9,6 +9,8 @@ import torch
 import src.globals as g
 import src.ui.train as train_ui
 from src.ui.graphics import monitoring
+import open3d as o3d
+import numpy as np
 
 
 @HOOKS.register_module()
@@ -78,6 +80,12 @@ class SuperviselyHook(Hook):
     def after_val_epoch(self, runner: Runner, metrics: Dict[str, float] = None) -> None:
         if not metrics:
             return
+
+        # res = runner.val_evaluator.metrics[0].saved_results
+        # pts_filename = g.PROJECT_DIR + "/" + res["pcd_path"]
+        # pcd = o3d.io.read_point_cloud(pts_filename)
+        # xyz = np.asarray(pcd.points, dtype=np.float32)
+        # monitoring.update_iframe("visual", xyz)
 
         # Add mAP metrics
         # TODO метрики по классам 'per class'

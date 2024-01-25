@@ -132,6 +132,14 @@ class CustomNuScenesMetric(BaseMetric):
                 self.annotations["data_list"], self.map_gt_label_to_class_name
             )
 
+        # Save first result for visualization
+        save_idx = 0
+        self.saved_results = {
+            "pred": results[save_idx],
+            "gt": self.annotations["data_list"][save_idx]["instances"],
+            "pcd_path": self.annotations["data_list"][save_idx]["lidar_points"]["lidar_path"],
+        }
+
         eval = nuscenes_eval.CustomNuScenesEval(pred_nusc_boxes, gt_nusc_boxes, verbose=True)
         metrics, metric_data_list = eval.evaluate()
 
