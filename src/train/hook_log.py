@@ -11,6 +11,7 @@ import src.ui.train as train_ui
 from src.ui.graphics import monitoring
 import open3d as o3d
 import numpy as np
+import pickle, random
 
 
 @HOOKS.register_module()
@@ -36,6 +37,19 @@ class SuperviselyHook(Hook):
         self.iter_progress = train_ui.iter_progress(
             message="Iterations", total=len(runner.train_dataloader)
         )
+
+        ann_file = runner.val_evaluator.metrics[0].ann_file
+        with open(ann_file, "rb") as f:
+            d = pickle.load(f)
+
+        # see nuscenes_metric.py ln. 136
+        save_idx = 0
+
+        # pts_filename = g.PROJECT_DIR + "/" + d["data_list"][save_idx]["lidar_points"]["lidar_path"]
+        # pcd = o3d.io.read_point_cloud(pts_filename)
+        # xyz = np.asarray(pcd.points, dtype=np.float32)
+
+        # monitoring.initialize_iframe("visual", xyz)
 
     def after_train_iter(
         self, runner: Runner, batch_idx: int, data_batch: DATA_BATCH = None, outputs: dict = None

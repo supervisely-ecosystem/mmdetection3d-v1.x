@@ -2,7 +2,7 @@ from random import randint
 import numpy as np
 from typing import Dict, Optional, List, Tuple, Union
 from collections import OrderedDict
-from supervisely.app.widgets import GridPlot, Container, Field, Empty, IFrame
+from supervisely.app.widgets import GridChart, Container, Field, Empty, IFrame, GridPlot
 from supervisely.app.content import StateJson, DataJson
 import plotly.graph_objects as go
 import src.globals as g
@@ -32,11 +32,8 @@ class StageMonitoring(object):
                 for ser in series
             ]
 
-        self._metrics[metric] = {
-            "title": metric,
-            "series": srs,
-        }
-        self._metrics[metric].update(kwargs)
+        new_kwargs = {"title": metric, "series": srs, **kwargs}
+        self._metrics[metric] = new_kwargs
 
     def create_series(self, metric: str, series: Union[List[str], str]):
         if isinstance(series, str):
@@ -48,15 +45,23 @@ class StageMonitoring(object):
         self,
         make_right_indent=True,
         is_iframe=False,
-    ) -> Tuple[Union[Field, Container], Union[GridPlot, IFrame]]:
+    ) -> Tuple[Union[Field, Container], Union[GridChart, IFrame]]:
         if make_right_indent is True:
             self.create_metric("right_indent_empty_plot", ["right_indent_empty_plot"])
 
         if is_iframe is True:
-            plot = IFrame("static/point_cloud_visualization.html", height="500px", width="1100px")
+            # res = runner.val_evaluator.metrics[0].saved_results
+            # pts_filename = g.PROJECT_DIR + "/" + res["pcd_path"]
+            # pcd = o3d.io.read_point_cloud(pts_filename)
+            # xyz = np.asarray(pcd.points, dtype=np.float32)
+            # self.initialize_iframe
+            # plot = IFrame("static/point_cloud_visualization.html", height="500px", width="1100px")
+            plot = IFrame()
+            pass
         else:
             data = list(self._metrics.values())
-            plot = GridPlot(data, columns=len(data))
+            plot = GridChart(data, columns=len(data))
+            # plot = GridPlot(data, columns=len(data))
             if make_right_indent is True:
                 plot._widgets["right_indent_empty_plot"].hide()
 
@@ -79,11 +84,41 @@ class Monitoring(object):
         self._stages[stage.name]["compiled"] = field
         self._stages[stage.name]["raw"] = plot
 
-    def update_iframe(
+    def update_iframe():
+        pass
+
+    def add_scalar(
         self,
         stage_id: str,
-        xyz: np.ndarray,
+        metric_name: str,
+        series_name: str,
+        x: NumT,
+        y: NumT,
     ):
+        grid_chart: GridChart = self._stages[stage_id]["raw"]
+        grid_chart.add_scalar(f"{metric_name}/{series_name}", y, x)
+
+    def add_scalars(
+        self,
+        stage_id: str,
+        metric_name: str,
+        new_values: Dict[str, NumT],
+        x: NumT,
+    ):
+        self._stages[stage_id]["raw"].add_scalars(
+            metric_name,
+            new_values,
+            x,
+        )
+
+    def compile_monitoring_container(self, hide: bool = False) -> Container:
+        if self.container is None:
+            self.container = Container([stage["compiled"] for stage in self._stages.values()])
+        if hide:
+            self.container.hide()
+        return self.container
+
+    def initialize_iframe(self, stage_id: str, xyz: np.ndarray):
         fig = go.Figure()
 
         scatter_trace = go.Scatter3d(
@@ -113,61 +148,30 @@ class Monitoring(object):
         fig.write_html(g.STATIC_DIR.joinpath("point_cloud_visualization.html"))
 
         iframe: IFrame = self._stages[stage_id]["raw"]
-        iframe.set("static/point_cloud_visualization.html", height="900px", width="300px")
-
-    def add_scalar(
-        self,
-        stage_id: str,
-        metric_name: str,
-        series_name: str,
-        x: NumT,
-        y: NumT,
-    ):
-        gridplot: GridPlot = self._stages[stage_id]["raw"]
-        gridplot.add_scalar(f"{metric_name}/{series_name}", y, x)
-
-    def add_scalars(
-        self,
-        stage_id: str,
-        metric_name: str,
-        new_values: Dict[str, NumT],
-        x: NumT,
-    ):
-        self._stages[stage_id]["raw"].add_scalars(
-            metric_name,
-            new_values,
-            x,
-        )
-
-    def compile_monitoring_container(self, hide: bool = False) -> Container:
-        if self.container is None:
-            self.container = Container([stage["compiled"] for stage in self._stages.values()])
-        if hide:
-            self.container.hide()
-        return self.container
+        iframe.set("static/point_cloud_visualization.html", height="500px", width="1000px")
 
 
 train_stage = StageMonitoring("train", "Train")
-train_stage.create_metric("Loss", ["loss"])
-train_stage.create_metric("Learning Rate", ["lr"], decimals_in_float=6)
+train_stage.create_metric("Loss", ["loss"], stroke_curve="straight")
+train_stage.create_metric("Learning Rate", ["lr"], decimalsInFloat=6, stroke_curve="straight")
 
 visualization = StageMonitoring("visual", "Visualization")
 
 
 val_stage = StageMonitoring("val", "Validation")
-val_stage.create_metric("Metrics", g.NUSCENES_METRIC_KEYS)
-val_stage.create_metric("3D Errors")
-val_stage.create_metric("Class-Wise AP")
+val_stage.create_metric("Metrics", g.NUSCENES_METRIC_KEYS, stroke_curve="straight")
+val_stage.create_metric("3D Errors", stroke_curve="straight")
+val_stage.create_metric("Class-Wise AP", stroke_curve="straight")
 
 
 def add_3d_errors_metric():
-    gp: GridPlot = monitoring._stages["val"]["raw"]
-    gp._widgets["3D Errors"].show()
+    grid_chart: GridChart = monitoring._stages["val"]["raw"]
+    grid_chart._widgets["3D Errors"].show()
 
 
 def add_classwise_metric(selected_classes):
-    gp: GridPlot = monitoring._stages["val"]["raw"]
-    gp._widgets["Class-Wise AP"].show()
+    grid_chart: GridChart = monitoring._stages["val"]["raw"]
+    grid_chart._widgets["Class-Wise AP"].show()
 
 
 monitoring = Monitoring()
@@ -178,6 +182,6 @@ monitoring.add_stage(val_stage, True)
 
 # add_btn = Button("add")
 
-gp: GridPlot = monitoring._stages["val"]["raw"]
-gp._widgets["Class-Wise AP"].hide()
-gp._widgets["3D Errors"].hide()
+grid_chart: GridChart = monitoring._stages["val"]["raw"]
+grid_chart._widgets["Class-Wise AP"].hide()
+grid_chart._widgets["3D Errors"].hide()

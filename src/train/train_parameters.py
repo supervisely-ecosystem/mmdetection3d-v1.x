@@ -81,166 +81,166 @@ class TrainParameters:
         self.data_root = app_dir
         self.work_dir = work_dir
 
-    def update_config(self, config: Config) -> Config:
-        cfg = deepcopy(config)
-        assert self.is_inited(), "TrainParameters: wrong initialization parameters."
+    # def update_config(self, config: Config) -> Config:
+    #     cfg = deepcopy(config)
+    #     assert self.is_inited(), "TrainParameters: wrong initialization parameters."
 
-        # change model num_classes
-        num_classes = len(self.selected_classes)
-        modify_num_classes_recursive(cfg.model, num_classes)
-        # modify_num_classes_recursive(cfg.model, num_classes, "num_things_classes")
-        # modify_num_classes_recursive(cfg.model, 0, "num_stuff_classes")
+    #     # change model num_classes
+    #     num_classes = len(self.selected_classes)
+    #     modify_num_classes_recursive(cfg.model, num_classes)
+    #     # modify_num_classes_recursive(cfg.model, num_classes, "num_things_classes")
+    #     # modify_num_classes_recursive(cfg.model, 0, "num_stuff_classes")
 
-        # can we just remove batch_augments?
-        if hasattr(cfg.model.data_preprocessor, "batch_augments"):
-            cfg.model.data_preprocessor.batch_augments = None
+    #     # can we just remove batch_augments?
+    #     if hasattr(cfg.model.data_preprocessor, "batch_augments"):
+    #         cfg.model.data_preprocessor.batch_augments = None
 
-            # # Mask2Former fix:
-            # if cfg.model.type == "Mask2Former":
-            #     cfg.model.panoptic_head.loss_cls["class_weight"] = [1.0] * num_classes + [0.1]
+    #         # # Mask2Former fix:
+    #         # if cfg.model.type == "Mask2Former":
+    #         #     cfg.model.panoptic_head.loss_cls["class_weight"] = [1.0] * num_classes + [0.1]
 
-            # # RTMDet and YOLOX fix:
-            # if cfg.model.type in ["RTMDet", "YOLOX"]:
-            #     cfg.model.data_preprocessor.pad_mask = True
-            #     cfg.model.data_preprocessor.pad_size_divisor = 32
+    #         # # RTMDet and YOLOX fix:
+    #         # if cfg.model.type in ["RTMDet", "YOLOX"]:
+    #         #     cfg.model.data_preprocessor.pad_mask = True
+    #         #     cfg.model.data_preprocessor.pad_size_divisor = 32
 
-            # pipelines
-            # train_pipeline, test_pipeline = get_default_pipelines(
-            #     with_mask=self.task == "segmentation3d"
-            # )
-            # img_aug = dict(type="SlyImgAugs", config_path=self.augs_config_path)
-            # idx_insert = find_index_for_imgaug(train_pipeline)  # 2 by default
-            # train_pipeline.insert(idx_insert, img_aug)
-            # train_pipeline[3]["scale"] = self.input_size
-            # test_pipeline[1]["scale"] = self.input_size
-            # if cfg.get("train_pipeline"):
-            #     cfg.train_pipeline = train_pipeline
-            # if cfg.get("test_pipeline"):
-            #     cfg.test_pipeline = test_pipeline
+    #         # pipelines
+    #         # train_pipeline, test_pipeline = get_default_pipelines(
+    #         #     with_mask=self.task == "segmentation3d"
+    #         # )
+    #         # img_aug = dict(type="SlyImgAugs", config_path=self.augs_config_path)
+    #         # idx_insert = find_index_for_imgaug(train_pipeline)  # 2 by default
+    #         # train_pipeline.insert(idx_insert, img_aug)
+    #         # train_pipeline[3]["scale"] = self.input_size
+    #         # test_pipeline[1]["scale"] = self.input_size
+    #         # if cfg.get("train_pipeline"):
+    #         #     cfg.train_pipeline = train_pipeline
+    #         # if cfg.get("test_pipeline"):
+    #         #     cfg.test_pipeline = test_pipeline
 
-        train_dataset = dict(
-            type="SuperviselyDatasetSplit",
-            data_root=g.PROJECT_DIR,
-            split_file=f"{self.data_root}/train_split.json",
-            task=self.task,
-            selected_classes=self.selected_classes,
-            # filter_images_without_gt=self.filter_images_without_gt,
-            # pipeline=train_pipeline,
-        )
-        val_dataset = dict(
-            type="SuperviselyDatasetSplit",
-            data_root=g.PROJECT_DIR,
-            split_file=f"{self.data_root}/val_split.json",
-            task=self.task,
-            selected_classes=self.selected_classes,
-            # filter_images_without_gt=self.filter_images_without_gt,
-            # pipeline=test_pipeline,
-            test_mode=True,
-        )
+    #     train_dataset = dict(
+    #         type="SuperviselyDatasetSplit",
+    #         data_root=g.PROJECT_DIR,
+    #         split_file=f"{self.data_root}/train_split.json",
+    #         task=self.task,
+    #         selected_classes=self.selected_classes,
+    #         # filter_images_without_gt=self.filter_images_without_gt,
+    #         # pipeline=train_pipeline,
+    #     )
+    #     val_dataset = dict(
+    #         type="SuperviselyDatasetSplit",
+    #         data_root=g.PROJECT_DIR,
+    #         split_file=f"{self.data_root}/val_split.json",
+    #         task=self.task,
+    #         selected_classes=self.selected_classes,
+    #         # filter_images_without_gt=self.filter_images_without_gt,
+    #         # pipeline=test_pipeline,
+    #         test_mode=True,
+    #     )
 
-        # dataloaders
-        train_dataloader, val_dataloader = get_default_dataloaders()
+    #     # dataloaders
+    #     train_dataloader, val_dataloader = get_default_dataloaders()
 
-        train_dataloader.batch_size = self.batch_size_train
-        train_dataloader.num_workers = self.num_workers
-        train_dataloader.persistent_workers = self.num_workers != 0
-        val_dataloader.batch_size = self.batch_size_val
-        val_dataloader.num_workers = self.num_workers
-        val_dataloader.persistent_workers = self.num_workers != 0
+    #     train_dataloader.batch_size = self.batch_size_train
+    #     train_dataloader.num_workers = self.num_workers
+    #     train_dataloader.persistent_workers = self.num_workers != 0
+    #     val_dataloader.batch_size = self.batch_size_val
+    #     val_dataloader.num_workers = self.num_workers
+    #     val_dataloader.persistent_workers = self.num_workers != 0
 
-        train_dataloader.dataset = train_dataset
-        val_dataloader.dataset = val_dataset
+    #     train_dataloader.dataset = train_dataset
+    #     val_dataloader.dataset = val_dataset
 
-        cfg.train_dataloader = train_dataloader
-        cfg.val_dataloader = val_dataloader
-        cfg.test_dataloader = cfg.val_dataloader.copy()
+    #     cfg.train_dataloader = train_dataloader
+    #     cfg.val_dataloader = val_dataloader
+    #     cfg.test_dataloader = cfg.val_dataloader.copy()
 
-        # evaluators
-        # from mmdet.evaluation.metrics import
-        from mmdet3d.evaluation.metrics import NuScenesMetric
+    #     # evaluators
+    #     # from mmdet.evaluation.metrics import
+    #     from mmdet3d.evaluation.metrics import NuScenesMetric
 
-        nuscenes_metric = "segm" if self.task == "segmentation3d" else "bbox"
+    #     nuscenes_metric = "segm" if self.task == "segmentation3d" else "bbox"
 
-        cfg.val_evaluator = dict(
-            type="NuScenesMetric",
-            ann_file=f"{self.data_root}/val_coco_instances.json",
-            metric=nuscenes_metric,
-            classwise=self.add_classwise_metric,
-        )
+    #     cfg.val_evaluator = dict(
+    #         type="NuScenesMetric",
+    #         ann_file=f"{self.data_root}/val_coco_instances.json",
+    #         metric=nuscenes_metric,
+    #         classwise=self.add_classwise_metric,
+    #     )
 
-        cfg.test_evaluator = cfg.val_evaluator.copy()
+    #     cfg.test_evaluator = cfg.val_evaluator.copy()
 
-        # train/val
-        cfg.train_cfg = dict(
-            by_epoch=self.epoch_based_train,
-            max_epochs=self.total_epochs,
-            val_interval=self.val_interval,
-        )
+    #     # train/val
+    #     cfg.train_cfg = dict(
+    #         by_epoch=self.epoch_based_train,
+    #         max_epochs=self.total_epochs,
+    #         val_interval=self.val_interval,
+    #     )
 
-        # hooks
-        # from sly_hook import SuperviselyHook
-        # from mmdet.engine.hooks import CheckInvalidLossHook, MeanTeacherHook, NumClassCheckHook
-        # from mmengine.hooks import
+    #     # hooks
+    #     # from sly_hook import SuperviselyHook
+    #     # from mmdet.engine.hooks import CheckInvalidLossHook, MeanTeacherHook, NumClassCheckHook
+    #     # from mmengine.hooks import
 
-        save_best = "auto" if self.save_best else None
-        cfg.default_hooks.checkpoint = dict(
-            type="CheckpointHook",
-            interval=self.checkpoint_interval,
-            by_epoch=self.epoch_based_train,
-            max_keep_ckpts=self.max_keep_checkpoints,
-            save_last=self.save_last,
-            save_best=save_best,
-            save_optimizer=self.save_optimizer,
-        )
-        cfg.log_processor = dict(
-            type="LogProcessor", window_size=self.chart_update_interval, by_epoch=True
-        )
-        cfg.default_hooks.logger["interval"] = self.log_interval
-        cfg.custom_hooks = [
-            # dict(type="NumClassCheckHook"),
-            # dict(type="CheckInvalidLossHook", interval=1),
-            dict(type="SuperviselyHook", chart_update_interval=self.chart_update_interval),
-        ]
+    #     save_best = "auto" if self.save_best else None
+    #     cfg.default_hooks.checkpoint = dict(
+    #         type="CheckpointHook",
+    #         interval=self.checkpoint_interval,
+    #         by_epoch=self.epoch_based_train,
+    #         max_keep_ckpts=self.max_keep_checkpoints,
+    #         save_last=self.save_last,
+    #         save_best=save_best,
+    #         save_optimizer=self.save_optimizer,
+    #     )
+    #     cfg.log_processor = dict(
+    #         type="LogProcessor", window_size=self.chart_update_interval, by_epoch=True
+    #     )
+    #     cfg.default_hooks.logger["interval"] = self.log_interval
+    #     cfg.custom_hooks = [
+    #         # dict(type="NumClassCheckHook"),
+    #         # dict(type="CheckInvalidLossHook", interval=1),
+    #         dict(type="SuperviselyHook", chart_update_interval=self.chart_update_interval),
+    #     ]
 
-        # visualization
-        from mmdet3d.engine.hooks import Det3DVisualizationHook
+    #     # visualization
+    #     from mmdet3d.engine.hooks import Det3DVisualizationHook
 
-        # TODO: debug
-        cfg.default_hooks.visualization = dict(
-            type="Det3DVisualizationHook", draw=True, interval=100
-        )
+    #     # TODO: debug
+    #     cfg.default_hooks.visualization = dict(
+    #         type="Det3DVisualizationHook", draw=True, interval=100
+    #     )
 
-        # optimizer
-        # from mmengine.optim.optimizer import OptimWrapper
-        cfg.optim_wrapper.optimizer = self.optimizer
-        if self.clip_grad_norm:
-            cfg.optim_wrapper.clip_grad = dict(max_norm=self.clip_grad_norm)
+    #     # optimizer
+    #     # from mmengine.optim.optimizer import OptimWrapper
+    #     cfg.optim_wrapper.optimizer = self.optimizer
+    #     if self.clip_grad_norm:
+    #         cfg.optim_wrapper.clip_grad = dict(max_norm=self.clip_grad_norm)
 
-        # scheduler
-        # from mmengine.optim.scheduler import ConstantLR, LinearLR
-        cfg.param_scheduler = []
-        if self.warmup_iters:
-            warmup = dict(
-                type="LinearLR",
-                start_factor=self.warmup_ratio,
-                by_epoch=False,
-                begin=0,
-                end=self.warmup_iters,
-            )
-            cfg.param_scheduler.append(warmup)
-        if self.scheduler:
-            if self.scheduler["by_epoch"] is False:
-                self.scheduler["begin"] = self.warmup_iters
-            cfg.param_scheduler.append(self.scheduler)
+    #     # scheduler
+    #     # from mmengine.optim.scheduler import ConstantLR, LinearLR
+    #     cfg.param_scheduler = []
+    #     if self.warmup_iters:
+    #         warmup = dict(
+    #             type="LinearLR",
+    #             start_factor=self.warmup_ratio,
+    #             by_epoch=False,
+    #             begin=0,
+    #             end=self.warmup_iters,
+    #         )
+    #         cfg.param_scheduler.append(warmup)
+    #     if self.scheduler:
+    #         if self.scheduler["by_epoch"] is False:
+    #             self.scheduler["begin"] = self.warmup_iters
+    #         cfg.param_scheduler.append(self.scheduler)
 
-        cfg.load_from = self.load_from  # will set later as we don't know 'weights_path' so far
-        cfg.work_dir = self.work_dir
-        cfg.experiment_name = self.experiment_name
-        cfg.launcher = "none"
-        # cfg.env_cfg.mp_cfg.mp_start_method = "spawn"
-        cfg.num_classes = len(self.selected_classes)
+    #     cfg.load_from = self.load_from  # will set later as we don't know 'weights_path' so far
+    #     cfg.work_dir = self.work_dir
+    #     cfg.experiment_name = self.experiment_name
+    #     cfg.launcher = "none"
+    #     # cfg.env_cfg.mp_cfg.mp_start_method = "spawn"
+    #     cfg.num_classes = len(self.selected_classes)
 
-        return cfg
+    #     return cfg
 
     def is_inited(self):
         need_to_check = [self.task, self.selected_classes, self.work_dir]
