@@ -152,18 +152,20 @@ class Monitoring(object):
 
 
 train_stage = StageMonitoring("train", "Train")
-train_stage.create_metric("Loss", ["loss"], stroke_curve="straight")
-train_stage.create_metric("Learning Rate", ["lr"], decimalsInFloat=6, stroke_curve="straight")
+train_stage.create_metric("Loss", ["loss"], stroke_curve="straight", data_type="tuple")
+train_stage.create_metric(
+    "Learning Rate", ["lr"], decimalsInFloat=6, stroke_curve="straight", data_type="tuple"
+)
 
 visualization = StageMonitoring("visual", "Visualization")
 
 
 val_stage = StageMonitoring("val", "Validation")
-val_stage.create_metric("Metrics", g.NUSCENES_METRIC_KEYS, stroke_curve="straight")
-val_stage.create_metric("3D Errors", stroke_curve="straight", sly_options={"data_type": "tuple"})
 val_stage.create_metric(
-    "Class-Wise AP", stroke_curve="straight", sly_options={"data_type": "tuple"}
+    "Metrics", g.NUSCENES_METRIC_KEYS, stroke_curve="straight", data_type="tuple"
 )
+val_stage.create_metric("3D Errors", stroke_curve="straight", data_type="tuple")
+val_stage.create_metric("Class-Wise AP", stroke_curve="straight", data_type="tuple")
 
 
 def add_3d_errors_metric():
@@ -184,6 +186,6 @@ monitoring.add_stage(val_stage, True)
 
 # add_btn = Button("add")
 
-grid_chart: GridChart = monitoring._stages["val"]["raw"]
-grid_chart._widgets["Class-Wise AP"].hide()
-grid_chart._widgets["3D Errors"].hide()
+grid_chart_val: GridChart = monitoring._stages["val"]["raw"]
+grid_chart_val._widgets["3D Errors"].hide()
+grid_chart_val._widgets["Class-Wise AP"].hide()

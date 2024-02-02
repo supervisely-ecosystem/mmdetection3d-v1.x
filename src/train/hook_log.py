@@ -8,10 +8,11 @@ import torch
 
 import src.globals as g
 import src.ui.train as train_ui
-from src.ui.graphics import monitoring
+from src.ui.graphics import monitoring, grid_chart_val
 import open3d as o3d
 import numpy as np
 import pickle, random
+from supervisely.app.widgets.line_chart.line_chart import LineChart
 
 
 @HOOKS.register_module()
@@ -117,6 +118,8 @@ class SuperviselyHook(Hook):
         # Add classwise metrics
         if g.params.add_classwise_metric:
             colors = runner.val_dataloader.dataset.metainfo["palette"]
+            cw: LineChart = grid_chart_val._widgets["Class-Wise AP"]
+            cw.set_colors(colors)
             classwise_metrics = metrics.get("NuScenes metric/cls_AP", {})
             for class_name, value in classwise_metrics.items():
                 monitoring.add_scalar("val", "Class-Wise AP", class_name, runner.epoch, value)
