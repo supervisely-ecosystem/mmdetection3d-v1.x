@@ -139,11 +139,11 @@ def collect_mmdet3d_info(project_dir, cv_task: str):
             image_infos = collect_image_infos(project_dir, ori_image_infos)
 
             # Collect centerize vector
-            pts_filename = f"{project_dir}/{lidar_info['lidar_path']}"
-            pcd = o3d.io.read_point_cloud(pts_filename)
-            xyz = np.asarray(pcd.points, dtype=np.float32)
-            centerize_vector = -xyz.mean(0)
-            centerize_vector[2] = 0.
+            # pts_filename = f"{project_dir}/{lidar_info['lidar_path']}"
+            # pcd = o3d.io.read_point_cloud(pts_filename)
+            # xyz = np.asarray(pcd.points, dtype=np.float32)
+            # centerize_vector = -xyz.mean(0)
+            # centerize_vector[2] = 0.
             
             # Sum up
             data_sample = {
@@ -151,7 +151,7 @@ def collect_mmdet3d_info(project_dir, cv_task: str):
                 "images": image_infos,
                 "instances": instances,
                 "cam_instances": None,
-                "centerize_vector": centerize_vector,
+                # "centerize_vector": centerize_vector,
             }
             data_list.append(data_sample)
     
