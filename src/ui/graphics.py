@@ -160,8 +160,10 @@ visualization = StageMonitoring("visual", "Visualization")
 
 val_stage = StageMonitoring("val", "Validation")
 val_stage.create_metric("Metrics", g.NUSCENES_METRIC_KEYS, stroke_curve="straight")
-val_stage.create_metric("3D Errors", stroke_curve="straight")
-val_stage.create_metric("Class-Wise AP", stroke_curve="straight")
+val_stage.create_metric("3D Errors", stroke_curve="straight", sly_options={"data_type": "tuple"})
+val_stage.create_metric(
+    "Class-Wise AP", stroke_curve="straight", sly_options={"data_type": "tuple"}
+)
 
 
 def add_3d_errors_metric():

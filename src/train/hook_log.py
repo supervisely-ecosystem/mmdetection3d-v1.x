@@ -45,11 +45,11 @@ class SuperviselyHook(Hook):
         # see nuscenes_metric.py ln. 136
         save_idx = 0
 
-        # pts_filename = g.PROJECT_DIR + "/" + d["data_list"][save_idx]["lidar_points"]["lidar_path"]
-        # pcd = o3d.io.read_point_cloud(pts_filename)
-        # xyz = np.asarray(pcd.points, dtype=np.float32)
+        pts_filename = g.PROJECT_DIR + "/" + d["data_list"][save_idx]["lidar_points"]["lidar_path"]
+        pcd = o3d.io.read_point_cloud(pts_filename)
+        xyz = np.asarray(pcd.points, dtype=np.float32)
 
-        # monitoring.initialize_iframe("visual", xyz)
+        monitoring.initialize_iframe("visual", xyz)
 
     def after_train_iter(
         self, runner: Runner, batch_idx: int, data_batch: DATA_BATCH = None, outputs: dict = None
