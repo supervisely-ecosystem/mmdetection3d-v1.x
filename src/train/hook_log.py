@@ -48,7 +48,9 @@ class SuperviselyHook(Hook):
         save_idx = 0  # see nuscenes_metric.py ln. 136
         pts_filepath = g.PROJECT_DIR + "/" + a["data_list"][save_idx]["lidar_points"]["lidar_path"]
 
-        monitoring.initialize_iframe("visual", pts_filepath)
+        gt_bboxes_3d = a["data_list"][save_idx]["instances"]
+
+        monitoring.initialize_iframe("visual", pts_filepath, gt_bboxes_3d)
 
     def after_train_iter(
         self, runner: Runner, batch_idx: int, data_batch: DATA_BATCH = None, outputs: dict = None
@@ -100,11 +102,11 @@ class SuperviselyHook(Hook):
         labels_3d = p["labels_3d"]
         scores_3d = p["scores_3d"]
 
-        if len(bboxes_3d) > 0:
+        if len(bboxes_3d) > 0 and runner.epoch % 5 == 0:
             bboxes_3d, labels_3d, scores_3d = filter_by_confidence(
-                bboxes_3d, labels_3d, scores_3d, threshold=0.7
+                bboxes_3d, labels_3d, scores_3d, threshold=0.5
             )
-            monitoring.update_iframe("visual", bboxes_3d)
+            monitoring.update_iframe("visual", bboxes_3d, runner.epoch)
 
         # Add mAP metrics
         # TODO метрики по классам 'per class'

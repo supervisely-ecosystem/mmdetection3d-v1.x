@@ -10,6 +10,7 @@ import supervisely as sly
 import open3d as o3d
 import numpy as np
 import pickle, random
+import copy
 
 # from src.inference.functional import create_sly_annotation, up_bbox3d, filter_by_confidence
 
@@ -92,35 +93,6 @@ class Monitoring(object):
         self._stages[stage.name]["compiled"] = field
         self._stages[stage.name]["raw"] = plot
 
-    def update_iframe(self, stage_id, pred_bboxes_3d):
-
-        iframe: IFrame = self._stages[stage_id]["raw"]
-
-        fig = go.Figure()
-        for b in pred_bboxes_3d:
-
-            center, dimensions, yaw = b[:3], b[3:6], b[6]
-
-            box_corners = drt.get_box_corners(center, dimensions, yaw)
-
-            # Plotting the box
-            for start, end in drt.lines:
-                x_vals = [box_corners[start][0], box_corners[end][0]]
-                y_vals = [box_corners[start][1], box_corners[end][1]]
-                z_vals = [box_corners[start][2], box_corners[end][2]]
-
-                # Adding a line trace for each pair of points
-                fig.add_trace(
-                    go.Scatter3d(x=x_vals, y=y_vals, z=z_vals, mode="lines", line=dict(color="red"))
-                )
-
-            # Set layout
-            fig.update_layout(scene=dict(aspectmode="data"))
-
-        fig.write_html(g.STATIC_DIR.joinpath(f"pred_bbox_visualization.html"))
-        iframe.set(f"static/pred_bbox_visualization.html", height="500px", width="1000px")
-        self._stages[stage_id]["raw"] = iframe
-
     def add_scalar(
         self,
         stage_id: str,
@@ -152,20 +124,18 @@ class Monitoring(object):
             self.container.hide()
         return self.container
 
-    def initialize_iframe(self, stage_id: str, pts_filepath: str) -> None:
-
-        # fname = "_".join(pts_filepath.split("/")[-3:])
-        iframe: IFrame = self._stages[stage_id]["raw"]
-
-        # iframe.set(f"static/point_cloud_visualization.html", height="500px", width="1000px")
-        # return
-
-        # if sly.fs.file_exists(f"static/{fname}.html"):
-        #     iframe.set(f"static/{fname}.html", height="500px", width="1000px")
-        #     return
+    def initialize_iframe(self, stage_id: str, pts_filepath: str, gt_bboxes_3d=[]) -> None:
 
         pcd = o3d.io.read_point_cloud(pts_filepath)
-        xyz = np.asarray(pcd.points, dtype=np.float32)
+        pcd_downsampled = pcd.voxel_down_sample(voxel_size=1)
+
+        xyz = np.asarray(pcd_downsampled.points, dtype=np.float32)
+        center = np.mean(xyz, axis=0)
+
+        distances = np.linalg.norm(xyz - center, axis=1)
+        normalized_distances = (distances - np.min(distances)) / (
+            np.max(distances) - np.min(distances)
+        )
 
         fig = go.Figure()
 
@@ -175,16 +145,24 @@ class Monitoring(object):
             z=xyz[:, 2],
             mode="markers",
             marker=dict(
-                size=1,  # Adjust the size of markers
-                color="blue",  # You can also use an array for individual colors
-                opacity=0.8,
+                size=2,  # Adjust the size of markers
+                color=normalized_distances,  # You can also use an array for individual colors
+                opacity=0.5,
             ),
         )
 
         fig.add_trace(scatter_trace)
 
         fig.update_layout(
-            scene=dict(xaxis_title="X-axis", yaxis_title="Y-axis", zaxis_title="Z-axis")
+            scene=dict(
+                aspectmode="data",
+                camera=dict(
+                    eye=dict(x=0.1, y=0.1, z=1.5),
+                ),
+                xaxis_title="X-axis",
+                yaxis_title="Y-axis",
+                zaxis_title="Z-axis",
+            )
         )
         fig.update_layout(
             title="Point Cloud Visualization",
@@ -192,13 +170,75 @@ class Monitoring(object):
             margin=dict(l=0, r=0, b=0, t=0),  # Adjust the margin for a clean layout
         )
 
-        fig.write_html(g.STATIC_DIR.joinpath(f"point_cloud_visualization.html"))
-        iframe.set(f"static/point_cloud_visualization.html", height="500px", width="1000px")
-        self._stages[stage_id]["raw"] = iframe
+        if len(gt_bboxes_3d) != 0:
+            for gt_bbox in gt_bboxes_3d:
 
-        # iframe.set(f"static/pred_bbox_visualization.html", height="500px", width="1000px")
-        # fig.write_html(g.STATIC_DIR.joinpath(f"{fname}.html"))
-        # iframe.set(f"static/{fname}.html", height="500px", width="1000px")
+                b, bbox_label_3d = gt_bbox["bbox_3d"], gt_bbox["bbox_label_3d"]
+
+                if b[0] < -100:
+                    continue
+
+                center, dimensions, yaw = b[:3], b[3:6], b[6]
+                box_corners = drt.get_box_corners(center, dimensions, yaw)
+                lines_x, lines_y, lines_z = [], [], []
+
+                for start, end in drt.lines:
+                    lines_x.extend([box_corners[start][0], box_corners[end][0], None])
+                    lines_y.extend([box_corners[start][1], box_corners[end][1], None])
+                    lines_z.extend([box_corners[start][2], box_corners[end][2], None])
+
+                fig.add_trace(
+                    go.Scatter3d(
+                        x=lines_x, y=lines_y, z=lines_z, mode="lines", line=dict(color="green")
+                    )
+                )
+
+            fig.update_layout(scene=dict(aspectmode="data"))
+
+        fig.write_html(g.STATIC_DIR.joinpath(f"point_cloud_visualization.html"))
+
+        self._stages[stage_id]["fig"] = fig
+
+        iframe: IFrame = self._stages[stage_id]["raw"]
+        iframe.set(f"static/point_cloud_visualization.html", height="500px", width="1000px")
+
+    def update_iframe(self, stage_id, pred_bboxes_3d, epoch):
+
+        pcl_fig = self._stages[stage_id]["fig"]
+        fig = copy.deepcopy(pcl_fig)
+        for b in pred_bboxes_3d:
+
+            center, dimensions, yaw = b[:3], b[3:6], b[6]
+
+            box_corners = drt.get_box_corners(center, dimensions, yaw)
+
+            lines_x, lines_y, lines_z = [], [], []
+
+            for start, end in drt.lines:
+                lines_x.extend([box_corners[start][0], box_corners[end][0], None])
+                lines_y.extend([box_corners[start][1], box_corners[end][1], None])
+                lines_z.extend([box_corners[start][2], box_corners[end][2], None])
+
+            fig.add_trace(
+                go.Scatter3d(x=lines_x, y=lines_y, z=lines_z, mode="lines", line=dict(color="red"))
+            )
+
+            # for start, end in drt.lines:
+            #     x_vals = [box_corners[start][0], box_corners[end][0]]
+            #     y_vals = [box_corners[start][1], box_corners[end][1]]
+            #     z_vals = [box_corners[start][2], box_corners[end][2]]
+
+            #     # Adding a line trace for each pair of points
+            #     fig.add_trace(
+            #         go.Scatter3d(x=x_vals, y=y_vals, z=z_vals, mode="lines", line=dict(color="red"))
+            #     )
+
+        fig.update_layout(scene=dict(aspectmode="data"))
+
+        fname = "pred_bbox_visualization_" + str(epoch) + ".html"
+        fig.write_html(g.STATIC_DIR.joinpath(fname))
+        iframe: IFrame = self._stages[stage_id]["raw"]
+        iframe.set(f"static/{fname}", height="500px", width="1000px")
 
 
 train_stage = StageMonitoring("train", "Train")
@@ -207,7 +247,7 @@ train_stage.create_metric(
     "Learning Rate", ["lr"], decimalsInFloat=6, stroke_curve="straight", data_type="tuple"
 )
 
-visualization = StageMonitoring("visual", "Visualization")
+visualization = StageMonitoring("visual", "Visualization (updates every 5th epoch)")
 
 
 val_stage = StageMonitoring("val", "Validation")
