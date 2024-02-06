@@ -1,5 +1,7 @@
 import os
 from typing import Union, List, Literal, Tuple
+import open3d as o3d
+import numpy as np
 
 import supervisely as sly
 from supervisely.geometry.cuboid_3d import Cuboid3d
@@ -141,6 +143,13 @@ def from_splits(
             ori_image_infos = dataset.get_related_images(name)
             image_infos = collect_image_infos(project_dir, ori_image_infos)
 
+            # Collect centerize vector
+            # pts_filename = f"{project_dir}/{lidar_info['lidar_path']}"
+            # pcd = o3d.io.read_point_cloud(pts_filename)
+            # xyz = np.asarray(pcd.points, dtype=np.float32)
+            # centerize_vector = -xyz.mean(0)
+            # centerize_vector[2] = 0.
+
             # Sum up
             data_sample = get_data_sample(lidar_info, image_infos, instances)
             data_list.append(data_sample)
@@ -194,7 +203,13 @@ def collect_mmdet3d_info(project_dir, cv_task: str):
             image_infos = collect_image_infos(project_dir, ori_image_infos)
 
             # Sum up
-            data_sample = get_data_sample(lidar_info, image_infos, instances)
+            data_sample = {
+                "lidar_points": lidar_info,
+                "images": image_infos,
+                "instances": instances,
+                "cam_instances": None,
+                # "centerize_vector": centerize_vector,
+            }
             data_list.append(data_sample)
 
     mmdet3d_info = {"metainfo": metainfo, "data_list": data_list}
