@@ -10,7 +10,8 @@ import supervisely as sly
 import open3d as o3d
 import numpy as np
 import pickle, random
-from src.inference.functional import create_sly_annotation, up_bbox3d, filter_by_confidence
+
+# from src.inference.functional import create_sly_annotation, up_bbox3d, filter_by_confidence
 
 import src.tests.draw_test as drt
 
@@ -118,6 +119,7 @@ class Monitoring(object):
 
         fig.write_html(g.STATIC_DIR.joinpath(f"pred_bbox_visualization.html"))
         iframe.set(f"static/pred_bbox_visualization.html", height="500px", width="1000px")
+        self._stages[stage_id]["raw"] = iframe
 
     def add_scalar(
         self,
@@ -156,7 +158,7 @@ class Monitoring(object):
         iframe: IFrame = self._stages[stage_id]["raw"]
 
         # iframe.set(f"static/point_cloud_visualization.html", height="500px", width="1000px")
-        return
+        # return
 
         # if sly.fs.file_exists(f"static/{fname}.html"):
         #     iframe.set(f"static/{fname}.html", height="500px", width="1000px")
@@ -192,6 +194,8 @@ class Monitoring(object):
 
         fig.write_html(g.STATIC_DIR.joinpath(f"point_cloud_visualization.html"))
         iframe.set(f"static/point_cloud_visualization.html", height="500px", width="1000px")
+        self._stages[stage_id]["raw"] = iframe
+
         # iframe.set(f"static/pred_bbox_visualization.html", height="500px", width="1000px")
         # fig.write_html(g.STATIC_DIR.joinpath(f"{fname}.html"))
         # iframe.set(f"static/{fname}.html", height="500px", width="1000px")

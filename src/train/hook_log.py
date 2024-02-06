@@ -14,7 +14,7 @@ import numpy as np
 import pickle, random
 from supervisely.app.widgets.line_chart.line_chart import LineChart
 
-from src.inference.functional import create_sly_annotation, up_bbox3d, filter_by_confidence
+from src.inference.functional import filter_by_confidence
 
 
 @HOOKS.register_module()
@@ -102,7 +102,7 @@ class SuperviselyHook(Hook):
 
         if len(bboxes_3d) > 0:
             bboxes_3d, labels_3d, scores_3d = filter_by_confidence(
-                bboxes_3d, labels_3d, scores_3d, threshold=0.45
+                bboxes_3d, labels_3d, scores_3d, threshold=0.7
             )
             monitoring.update_iframe("visual", bboxes_3d)
 
