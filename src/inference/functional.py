@@ -1,9 +1,12 @@
 from typing import Union, List
-from supervisely.nn.prediction_dto import PredictionCuboid3d
+
+# from supervisely.nn.prediction_dto import PredictionCuboid3d
 import numpy as np
 import supervisely as sly
 from supervisely.geometry.cuboid_3d import Cuboid3d, Vector3d
-from supervisely.pointcloud_annotation.pointcloud_object_collection import PointcloudObjectCollection
+from supervisely.pointcloud_annotation.pointcloud_object_collection import (
+    PointcloudObjectCollection,
+)
 
 
 def bbox_3d_to_cuboid3d(bbox_3d):
@@ -40,9 +43,14 @@ def up_bbox3d(bbox3d: list):
 #     annotation = sly.PointcloudAnnotation(objects, figures)
 
 #     return annotation
-    
 
-def create_sly_annotation(bboxes_3d: list, labels_3d: list, label2class_name: Union[list, dict], project_meta: sly.ProjectMeta):
+
+def create_sly_annotation(
+    bboxes_3d: list,
+    labels_3d: list,
+    label2class_name: Union[list, dict],
+    project_meta: sly.ProjectMeta,
+):
     assert len(bboxes_3d) == len(labels_3d)
     # numpy to list
     if isinstance(bboxes_3d, np.ndarray):
@@ -61,27 +69,29 @@ def create_sly_annotation(bboxes_3d: list, labels_3d: list, label2class_name: Un
         figure = sly.PointcloudFigure(object, geometry)
         objects.append(object)
         figures.append(figure)
-        
+
     objects = PointcloudObjectCollection(objects)
     annotation = sly.PointcloudAnnotation(objects, figures)
     return annotation
 
 
-def create_sly_annotation_from_prediction(prediction: List[PredictionCuboid3d], project_meta: sly.ProjectMeta):
-    # create annotation
-    objects = []
-    figures = []
-    for pred in prediction:
-        class_name = pred.class_name
-        geometry = pred.cuboid_3d
-        object = sly.PointcloudObject(project_meta.get_obj_class(class_name))
-        figure = sly.PointcloudFigure(object, geometry)
-        objects.append(object)
-        figures.append(figure)        
-    objects = PointcloudObjectCollection(objects)
-    annotation = sly.PointcloudAnnotation(objects, figures)
-    return annotation
-    
+# def create_sly_annotation_from_prediction(
+#     prediction: List[PredictionCuboid3d], project_meta: sly.ProjectMeta
+# ):
+#     # create annotation
+#     objects = []
+#     figures = []
+#     for pred in prediction:
+#         class_name = pred.class_name
+#         geometry = pred.cuboid_3d
+#         object = sly.PointcloudObject(project_meta.get_obj_class(class_name))
+#         figure = sly.PointcloudFigure(object, geometry)
+#         objects.append(object)
+#         figures.append(figure)
+#     objects = PointcloudObjectCollection(objects)
+#     annotation = sly.PointcloudAnnotation(objects, figures)
+#     return annotation
+
 
 def filter_by_confidence(bboxes_3d, labels_3d, scores_3d, threshold=0.5):
     filtered_bboxes_3d = []
@@ -95,7 +105,12 @@ def filter_by_confidence(bboxes_3d, labels_3d, scores_3d, threshold=0.5):
     return filtered_bboxes_3d, filtered_labels_3d, filtered_scores_3d
 
 
-def create_sly_annotation_episodes(bboxes_3d: list, labels_3d: list, label2class_name: Union[list, dict], project_meta: sly.ProjectMeta):
+def create_sly_annotation_episodes(
+    bboxes_3d: list,
+    labels_3d: list,
+    label2class_name: Union[list, dict],
+    project_meta: sly.ProjectMeta,
+):
     assert len(bboxes_3d) == len(labels_3d)
     # numpy to list
     if isinstance(bboxes_3d, np.ndarray):
@@ -115,8 +130,7 @@ def create_sly_annotation_episodes(bboxes_3d: list, labels_3d: list, label2class
     #     figure = sly.PointcloudFigure(object, geometry)
     #     objects.append(object)
     #     figures.append(figure)
-        
+
     # objects = PointcloudObjectCollection(objects)
     # annotation = sly.PointcloudEpisodeAnnotation(objects, figures)
     # return annotation
-    

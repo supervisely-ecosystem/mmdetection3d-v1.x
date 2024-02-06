@@ -5,7 +5,7 @@ from mmengine.hooks.hook import DATA_BATCH
 from mmengine.runner import Runner
 import supervisely as sly
 import torch
-
+import plotly.graph_objects as go
 import src.globals as g
 import src.ui.train as train_ui
 from src.ui.graphics import monitoring, grid_chart_val
@@ -13,6 +13,8 @@ import open3d as o3d
 import numpy as np
 import pickle, random
 from supervisely.app.widgets.line_chart.line_chart import LineChart
+
+from src.inference.functional import create_sly_annotation, up_bbox3d, filter_by_confidence
 
 
 @HOOKS.register_module()
@@ -41,16 +43,12 @@ class SuperviselyHook(Hook):
 
         ann_file = runner.val_evaluator.metrics[0].ann_file
         with open(ann_file, "rb") as f:
-            d = pickle.load(f)
+            a = pickle.load(f)
 
-        # see nuscenes_metric.py ln. 136
-        save_idx = 0
+        save_idx = 0  # see nuscenes_metric.py ln. 136
+        pts_filepath = g.PROJECT_DIR + "/" + a["data_list"][save_idx]["lidar_points"]["lidar_path"]
 
-        pts_filename = g.PROJECT_DIR + "/" + d["data_list"][save_idx]["lidar_points"]["lidar_path"]
-        pcd = o3d.io.read_point_cloud(pts_filename)
-        xyz = np.asarray(pcd.points, dtype=np.float32)
-
-        monitoring.initialize_iframe("visual", xyz)
+        monitoring.initialize_iframe("visual", pts_filepath)
 
     def after_train_iter(
         self, runner: Runner, batch_idx: int, data_batch: DATA_BATCH = None, outputs: dict = None
@@ -96,11 +94,17 @@ class SuperviselyHook(Hook):
         if not metrics:
             return
 
-        # res = runner.val_evaluator.metrics[0].saved_results
-        # pts_filename = g.PROJECT_DIR + "/" + res["pcd_path"]
-        # pcd = o3d.io.read_point_cloud(pts_filename)
-        # xyz = np.asarray(pcd.points, dtype=np.float32)
-        # monitoring.update_iframe("visual", xyz)
+        res = runner.val_evaluator.metrics[0].saved_results
+        p = res["pred"]["pred_instances_3d"]
+        bboxes_3d = p["bboxes_3d"]
+        labels_3d = p["labels_3d"]
+        scores_3d = p["scores_3d"]
+
+        if len(bboxes_3d) > 0:
+            bboxes_3d, labels_3d, scores_3d = filter_by_confidence(
+                bboxes_3d, labels_3d, scores_3d, threshold=0.45
+            )
+            monitoring.update_iframe("visual", bboxes_3d)
 
         # Add mAP metrics
         # TODO метрики по классам 'per class'
