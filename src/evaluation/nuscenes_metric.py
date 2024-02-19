@@ -86,7 +86,8 @@ class CustomNuScenesMetric(BaseMetric):
             self._filter_annotations_by_selected_classes(self.annotations, self.selected_classes)
         if centerize:
             self._centerize_annotations()
-        nuscenes_eval.override_constants(self.selected_classes, ["dummy_attr"])
+        tp_metrics = ["trans_err", "scale_err", "orient_err"]
+        nuscenes_eval.override_constants(self.selected_classes, ["dummy_attr"], tp_metrics)
 
     def process(self, data_batch: dict, data_samples: Sequence[dict]) -> None:
         """Process one batch of data samples and predictions.

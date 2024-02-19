@@ -32,11 +32,13 @@ class CustomNuScenesEval(DetectionEval):
         self.cfg = DetectionConfig.deserialize(cfg_data)
 
 
-def override_constants(NEW_DETECTION_NAMES: list, NEW_ATTRIBUTE_NAMES: list):
+def override_constants(NEW_DETECTION_NAMES: list, NEW_ATTRIBUTE_NAMES: list, NEW_TP_METRICS: list):
     constants.DETECTION_NAMES.clear()
     constants.DETECTION_NAMES.extend(NEW_DETECTION_NAMES)
     constants.ATTRIBUTE_NAMES.clear()
     constants.ATTRIBUTE_NAMES.extend(NEW_ATTRIBUTE_NAMES)
+    constants.TP_METRICS.clear()
+    constants.TP_METRICS.extend(NEW_TP_METRICS)
 
 
 def convert_pred_to_nusc_boxes(pred: List[Dict], id2class: dict = None) -> EvalBoxes:
