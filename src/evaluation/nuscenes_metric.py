@@ -48,6 +48,7 @@ class CustomNuScenesMetric(BaseMetric):
         prefix: Optional[str] = None,
         collect_device: str = "cpu",
         gt_is_kitti: bool = False,
+        centerize: bool = False,
         backend_args: Optional[dict] = None,
     ) -> None:
         self.default_prefix = "NuScenes metric"
@@ -83,6 +84,8 @@ class CustomNuScenesMetric(BaseMetric):
         self.selected_classes = self._parse_selected_classes(selected_classes, classes)
         if self.selected_classes != self.classes:
             self._filter_annotations_by_selected_classes(self.annotations, self.selected_classes)
+        if centerize:
+            self._centerize_annotations()
         nuscenes_eval.override_constants(self.selected_classes, ["dummy_attr"])
 
     def process(self, data_batch: dict, data_samples: Sequence[dict]) -> None:
@@ -211,8 +214,17 @@ class CustomNuScenesMetric(BaseMetric):
     def _filter_annotations_by_selected_classes(
         self, annotations: dict, selected_classes: List[str]
     ):
+        class_names = set(selected_classes)
         for info in annotations["data_list"]:
             info["instances"] = [
-                x for x in info["instances"] if x["bbox_label_3d"] in set(selected_classes)
+                x
+                for x in info["instances"]
+                if self.map_gt_label_to_class_name[x["bbox_label_3d"]] in class_names
             ]
         return annotations
+
+    def _centerize_annotations(self):
+        # translate boxes using centerize_vector
+        for info in self.annotations["data_list"]:
+            for instance in info["instances"]:
+                instance["bbox_3d"][:3] += info["centerize_vector"]
