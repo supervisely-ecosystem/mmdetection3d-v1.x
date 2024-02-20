@@ -3,7 +3,7 @@ from mmengine.config import Config, ConfigDict
 from src.config_factory import detection3d
 from src.train.train_parameters import configure_init_weights_and_resume, configure_loops, merge_default_runtime
 from src.train.train import build_runner
-from src.config_factory.config_parameters import ConfigParameters, write_parameters_to_config_2
+from src.config_factory.config_parameters import ConfigParameters, write_parameters_to_config_2, get_model_classes
 from src.tests.extract_weights_url import find_weights_url
 import re
 import json
@@ -141,11 +141,7 @@ cfg.optim_wrapper.optimizer.weight_decay = 1e-4
 cfg.custom_hooks.clear()
 
 # Handle Model Classes
-from src.dataset.custom_dataset import CustomDataset
-selected_classes_map = CustomDataset(data_root, "infos_val.pkl", selected_classes=selected_classes).selected_classes_map
-model_classes = [None] * len(selected_classes_map)
-for k,v in selected_classes_map.items():
-    model_classes[v] = k
+model_classes = get_model_classes(data_root, selected_classes)
 cfg.class_names = model_classes
 
 # Runner

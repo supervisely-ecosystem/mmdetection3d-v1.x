@@ -2,6 +2,7 @@ from typing import Union
 from mmengine.config import Config, ConfigDict
 import os
 import re
+from src.dataset.custom_dataset import CustomDataset
 
 
 class ConfigParameters:
@@ -231,7 +232,7 @@ def write_parameters_to_config_2(
     p = parameters
     num_classes = len(selected_classes)
 
-    cfg.class_names = selected_classes
+    # cfg.class_names = selected_classes
 
     # in_channels
     d = find_by_parameter(cfg.model, "in_channels")
@@ -328,3 +329,11 @@ def write_parameters_to_config_2(
     # SSN:
     # it is very hardcoded model, do not use.
     return cfg
+
+
+def get_model_classes(data_root, selected_classes):
+    selected_classes_map = CustomDataset(data_root, "infos_val.pkl", selected_classes=selected_classes).selected_classes_map
+    model_classes = [None] * len(selected_classes_map)
+    for k,v in selected_classes_map.items():
+        model_classes[v] = k
+    return model_classes
