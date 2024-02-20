@@ -1,6 +1,9 @@
+import copy
+import pickle
 from typing import Callable, List, Optional, Union
 from mmdet3d.registry import DATASETS
 from mmdet3d.datasets.det3d_dataset import Det3DDataset
+from mmengine.dataset import force_full_init
 from mmdet3d.structures import CameraInstance3DBoxes, LiDARInstance3DBoxes
 from mmengine.registry import init_default_scope
 import mmengine
@@ -46,8 +49,11 @@ class CustomDataset(Det3DDataset):
 
         if isinstance(selected_classes, dict):
             self.label_mapping = {i: selected_classes.get(x, -1) for i, x in enumerate(classes)}
+        
+        self.selected_classes_map = {self.METAINFO['classes'][k]: v for k,v in self.label_mapping.items() if v != -1}
 
         print(f"{self.METAINFO['classes']=}, {self.label_mapping=}")
+        print(f"{self.selected_classes_map=}")
 
     def parse_ann_info(self, info: dict) -> dict:
         ann_info = super().parse_ann_info(info)
@@ -85,3 +91,17 @@ class CustomDataset(Det3DDataset):
             info["instances"] = instances
             data_list.append(info)
         return data_list
+    
+    @force_full_init
+    def get_data_info(self, idx: int) -> dict:
+        # Overrides to not rewrite the sample_idx
+        if self.serialize_data:
+            start_addr = 0 if idx == 0 else self.data_address[idx - 1].item()
+            end_addr = self.data_address[idx].item()
+            bytes = memoryview(
+                self.data_bytes[start_addr:end_addr])  # type: ignore
+            data_info = pickle.loads(bytes)  # type: ignore
+        else:
+            data_info = copy.deepcopy(self.data_list[idx])
+        assert data_info.get("sample_idx") is not None, f"sample_idx not found in {data_info}"
+        return data_info

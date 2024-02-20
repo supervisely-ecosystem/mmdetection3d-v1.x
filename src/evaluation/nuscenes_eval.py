@@ -78,7 +78,7 @@ def convert_pred_to_nusc_boxes(pred: List[Dict], id2class: dict = None) -> EvalB
 def convert_gt_to_nusc_boxes(gt: List[Dict], id2class: dict = None) -> EvalBoxes:
     eval_boxes = EvalBoxes()
     for idx, sample in enumerate(gt):
-        sample_idx = idx
+        sample_idx = sample["sample_idx"]
         instances = sample["instances"]
         boxes = []
         for instance in instances:
@@ -104,7 +104,7 @@ def convert_gt_kitti_to_nusc_boxes(gt: List[Dict], id2class: dict = None) -> Eva
     # SAMPLE: {'CAM2': [{'bbox_label': 0, 'bbox_label_3d': 0, 'bbox': [710.4446301035068, 144.00207112943306, 820.2930685018162, 307.58688675239017], 'bbox_3d_isvalid': True, 'bbox_3d': [1.840000033378601, 1.4700000286102295, 8.40999984741211, 1.2000000476837158, 1.8899999856948853, 0.47999998927116394, 0.009999999776482582], 'velocity': -1, 'center_2d': [763.7633056640625, 224.4706268310547], 'depth': 8.4149808883667}]}
     eval_boxes = EvalBoxes()
     for idx, sample in enumerate(gt):
-        sample_idx = idx
+        sample_idx = sample["sample_idx"]
         instances = sample["cam_instances"]["CAM2"]
         boxes = []
         for instance in instances:

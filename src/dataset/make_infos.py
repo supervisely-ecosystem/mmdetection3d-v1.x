@@ -85,12 +85,13 @@ def collect_image_infos(project_dir: str, ori_image_infos: list):
 
 
 def get_data_sample(
-    lidar_info: dict, image_infos: dict, instances: list, cam_instances: list = None
+    lidar_info: dict, image_infos: dict, instances: list, sample_idx: int, cam_instances: list = None
 ):
     data_sample = {
         "lidar_points": lidar_info,
         "images": image_infos,
         "instances": instances,
+        "sample_idx": sample_idx,
         "cam_instances": cam_instances,
     }
     return data_sample
@@ -116,6 +117,7 @@ def from_splits(
     metainfo = {"classes": class_names, "palette": palette, "categories": class2id}
 
     data_list = []
+    sample_idx = 0
     for dataset in project.datasets:
         dataset: Union[sly.PointcloudDataset, sly.PointcloudEpisodeDataset]
         if is_episodes:
@@ -151,8 +153,9 @@ def from_splits(
             # centerize_vector[2] = 0.
 
             # Sum up
-            data_sample = get_data_sample(lidar_info, image_infos, instances)
+            data_sample = get_data_sample(lidar_info, image_infos, instances, sample_idx)
             data_list.append(data_sample)
+            sample_idx += 1
 
     mmdet3d_info = {"metainfo": metainfo, "data_list": data_list}
     return mmdet3d_info
@@ -176,6 +179,7 @@ def collect_mmdet3d_info(project_dir, cv_task: str):
     metainfo = {"classes": class_names, "palette": palette, "categories": class2id}
 
     data_list = []
+    sample_idx = 0
     for dataset in project.datasets:
         dataset: Union[sly.PointcloudDataset, sly.PointcloudEpisodeDataset]
         if is_episodes:
@@ -203,14 +207,9 @@ def collect_mmdet3d_info(project_dir, cv_task: str):
             image_infos = collect_image_infos(project_dir, ori_image_infos)
 
             # Sum up
-            data_sample = {
-                "lidar_points": lidar_info,
-                "images": image_infos,
-                "instances": instances,
-                "cam_instances": None,
-                # "centerize_vector": centerize_vector,
-            }
+            data_sample = get_data_sample(lidar_info, image_infos, instances, sample_idx)
             data_list.append(data_sample)
+            sample_idx += 1
 
     mmdet3d_info = {"metainfo": metainfo, "data_list": data_list}
     return mmdet3d_info
