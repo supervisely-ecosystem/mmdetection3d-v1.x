@@ -1,7 +1,7 @@
 from typing import Union
 from mmengine.config import Config, ConfigDict
 from src.config_factory import detection3d
-from src.config_factory.training_params import configure_init_weights_and_resume, configure_loops, merge_default_runtime
+from src.train.train_parameters import configure_init_weights_and_resume, configure_loops, merge_default_runtime
 from src.train.train import build_runner
 from src.config_factory.config_parameters import ConfigParameters, write_parameters_to_config_2
 from src.tests.extract_weights_url import find_weights_url
@@ -29,6 +29,12 @@ pre_trained_configs = model_item['pre_trained_configs']
 
 is_pre_trained = True
 config_path = f"{mmdetection3d_root_dir}/{pre_trained_configs[0]['config']}"
+
+config_path = (
+    # "mmdetection3d/configs/centerpoint/centerpoint_voxel01_second_secfpn_head-circlenms_8xb4-cyclic-20e_nus-3d.py"
+    # "mmdetection3d/configs/pointpillars/pointpillars_hv_fpn_sbn-all_8xb4-2x_nus-3d.py"  # CUDA OOM
+    "mmdetection3d/configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py"
+)
 
 manual_weights_url = None
 # ### For projects ### #
@@ -69,16 +75,19 @@ print(f"parameters.schedulers: {parameters.schedulers}")
 
 
 # Input Parameters
-data_root = "app_data/lyft"
-selected_classes = ["car", "pedestrian", "truck"]
+data_root = "app_data/sly_project"
+# selected_classes = ["car", "pedestrian", "truck"]
+# selected_classes = ['Pedestrian', 'Cyclist', 'Car']
+selected_classes = {"Pedestrian": 2, "Cyclist": 1, "Car": 0}
 batch_size = 4
 num_workers = 4
 input_lidar_dims = 4
 # input_point_cloud_range = [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]
-input_point_cloud_range = [0, -40, -3, 70.4, 40, 1]
+# input_point_cloud_range = [0, -40, -3, 70.4, 40, 1]
+input_point_cloud_range = parameters.point_cloud_range
 input_voxel_size = parameters.voxel_size
 point_sample = parameters.point_sample
-load_weights = True
+load_weights = False
 
 
 # 3. Update parameters from UI
@@ -88,7 +97,7 @@ parameters.voxel_size = input_voxel_size
 
 
 # 4. Write parameters to config file
-cfg = write_parameters_to_config_2(parameters, cfg, selected_classes)
+write_parameters_to_config_2(parameters, cfg, selected_classes)
 merge_default_runtime(cfg)
 
 # Model weights
@@ -106,17 +115,44 @@ detection3d.configure_datasets(cfg, data_root, batch_size, num_workers, input_li
 
 # Training params
 max_epochs = 40
-cfg.train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=5)
+cfg.train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=2)
 # configure_training_params(cfg, max_epochs, 1)
 cfg.param_scheduler = []
-cfg.optim_wrapper.optimizer.lr = 6e-4
+cfg.optim_wrapper.optimizer.lr = 1e-3
 cfg.optim_wrapper.optimizer.weight_decay = 1e-4
 # cfg.optim_wrapper.clip_grad = dict(max_norm=35, norm_type=2)
+# cfg.train_dataloader.dataset.pipeline[0].zero_aux_dims = True
+# cfg.val_dataloader.dataset.pipeline[0].zero_aux_dims = True
+# cfg.test_dataloader.dataset.pipeline[0].zero_aux_dims = True
+# cfg.model.bbox_head.anchor_generator = dict(
+#             type='AlignedAnchor3DRangeGenerator',
+#             ranges=[[0, -39.68, -1.78, 69.12, 39.68, -1.78]],
+#             scales=[1],
+#             sizes=[
+#                 [2.5981, 0.8660, 1.],  # 1.5 / sqrt(3)
+#                 [1.7321, 0.5774, 1.],  # 1 / sqrt(3)
+#                 [1., 1., 1.],
+#                 [0.4, 0.4, 1],
+#             ],
+#             custom_values=[0, 0],
+#             rotations=[0, 1.57],
+#             reshape_out=False)
+# cfg.model.bbox_head.assign_per_class = True
+cfg.custom_hooks.clear()
+
+# Handle Model Classes
+from src.dataset.custom_dataset import CustomDataset
+selected_classes_map = CustomDataset(data_root, "infos_val.pkl", selected_classes=selected_classes).selected_classes_map
+model_classes = [None] * len(selected_classes_map)
+for k,v in selected_classes_map.items():
+    model_classes[v] = k
+cfg.class_names = model_classes
 
 # Runner
 runner = build_runner(cfg, "app_data/work_dir", amp=False, auto_scale_lr=False)
 runner.train()
 
+exit()
 
 # Inference
 print("Inference...")
@@ -132,7 +168,7 @@ from src.inference.functional import create_sly_annotation, up_bbox3d, filter_by
 from src.pcd_utils import convert_bin_to_pcd
 
 
-# globals    
+# globals
 api = sly.Api()
 project_id = 32768
 dataset_id = 81541
