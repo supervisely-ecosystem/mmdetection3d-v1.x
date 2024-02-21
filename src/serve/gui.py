@@ -35,14 +35,14 @@ class MMDetectionGUI(GUI.InferenceGUI):
         self._select_task_radio = Widgets.RadioGroup(
             [
                 Widgets.RadioGroup.Item(
-                    value="detection_3d"
+                    value="detection3d"
                 ),
                 Widgets.RadioGroup.Item(
-                    value="segmentation_3d (Coming soon)"
+                    value="segmentation3d"
                 ),
             ]
         )
-        self._select_task_radio.set_value("detection_3d")
+        self._select_task_radio.set_value("detection3d")
         self._select_task_field = Widgets.Field(
             content=self._select_task_radio,
             title="Select deep learning problem to solve",
@@ -62,6 +62,7 @@ class MMDetectionGUI(GUI.InferenceGUI):
             plain=True,
         )
         self._reselect_task_button.hide()
+        self._reselect_task_button.disable()
 
         self._task_card = Widgets.Card(
             title="MMDetection3D task",
@@ -91,8 +92,9 @@ class MMDetectionGUI(GUI.InferenceGUI):
             self._select_task_button.loading = True
             self._task_loading_text.show()
             task_type = self._select_task_radio.get_value()
-            models = self._all_models[task_type]
+            models = self._all_models['detection_3d']
             self._set_pretrained_models(models)
+            # self._model_select.set_value("CenterPoint")
             self._select_task_button.loading = False
             self._select_task_button.hide()
             self._task_loading_text.hide()
@@ -118,7 +120,7 @@ class MMDetectionGUI(GUI.InferenceGUI):
         return self._select_task_radio.get_value()
 
     def change_model(self) -> None:
-        self._reselect_task_button.enable()
+        # self._reselect_task_button.enable()
         super(MMDetectionGUI, self).change_model()
 
     def set_deployed(self) -> None:

@@ -1,5 +1,6 @@
 import os
 from typing_extensions import Literal
+
 try:
     from typing import Literal
 except:
@@ -12,18 +13,27 @@ from supervisely.nn.inference.object_detection_3d.object_detection_3d import Obj
 from supervisely.geometry.cuboid_3d import Cuboid3d
 from src.serve.gui import MMDetectionGUI
 from src.inference.pcd_inferencer import PcdDet3DInferencer
-from src.inference.functional import create_sly_annotation, up_bbox3d, filter_by_confidence, bbox_3d_to_cuboid3d, create_sly_annotation_from_prediction
+from src.inference.functional import up_bbox3d, filter_by_confidence, bbox_3d_to_cuboid3d
 from src.sly_utils import upload_point_cloud
 
 
-model_list = sly.json.load_json_file('model_list.json')
+model_list = sly.json.load_json_file("model_list.json")
 mmdetection3d_root = "mmdetection3d"
 
 
 class MMDetection3dModel(ObjectDetection3D):
-    def load_model(self, cfg: Config, weights: str, device: str, zero_aux_dims: bool = False, palette: str = 'none'):
+    def load_model(
+        self,
+        cfg: Config,
+        weights: str,
+        device: str,
+        zero_aux_dims: bool = False,
+        palette: str = "none",
+    ):
         # weights is either path or url
-        model = PcdDet3DInferencer(cfg, weights, device, zero_aux_dims=zero_aux_dims, palette=palette)
+        model = PcdDet3DInferencer(
+            cfg, weights, device, zero_aux_dims=zero_aux_dims, palette=palette
+        )
         return model
 
     def load_on_device(
@@ -65,7 +75,7 @@ class MMDetection3dModel(ObjectDetection3D):
                 self.model_name = cfg.model.type
                 self.checkpoint_name = os.path.basename(custom_weights_link)
                 self.dataset_name = cfg.sly_metadata.project_name
-                self.task_type = cfg.sly_metadata.task_type.replace("_", " ")
+                self.task_type = cfg.sly_metadata.task_type
             else:
                 raise ValueError(f"Model source {model_source} is not supported")
         else:
@@ -75,10 +85,10 @@ class MMDetection3dModel(ObjectDetection3D):
         self.class_names = classes
         sly.logger.debug(f"classes={classes}")
 
-        if self.task_type == "detection_3d":
+        if self.task_type == "detection3d":
             obj_classes = [sly.ObjClass(name, Cuboid3d) for name in classes]
         else:
-            raise NotImplementedError("Only detection_3d task type is supported now")
+            raise NotImplementedError("Only detection3d task type is supported now")
         self._model_meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection(obj_classes))
         self._get_confidence_tag_meta()
 
@@ -125,7 +135,7 @@ class MMDetection3dModel(ObjectDetection3D):
                 model_name = model["name"]
                 all_models[task][model_name] = model_item
         return all_models
-            
+
     # def download_pretrained_files(self, selected_model: Dict[str, str], model_dir: str):
     #     gui: MMDetectionGUI
     #     task_type = self.gui.get_task_type()
@@ -189,11 +199,13 @@ class MMDetection3dModel(ObjectDetection3D):
 
         results_dict = self.model(inputs=dict(points=pcd_path), no_save_vis=True)
 
-        predictions = results_dict['predictions'][0]
-        bboxes_3d = predictions['bboxes_3d']
-        labels_3d = predictions['labels_3d']
-        scores_3d = predictions['scores_3d']
-        bboxes_3d, labels_3d, scores_3d = filter_by_confidence(bboxes_3d, labels_3d, scores_3d, threshold=conf_tresh)
+        predictions = results_dict["predictions"][0]
+        bboxes_3d = predictions["bboxes_3d"]
+        labels_3d = predictions["labels_3d"]
+        scores_3d = predictions["scores_3d"]
+        bboxes_3d, labels_3d, scores_3d = filter_by_confidence(
+            bboxes_3d, labels_3d, scores_3d, threshold=conf_tresh
+        )
         bboxes_3d = [up_bbox3d(bbox3d) for bbox3d in bboxes_3d]
         predictions = []
         for bbox3d, label3d, score3d in zip(bboxes_3d, labels_3d, scores_3d):
