@@ -12,3 +12,10 @@
 - optimizer, lr, clip_grad, etc
 - charts (hook)
 - visualization 3d
+
+
+Prepare:
+- Commit & Merge to master
+- Test with UI
+- Readme
+- release app
