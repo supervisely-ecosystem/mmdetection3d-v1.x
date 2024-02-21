@@ -2,8 +2,12 @@ import os
 import sys
 from mmengine.config import Config
 from src.config_factory import detection3d
-from src.config_factory.config_parameters import ConfigParameters, write_parameters_to_config_2, get_model_classes
-from src.tests.extract_weights_url import find_weights_url
+from src.config_factory.config_parameters import (
+    ConfigParameters,
+    write_parameters_to_config_2,
+    get_model_classes,
+)
+from src.train.utils import find_weights_url
 from src.train.train_parameters import TrainParameters
 import src.train.train_parameters as config_factory
 import logging
@@ -130,7 +134,7 @@ def update_config(
     # Set model classes
     model_classes = get_model_classes(train_params.data_root, train_params.selected_classes)
     cfg.class_names = model_classes
-    
+
     return cfg
 
 

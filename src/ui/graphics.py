@@ -14,7 +14,7 @@ import copy
 
 # from src.inference.functional import create_sly_annotation, up_bbox3d, filter_by_confidence
 
-import src.tests.draw_test as drt
+import src.ui.drawing_utils as drt
 
 NumT = Union[int, float]
 
