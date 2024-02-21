@@ -89,6 +89,8 @@ class CustomNuScenesMetric(BaseMetric):
         tp_metrics = ["trans_err", "scale_err", "orient_err"]
         nuscenes_eval.override_constants(self.selected_classes, ["dummy_attr"], tp_metrics)
 
+        sly.logger.debug(f"(nuscenes_metric.py) {self.map_pred_label_to_class_name=}")
+
     def process(self, data_batch: dict, data_samples: Sequence[dict]) -> None:
         """Process one batch of data samples and predictions.
 
@@ -126,6 +128,7 @@ class CustomNuScenesMetric(BaseMetric):
         pred_nusc_boxes = nuscenes_eval.convert_pred_to_nusc_boxes(
             results, self.map_pred_label_to_class_name
         )
+        sly.logger.debug(f"pred_nusc_boxes: {pred_nusc_boxes}")
 
         if self.gt_is_kitti:
             gt_nusc_boxes = nuscenes_eval.convert_gt_kitti_to_nusc_boxes(
