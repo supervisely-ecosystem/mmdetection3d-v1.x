@@ -152,6 +152,7 @@ def on_preivew_scheduler():
         param_scheduler, start_lr, int(np.ceil(get_images_count() / batch_size)), total_epochs
     )
     name = get_preview_name(param_scheduler)
+    preview_chart.set_series([])
     preview_chart.add_series(f"{name}", x, lrs)
     preview_chart.show()
 

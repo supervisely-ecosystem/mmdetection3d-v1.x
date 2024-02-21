@@ -11,11 +11,10 @@ from supervisely.app.widgets import (
 from src.ui.utils import update_custom_button_params
 
 msg = """
-    <b>3D object detection</b>: the model will predict bounding boxes of the objects.
-    All annotations will be converted to Rectangles.
+    <b>Detection 3D</b>: the model will predict Cuboids (3d bounding boxes) of objects.
     <br>
-    <b>3D instance segmentation</b>: the model will predict bounding boxes and masks of the objects.
-    Only Bitmap and Polygon annotations will be used."""
+    <b>Segmentation 3D</b>: the model will predict a label for each point in a point cloud.
+    """
 
 info = NotificationBox(title="INFO: How to select the task?", description=msg, box_type="info")
 
@@ -23,7 +22,7 @@ info = NotificationBox(title="INFO: How to select the task?", description=msg, b
 task_selector = RadioGroup(
     items=[
         RadioGroup.Item(value="3D object detection", label="3D object detection"),
-        # RadioGroup.Item(value="3D instance segmentation", label="3D instance segmentation (upcoming in the future updates)"),
+        # RadioGroup.Item(value="3D segmentation", label="3D instance segmentation (upcoming in the future updates)"),
     ],
     direction="vertical",
 )
@@ -31,10 +30,10 @@ task_selector = RadioGroup(
 
 select_field = Field(title="Select the task you are going to solve:", content=task_selector)
 select_btn = Button(text="Select task")
-tmp_txt = Text("The 3D instance segmentation is upcoming in the future updates", status="info")
+tmp_txt = Text("3D Segmentation is upcoming in the future updates.", status="info")
 
 card = Card(
-    title="MMDetection task",
+    title="Task",
     description="Select task from list below",
     content=Container(widgets=[info, select_field, select_btn, tmp_txt], direction="vertical"),
     lock_message="Please, select project and load data.",

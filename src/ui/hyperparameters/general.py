@@ -34,11 +34,15 @@ general_params = InputContainer()
 
 
 epochs_input = InputNumber(NUM_EPOCHS, min=1)
-epochs_field = Field(epochs_input, "Number of epochs")
+epochs_field = Field(epochs_input, "Epochs", "The number of epochs to train the model.")
 general_params.add_input("total_epochs", epochs_input)
 
-channels_input = InputNumber(NUM_CHANNELS, min=3)
-channels_field = Field(channels_input, "Number of channels")
+channels_input = InputNumber(NUM_CHANNELS, min=3, max=6)
+channels_field = Field(
+    channels_input,
+    "Input channels",
+    'The number of channels to use in a point cloud. In general, point cloud data may have up to 6 channels. First 3 channels are usually x, y, z coordinates. The rest are either "intensity" and "elongation" from LIDAR sensors, or r, g, b values. It depends on your data. If you are not sure, leave it as is.',
+)
 general_params.add_input("input channels (lidar dims)", channels_input)
 
 
@@ -67,7 +71,7 @@ def size_and_prop(inp: BindedInputNumber) -> Tuple[Tuple[int, int], bool]:
 
 
 bs_train_input = InputNumber(1, 1)
-bs_train_field = Field(bs_train_input, "Train batch size")
+bs_train_field = Field(bs_train_input, "Batch size")
 general_params.add_input("batch_size_train", bs_train_input)
 
 bs_val_input = InputNumber(1, 1)
@@ -77,7 +81,7 @@ general_params.add_input("batch_size_val", bs_val_input)
 
 validation_input = InputNumber(1, 1, general_params.total_epochs)
 val_text = Text(
-    f"Evaluate validation set every {validation_input.get_value()} epochs",
+    f"Validating every {validation_input.get_value()} epochs",
     status="info",
 )
 validation_interval = Container([validation_input, val_text])

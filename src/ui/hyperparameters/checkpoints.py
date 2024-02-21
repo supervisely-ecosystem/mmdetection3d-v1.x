@@ -15,7 +15,7 @@ NUM_EPOCHS = 10
 checkpoint_params = InputContainer()
 
 # interval
-checkpoint_interval_input = InputNumber(1, 1, NUM_EPOCHS)
+checkpoint_interval_input = InputNumber(1, min=1)
 checkpoint_interval_text = Text(
     f"Save checkpoint every {checkpoint_interval_input.get_value()} epochs",
     status="info",
@@ -80,6 +80,7 @@ checkpoint_optimizer_switch = Switch(False)
 checkpoint_optimizer_field = Field(
     checkpoint_optimizer_switch,
     title="Save optimizer",
+    description="Whether to save optimizer's state. Useful for resuming training, but increases file size.",
 )
 checkpoint_params.add_input(
     "save_optimizer",
