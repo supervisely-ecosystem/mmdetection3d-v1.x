@@ -1,3 +1,4 @@
+from typing import Tuple
 import os
 import mmengine
 import src.train.train as t
@@ -52,7 +53,7 @@ def set_device_env(device_name: str):
         os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)
 
 
-def get_train_params(cfg: Config) -> (ConfigParameters, TrainParameters):
+def get_train_params(cfg: Config) -> Tuple[ConfigParameters, TrainParameters]:
     task = get_task()
     selected_classes = classes.get_selected_classes()
     # augs_config_path = get_selected_aug()
@@ -123,7 +124,7 @@ def add_metadata(cfg: Config) -> Config:
         metadata = cfg.sly_metadata
 
     metadata["project_id"] = g.PROJECT_ID
-    metadata["project_name"] = g.api.project.get_info_by_id(g.PROJECT_ID).name
+    metadata["project_name"] = g.PROJECT_INFO.name
 
     cfg.sly_metadata = ConfigDict(metadata)
 
@@ -156,6 +157,9 @@ def train():
     train_params.data_root = project_dir
     train_params.selected_classes = classes.get_selected_classes()
     train_params.weights_path_or_url = weights_path_or_url
+    train_params.task_type = get_task()
+    train_params.project_id = g.PROJECT_ID
+    train_params.project_name = g.PROJECT_INFO.name
 
     # If we won't do this, restarting the training will throw a error
     Visualizer._instance_dict.clear()
