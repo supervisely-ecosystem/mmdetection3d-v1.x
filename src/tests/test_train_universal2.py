@@ -31,9 +31,9 @@ is_pre_trained = True
 config_path = f"{mmdetection3d_root_dir}/{pre_trained_configs[0]['config']}"
 
 config_path = (
-    # "mmdetection3d/configs/centerpoint/centerpoint_voxel01_second_secfpn_head-circlenms_8xb4-cyclic-20e_nus-3d.py"
+    "mmdetection3d/configs/centerpoint/centerpoint_voxel01_second_secfpn_head-circlenms_8xb4-cyclic-20e_nus-3d.py"
     # "mmdetection3d/configs/pointpillars/pointpillars_hv_fpn_sbn-all_8xb4-2x_nus-3d.py"  # CUDA OOM
-    "mmdetection3d/configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py"
+    # "mmdetection3d/configs/pointpillars/pointpillars_hv_secfpn_8xb6-160e_kitti-3d-3class.py"
 )
 
 manual_weights_url = None
@@ -75,19 +75,21 @@ print(f"parameters.schedulers: {parameters.schedulers}")
 
 
 # Input Parameters
-data_root = "app_data/sly_project"
-# selected_classes = ["car", "pedestrian", "truck"]
+data_root = "app_data/lyft"
+# data_root = "app_data/kitti_episodes"
+# data_root = "app_data/sly_project"
+selected_classes = ["car", "pedestrian", "truck"]
 # selected_classes = ['Pedestrian', 'Cyclist', 'Car']
-selected_classes = {"Pedestrian": 2, "Cyclist": 1, "Car": 0}
-batch_size = 4
-num_workers = 4
+# selected_classes = {"Pedestrian": 2, "Cyclist": 1, "Car": 0}
+batch_size = 3
+num_workers = 3
 input_lidar_dims = 4
 # input_point_cloud_range = [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]
 # input_point_cloud_range = [0, -40, -3, 70.4, 40, 1]
 input_point_cloud_range = parameters.point_cloud_range
 input_voxel_size = parameters.voxel_size
 point_sample = parameters.point_sample
-load_weights = False
+load_weights = True
 
 
 # 3. Update parameters from UI
@@ -114,13 +116,13 @@ aug_pipeline = detection3d.get_default_aug_pipeline()
 detection3d.configure_datasets(cfg, data_root, batch_size, num_workers, input_lidar_dims, input_point_cloud_range, aug_pipeline, selected_classes, point_sample=point_sample, add_dummy_velocities=add_dummy_velocities)
 
 # Training params
-max_epochs = 40
-cfg.train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=2)
+max_epochs = 60
+cfg.train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=5)
 # configure_training_params(cfg, max_epochs, 1)
 cfg.param_scheduler = []
-cfg.optim_wrapper.optimizer.lr = 1e-3
-cfg.optim_wrapper.optimizer.weight_decay = 1e-4
-# cfg.optim_wrapper.clip_grad = dict(max_norm=35, norm_type=2)
+cfg.optim_wrapper.optimizer.lr = 6e-4
+cfg.optim_wrapper.optimizer.weight_decay = 1e-3
+cfg.optim_wrapper.clip_grad = dict(max_norm=20, norm_type=2)
 # cfg.train_dataloader.dataset.pipeline[0].zero_aux_dims = True
 # cfg.val_dataloader.dataset.pipeline[0].zero_aux_dims = True
 # cfg.test_dataloader.dataset.pipeline[0].zero_aux_dims = True
@@ -139,6 +141,48 @@ cfg.optim_wrapper.optimizer.weight_decay = 1e-4
 #             reshape_out=False)
 # cfg.model.bbox_head.assign_per_class = True
 cfg.custom_hooks.clear()
+lr = 5e-4
+warmup_fraction = 0.4
+s1_epochs = int(max_epochs * warmup_fraction)
+s2_epochs = max_epochs - s1_epochs
+print(f"s1_epochs: {s1_epochs}, s2_epochs: {s2_epochs}")
+cfg.param_scheduler = [
+    dict(
+        type='CosineAnnealingLR',
+        T_max=s1_epochs,
+        eta_min=lr * 10,
+        begin=0,
+        end=s1_epochs,
+        by_epoch=True,
+        convert_to_iter_based=True),
+    dict(
+        type='CosineAnnealingLR',
+        T_max=s2_epochs,
+        eta_min=lr * 1e-4,
+        begin=s1_epochs,
+        end=max_epochs,
+        by_epoch=True,
+        convert_to_iter_based=True),
+    # momentum scheduler
+    # During the first 16 epochs, momentum increases from 0 to 0.85 / 0.95
+    # during the next 24 epochs, momentum increases from 0.85 / 0.95 to 1
+    dict(
+        type='CosineAnnealingMomentum',
+        T_max=s1_epochs,
+        eta_min=0.85 / 0.95,
+        begin=0,
+        end=s1_epochs,
+        by_epoch=True,
+        convert_to_iter_based=True),
+    dict(
+        type='CosineAnnealingMomentum',
+        T_max=s2_epochs,
+        eta_min=1,
+        begin=s1_epochs,
+        end=max_epochs,
+        by_epoch=True,
+        convert_to_iter_based=True)
+]
 
 # Handle Model Classes
 model_classes = get_model_classes(data_root, selected_classes)
