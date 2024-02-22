@@ -20,6 +20,7 @@ from supervisely.app.widgets import (
     FolderThumbnail,
     DoneLabel,
 )
+from typing import Tuple
 
 import src.globals as g
 from src.train.train_parameters import TrainParameters
@@ -52,7 +53,7 @@ def set_device_env(device_name: str):
         os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)
 
 
-def get_train_params(cfg: Config) -> (ConfigParameters, TrainParameters):
+def get_train_params(cfg: Config) -> Tuple[ConfigParameters, TrainParameters]:
     task = get_task()
     selected_classes = classes.get_selected_classes()
     # augs_config_path = get_selected_aug()

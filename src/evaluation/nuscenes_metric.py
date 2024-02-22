@@ -4,6 +4,7 @@ import mmengine
 from mmengine.evaluator import BaseMetric
 from mmdet3d.registry import METRICS
 import supervisely as sly
+import src.globals as g
 
 from src.evaluation import nuscenes_eval
 
@@ -139,8 +140,9 @@ class CustomNuScenesMetric(BaseMetric):
                 self.annotations["data_list"], self.map_gt_label_to_class_name
             )
 
-        # Save first result for visualization
-        save_idx = 0
+        # Save first result for visualization            
+        # save_idx = 0
+        save_idx = g.debug_save_idx
         self.saved_results = {
             "pred": results[save_idx],
             "gt": self.annotations["data_list"][save_idx]["instances"],
@@ -168,8 +170,6 @@ class CustomNuScenesMetric(BaseMetric):
             "NDS": metrics_summary["nd_score"],
             "cls_AP": metrics_summary["mean_dist_aps"],
             "3d_err": err_3d,
-            # TODO per-class метрики
-            # TODO ate ase aoe
         }
 
     def _parse_selected_classes(self, selected_classes, classes) -> List[str]:

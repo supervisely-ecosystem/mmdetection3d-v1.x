@@ -28,8 +28,14 @@ def _load_models_meta(task: str):
     models_meta = {
         m["name"]: m
         for m in models_meta["detection_3d"]
-        if m["name"] in ("PointPillars", "CenterPoint")
+        if m["name"] in ("CenterPoint", "PointPillars")
     }  #'CenterFormer',}
+
+    models_meta = {
+        "CenterPoint":models_meta["CenterPoint"],
+        "PointPillars":models_meta["PointPillars"],
+    }
+
     return models_meta
 
 
@@ -173,11 +179,7 @@ load_from_field = Field(
     "Download pre-trained model",
     "Whether to download pre-trained weights and finetune the model or train it from scratch.",
 )
-load_from.disable()
 
-tmp_txt = Text(
-    "Training from scratch will be available once GPU support is enabled.", status="info"
-)
 
 input_file = TeamFilesSelector(TEAM_ID, selection_file_type="file")
 path_field = Field(
@@ -189,7 +191,7 @@ path_field = Field(
 radio_tabs = RadioTabs(
     titles=["Pretrained models", "Custom weights"],
     contents=[
-        Container(widgets=[arch_select, table, text, load_from_field, tmp_txt]),
+        Container(widgets=[arch_select, table, text, load_from_field]),
         path_field,
     ],
 )

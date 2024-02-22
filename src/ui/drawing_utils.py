@@ -19,7 +19,7 @@ def get_box_corners(center, dimensions, yaw):
     Calculate the 3D corners of a rotated box given its center, dimensions, and yaw rotation.
     """
     x, y, z = center
-    w, h, l = dimensions
+    w, l, h  = dimensions
 
     # Calculate the corners of the box assuming no rotation (axis-aligned)
     dx = w / 2

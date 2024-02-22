@@ -195,6 +195,17 @@ class Monitoring(object):
 
             fig.update_layout(scene=dict(aspectmode="data"))
 
+            fig.add_annotation(
+                dict(
+                    text=pts_filepath,
+                    x=1,  # X-coordinate, 0.5 means center
+                    y=0,  # Y-coordinate, 0.95 means near the top
+                    xref="paper",
+                    yref="paper",
+                    showarrow=False,
+                    font=dict(size=10, color="black"),  # Customize font size and color
+                )
+            )
         fig.write_html(g.STATIC_DIR.joinpath(f"point_cloud_visualization.html"))
 
         self._stages[stage_id]["fig"] = fig
