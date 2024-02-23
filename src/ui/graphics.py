@@ -124,7 +124,7 @@ class Monitoring(object):
             self.container.hide()
         return self.container
 
-    def initialize_iframe(self, stage_id: str, pts_filepath: str, gt_bboxes_3d=[]) -> None:
+    def initialize_iframe(self, stage_id: str, pts_filepath: str, id2name, gt_bboxes_3d=[]) -> None:
 
         pcd = o3d.io.read_point_cloud(pts_filepath)
         pcd_downsampled = pcd.voxel_down_sample(voxel_size=1)
@@ -187,9 +187,11 @@ class Monitoring(object):
                     lines_y.extend([box_corners[start][1], box_corners[end][1], None])
                     lines_z.extend([box_corners[start][2], box_corners[end][2], None])
 
+                    
+
                 fig.add_trace(
                     go.Scatter3d(
-                        x=lines_x, y=lines_y, z=lines_z, mode="lines", line=dict(color="green")
+                        x=lines_x, y=lines_y, z=lines_z, mode="lines", line=dict(color="green"), name=id2name[bbox_label_3d]
                     )
                 )
 
@@ -213,11 +215,11 @@ class Monitoring(object):
         iframe: IFrame = self._stages[stage_id]["raw"]
         iframe.set(f"static/point_cloud_visualization.html", height="500px", width="1000px")
 
-    def update_iframe(self, stage_id, pred_bboxes_3d, epoch):
+    def update_iframe(self, stage_id, pred_bboxes_3d, labels_3d, epoch, id2name):
 
         pcl_fig = self._stages[stage_id]["fig"]
         fig = copy.deepcopy(pcl_fig)
-        for b in pred_bboxes_3d:
+        for b, l in zip(pred_bboxes_3d, labels_3d):
 
             center, dimensions, yaw = b[:3], b[3:6], b[6]
 
@@ -231,7 +233,7 @@ class Monitoring(object):
                 lines_z.extend([box_corners[start][2], box_corners[end][2], None])
 
             fig.add_trace(
-                go.Scatter3d(x=lines_x, y=lines_y, z=lines_z, mode="lines", line=dict(color="red"))
+                go.Scatter3d(x=lines_x, y=lines_y, z=lines_z, mode="lines", line=dict(color="red"), name=id2name[int(l)]) 
             )
 
             # for start, end in drt.lines:

@@ -101,12 +101,13 @@ def update_config(
 
     # Model weights
     weights_url = None
+    sly_check_path = None # TODO 
     if train_params.weights_path_or_url is not None:
         weights_url = train_params.weights_path_or_url
     elif is_pre_trained_config and train_params.load_weights:
         model_index = "mmdetection3d/model-index.yml"
         weights_url = find_weights_url(model_index, config_path)
-    config_factory.configure_init_weights_and_resume(cfg, mmdet_checkpoint_path=weights_url)
+    config_factory.configure_init_weights_and_resume(cfg, mmdet_checkpoint_path=weights_url, supervisely_checkpoint_path=sly_check_path)
 
     # Make dataset config
     aug_pipeline = detection3d.get_default_aug_pipeline()

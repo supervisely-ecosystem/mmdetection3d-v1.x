@@ -156,7 +156,8 @@ def train():
     train_params: TrainParameters
     train_params.data_root = project_dir
     train_params.selected_classes = classes.get_selected_classes()
-    train_params.weights_path_or_url = weights_path_or_url
+    if train_params.load_weights is True and weights_path_or_url is not None:        
+        train_params.weights_path_or_url = weights_path_or_url
 
     # If we won't do this, restarting the training will throw a error
     Visualizer._instance_dict.clear()
@@ -170,10 +171,6 @@ def train():
         config_params,
         train_params,
     )
-
-    # update load_from with custom_weights_path
-    # if params.load_from and weights_path_or_url:
-    #     train_cfg.load_from = weights_path_or_url
 
     # add sly_metadata
     # cfg = add_metadata(cfg)

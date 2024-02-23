@@ -105,7 +105,7 @@ models_select_callback = wrap_button_click(
         models.arch_select,
         models.path_field,
         models.table,
-        models.load_from,
+        models.load_weights,
     ],
     callback=classes_select_callback,
 )

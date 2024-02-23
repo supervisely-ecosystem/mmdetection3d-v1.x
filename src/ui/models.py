@@ -173,9 +173,9 @@ arch_select = SelectString([""])
 table = RadioTable([""], [[""]])
 text = Text()
 
-load_from = Switch(True)
+load_weights = Switch(True)
 load_from_field = Field(
-    load_from,
+    load_weights,
     "Download pre-trained model",
     "Whether to download pre-trained weights and finetune the model or train it from scratch.",
 )

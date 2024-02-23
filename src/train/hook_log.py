@@ -45,16 +45,18 @@ class SuperviselyHook(Hook):
 
         # TODO
         pcl_paths = [x["lidar_points"]["lidar_path"] for x in a["data_list"]]
-        try:
-            g.debug_save_idx = pcl_paths.index(g.DEBUG_VISUALIZATION_FILENAME)
-        except:
-            pass
+        if sly.is_development():
+            try:
+                g.debug_save_idx = pcl_paths.index(g.DEBUG_IFRAME_WITH_FILENAME)
+            except:
+                pass
         save_idx = g.debug_save_idx # see nuscenes_metric.py ln. 136
         pts_filepath = g.PROJECT_DIR + "/" + a["data_list"][save_idx]["lidar_points"]["lidar_path"]
 
         gt_bboxes_3d = a["data_list"][save_idx]["instances"]
+        id2name ={v:k for k,v in runner.val_evaluator.dataset_meta['categories'].items()}
 
-        monitoring.initialize_iframe("visual", pts_filepath, gt_bboxes_3d)
+        monitoring.initialize_iframe("visual", pts_filepath, id2name, gt_bboxes_3d)
 
     def after_train_iter(
         self, runner: Runner, batch_idx: int, data_batch: DATA_BATCH = None, outputs: dict = None
@@ -110,7 +112,8 @@ class SuperviselyHook(Hook):
             bboxes_3d, labels_3d, scores_3d = filter_by_confidence(
                 bboxes_3d, labels_3d, scores_3d, threshold=0.3
             )
-            monitoring.update_iframe("visual", bboxes_3d, runner.epoch)
+            id2name = {v:k for k,v in runner.val_evaluator.dataset_meta['categories'].items()}
+            monitoring.update_iframe("visual", bboxes_3d, labels_3d, runner.epoch, id2name)
 
         # Add mAP metrics
         # TODO метрики по классам 'per class'

@@ -25,12 +25,12 @@ class TrainParameters:
         self.batch_size_val = 1
 
         self.num_workers = 4
-        self.load_from: bool = True  # load weights to continue training (path or url in config)
-        self.weights_path_or_url = None
+        self.load_weights:bool = True
+        self.weights_path_or_url:str = None
 
         self.lidar_dims = None
         self.point_cloud_range = None
-        self.load_weights = True
+        
 
         self.log_interval = 50  # for text logger
         self.chart_update_interval = 1
