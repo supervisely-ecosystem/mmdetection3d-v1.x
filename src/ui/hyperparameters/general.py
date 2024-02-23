@@ -37,7 +37,7 @@ epochs_input = InputNumber(NUM_EPOCHS, min=1)
 epochs_field = Field(epochs_input, "Number of epochs")
 general_params.add_input("total_epochs", epochs_input)
 
-channels_input = InputNumber(NUM_CHANNELS, min=3)
+channels_input = InputNumber(NUM_CHANNELS, min=3, max=6)
 channels_field = Field(channels_input, "Number of channels")
 general_params.add_input("input channels (lidar dims)", channels_input)
 
