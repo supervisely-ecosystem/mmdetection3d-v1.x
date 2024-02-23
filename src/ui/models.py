@@ -136,7 +136,7 @@ def _get_table_data(task: str, models: list):
     return columns, rows, subtitles
 
 
-def is_pretrained_model_selected():
+def is_pretrained_model_radiotab_selected():
     custom_path = get_selected_custom_path()
     if radio_tabs.get_active_tab() == "Pretrained models":
         if custom_path:

@@ -16,6 +16,7 @@ from mmengine.config import Config
 from mmengine.logging import print_log
 from mmdet3d.registry import RUNNERS
 from mmengine.runner import Runner
+import src.ui.models as models_ui
 
 import src.globals as g
 
@@ -103,7 +104,10 @@ def update_config(
     weights_url = None
     sly_check_path = None # TODO 
     if train_params.weights_path_or_url is not None:
-        weights_url = train_params.weights_path_or_url
+        if models_ui.is_pretrained_model_radiotab_selected():
+            weights_url = train_params.weights_path_or_url
+        else:
+            sly_check_path = train_params.weights_path_or_url
     elif is_pre_trained_config and train_params.load_weights:
         model_index = "mmdetection3d/model-index.yml"
         weights_url = find_weights_url(model_index, config_path)

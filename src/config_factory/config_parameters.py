@@ -28,9 +28,11 @@ class ConfigParameters:
         p = cls()
 
         # search in_channels
-        search_res = re.search("in_channels\s*=\s*([0-6])", cfg_str)
-        if search_res:
-            p.in_channels = int(search_res.group(1))
+        # search_res = re.search("in_channels\s*=\s*([0-6]*)", cfg_str)
+        search_res = re.findall("in_channels\s*=\s*([0-6]*)", cfg_str)
+        search_res = int([x for x in search_res if x and int(x)<=6 ][0]) # TODO refactor
+        # if search_res:
+        p.in_channels = search_res #int(search_res.group(1))
 
         # point_cloud_range, voxel_size
         p.point_cloud_range = cfg.get("point_cloud_range")
@@ -100,6 +102,14 @@ def find_by_parameter(d: Union[Config, ConfigDict, dict, list, tuple], key: str)
                 return res
     return None
 
+def find_key_regex(input_str, key):
+    pattern = re.compile(r'''['"]in_channels['"]: (\d+)''')
+    matches = re.findall(pattern, input_str)    
+    for match in matches:
+        if int(match) <= 6:
+            return int(match)
+    return None
+
 
 def find_all_by_parameter(d: Union[Config, ConfigDict, dict, list, tuple], key: str) -> list:
     found = []
@@ -128,6 +138,7 @@ def substitute_parameter(d, key, value):
 def write_parameters_to_config(
     parameters: ConfigParameters, cfg: Config, selected_classes: list
 ) -> Config:
+    # ! Legacy
     # 1. read text from config
     # 2. substitute parameters in text
     # 3. cfg = Config.fromtext(text)
@@ -235,7 +246,14 @@ def write_parameters_to_config_2(
     # cfg.class_names = selected_classes
 
     # in_channels
-    d = find_by_parameter(cfg.model, "in_channels")
+    found = find_all_by_parameter(cfg.model, "in_channels")
+    d=None
+    for f in found:
+        if isinstance(f['in_channels'], int) and f['in_channels'] <= 6 :
+            d = f
+
+    # d = extract_in_channels(cfg.model, "in_channels")
+    # d = find_key_regex(str(cfg.model), "in_channels")    
     d.in_channels = p.in_channels
 
     # num_classes

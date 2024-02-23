@@ -78,7 +78,7 @@ def get_train_params(cfg: Config) -> Tuple[ConfigParameters, TrainParameters]:
 def prepare_model():
     # download custom model if needed
     # returns config path and weights path
-    if models_ui.is_pretrained_model_selected():
+    if models_ui.is_pretrained_model_radiotab_selected():
         selected_model = models_ui.get_selected_pretrained_model()
         from mmdet3d.apis import Base3DInferencer
 
@@ -100,7 +100,7 @@ def prepare_model():
 
 
 def add_metadata(cfg: Config) -> Config:
-    is_pretrained = models_ui.is_pretrained_model_selected()
+    is_pretrained = models_ui.is_pretrained_model_radiotab_selected()
 
     if not is_pretrained and not hasattr(cfg, "sly_metadata"):
         # realy custom model
