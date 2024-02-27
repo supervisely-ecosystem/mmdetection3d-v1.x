@@ -1,11 +1,11 @@
-- Serve
-    - custom models support
-    - протестить применялку
-    - Померджить в сдк Inference class для detection3d
-    - поддержка Episodes
+Serving:
+- Обучить и протестить serving of custom models
+- Протестить Episodes в применялке
+- Сделать Detection & Tracking в применялке
 
 Prepare:
-- Commit & Merge to master
-- Test with UI
-- Readme
 - release app
+- SDK PRs:
+    widget_grid_chart
+    object_detection_3d
+    new_events
