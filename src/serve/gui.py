@@ -94,7 +94,6 @@ class MMDetectionGUI(GUI.InferenceGUI):
             task_type = self._select_task_radio.get_value()
             models = self._all_models['detection_3d']
             self._set_pretrained_models(models)
-            # self._model_select.set_value("CenterPoint")
             self._select_task_button.loading = False
             self._select_task_button.hide()
             self._task_loading_text.hide()
@@ -112,8 +111,8 @@ class MMDetectionGUI(GUI.InferenceGUI):
             self._models_card.lock()
             self._models_card.collapse()
 
-        # temporary skeep the need of selecting task
         reload_models()
+        # temporary skip the need of selecting task
         self._select_task_button.hide()
 
     def get_task_type(self) -> str:

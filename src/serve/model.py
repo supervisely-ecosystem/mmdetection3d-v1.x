@@ -20,6 +20,9 @@ from src.sly_utils import upload_point_cloud
 model_list = sly.json.load_json_file("model_list.json")
 mmdetection3d_root = "mmdetection3d"
 
+# Swap last two models in the list to make CenterPoint default
+model_list["detection_3d"][-1], model_list["detection_3d"][-2] = model_list["detection_3d"][-2], model_list["detection_3d"][-1]
+
 
 class MMDetection3dModel(ObjectDetection3D):
     def load_model(
