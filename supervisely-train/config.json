@@ -11,8 +11,8 @@
     "detection & tracking",
     "train"
   ],
-  "description": "Train MMDetection3D for detection or segmentation on Point Clouds",
-  "docker_image": "supervisely/mmdet3d-v1.x:1.0.0",
+  "description": "Train MMDetection3D for detection on Point Clouds",
+  "docker_image": "supervisely/mmdet3d-v1.x:1.0.1",
   "instance_version": "6.6.7",
   "task_location": "workspace_tasks",
   "need_gpu": true,

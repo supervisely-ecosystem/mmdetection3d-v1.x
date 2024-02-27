@@ -11,8 +11,8 @@
     "detection & tracking",
     "serve"
   ],
-  "description": "Deploy MMDetection3D for detection or segmentation on Point Clouds",
-  "docker_image": "supervisely/mmdet3d-v1.x:1.0.0",
+  "description": "Deploy MMDetection3D models to detect objects in Point Clouds",
+  "docker_image": "supervisely/mmdet3d-v1.x:1.0.1",
   "instance_version": "6.6.7",
   "task_location": "application_sessions",
   "need_gpu": true,

@@ -1,7 +1,7 @@
 <div align="center" markdown>
 <img src="https://github.com/supervisely-ecosystem/hrda/assets/115161827/59697391-5f58-472c-bdcb-7341bfc7ec79"/>  
 
-# Serve HRDA
+# Serve MMDetection 3D v1.x
 
 <p align="center">
   <a href="#Overview">Overview</a> •
@@ -21,12 +21,7 @@
 
 # Overview
 
-HRDA model is not a usual segmentation model. It is useful in cases where your trained model need to generalize well to new, unseen data. HRDA employs domain adaptation techniques, specifically pseudo-labeling, to enhance generalization across varying data domains.
-
-**We provide two scenarios in which HRDA model offers advantages:**
-1. **Training on synthetic data**: Synthetic data refers to data that wasn't directly obtained from the real world, but was generated using algorithms, simulations, or other artificial means. Such data will always have differences compared to real world data. These discrepancies critically affect the model, potentially leading to suboptimal performance. HRDA will help to address this problem ensuring a more consistent and reliable result.
-
-2. **Semi-supervised learning**: In this case we usually have a small amount of labeled data in conjunction with a larger pool of unlabeled data. The labeled portion provides an initial understanding of the problem, enabling HRDA to leverage unlabeled data and further improve its performance.
+This app deploys MMDetection3D models as a service for inference. These models detect objects in Point Cloud data using 3D bboxes (Cuboids), such as cars, pedestrians, signs, etc. You can deploy both the pre-trained model checkpoints trained by authors of MMDetection3D, and your custom models trained in Train MMDetection3D v1.x app.
 
 
 # How To Run

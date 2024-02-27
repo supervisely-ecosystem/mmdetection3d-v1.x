@@ -23,7 +23,8 @@
 
 # Overview
 
-HRDA model is not a usual segmentation model. It is useful in cases where your trained model need to generalize well to new, unseen data. HRDA employs domain adaptation techniques, specifically pseudo-labeling, to enhance generalization across varying data domains.
+Train your custom models for 3D object detection on Point Cloud data. Trained models will predict 3D bboxes (Cuboids) of objects in your dataset. After training you can deploy your model using Serve MMDetection3D v1.x app.
+
 
 **We provide two scenarios in which HRDA model offers advantages:**
 1. **Training on synthetic data**: Synthetic data refers to data that wasn't directly obtained from the real world, but was generated using algorithms, simulations, or other artificial means. Such data will always have differences compared to real world data. These discrepancies critically affect the model, potentially leading to suboptimal performance. HRDA will help to address this problem ensuring a more consistent and reliable result.
