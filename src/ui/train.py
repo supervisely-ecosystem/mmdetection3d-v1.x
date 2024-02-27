@@ -216,7 +216,7 @@ def train():
     #     sly_utils.save_augs_config(params.augs_config_path, params.data_root)
 
     if g.api.task_id is not None:
-        sly_utils.save_open_app_lnk(train_params.data_root)
+        sly_utils.save_open_app_lnk(g.WORK_DIR)
     out_path = sly_utils.upload_artifacts(
         g.WORK_DIR,
         train_params.experiment_name,

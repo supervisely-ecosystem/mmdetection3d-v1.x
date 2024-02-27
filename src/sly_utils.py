@@ -157,3 +157,8 @@ def upload_artifacts(work_dir: str, experiment_name: str = None, progress_widget
     )
     progress_widget.hide()
     return out_path
+
+
+def save_open_app_lnk(work_dir: str):
+    with open(work_dir + "/open_app.lnk", "w") as f:
+        f.write(f"{g.api.server_address}/apps/sessions/{g.api.task_id}")
