@@ -41,3 +41,6 @@ MAX_CLASSES_TO_SHOW_CLASSWISE_METRIC = 10
 IMAGES_COUNT = api.project.get_info_by_id(PROJECT_ID).items_count
 
 stop_training = False
+
+DEBUG_IFRAME_WITH_FILENAME = 'ds1/pointcloud/000062.pcd'
+debug_save_idx = 0

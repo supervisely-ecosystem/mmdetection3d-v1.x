@@ -71,6 +71,33 @@ def upload_point_cloud(api: sly.Api, dataset_id: int, pcd_path: str, name: str):
         pass
     return api.pointcloud.upload_path(dataset_id, name, pcd_path)
 
+def download_custom_model(remote_weights_path: str):
+    config_path = download_custom_config(remote_weights_path)
+    weights_path = download_custom_model_weights(remote_weights_path)
+    return weights_path, config_path
+
+def download_custom_config(remote_weights_path: str):
+    # # download config_xxx.py
+    # save_dir = remote_weights_path.split("checkpoints")
+    # files = g.api.file.listdir(g.TEAM_ID, save_dir)
+    # # find config by name in save_dir
+    # remote_config_path = [f for f in files if f.endswith(".py")]
+    # assert len(remote_config_path) > 0, f"Can't find config in {save_dir}."
+
+    # download config.py
+    remote_dir = os.path.dirname(remote_weights_path)
+    remote_config_path = remote_dir + "/config.py"
+    config_name = remote_config_path.split("/")[-1]
+    config_path = g.app_dir + f"/{config_name}"
+    g.api.file.download(g.TEAM_ID, remote_config_path, config_path)
+    return config_path
+
+def download_custom_model_weights(remote_weights_path: str):
+    # download .pth
+    file_name = os.path.basename(remote_weights_path)
+    weights_path = g.app_dir + f"/{file_name}"
+    g.api.file.download(g.TEAM_ID, remote_weights_path, weights_path)
+    return weights_path
 
 def add_classes_to_project_meta(
     api: sly.Api, project_meta: sly.ProjectMeta, project_id: int, classes: list

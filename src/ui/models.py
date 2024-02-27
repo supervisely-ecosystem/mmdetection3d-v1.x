@@ -28,8 +28,14 @@ def _load_models_meta(task: str):
     models_meta = {
         m["name"]: m
         for m in models_meta["detection_3d"]
-        if m["name"] in ("PointPillars", "CenterPoint")
+        if m["name"] in ("CenterPoint", "PointPillars")
     }  #'CenterFormer',}
+
+    models_meta = {
+        "CenterPoint":models_meta["CenterPoint"],
+        "PointPillars":models_meta["PointPillars"],
+    }
+
     return models_meta
 
 
@@ -130,7 +136,7 @@ def _get_table_data(task: str, models: list):
     return columns, rows, subtitles
 
 
-def is_pretrained_model_selected():
+def is_pretrained_model_radiotab_selected():
     custom_path = get_selected_custom_path()
     if radio_tabs.get_active_tab() == "Pretrained models":
         if custom_path:
@@ -167,17 +173,13 @@ arch_select = SelectString([""])
 table = RadioTable([""], [[""]])
 text = Text()
 
-load_from = Switch(True)
+load_weights = Switch(True)
 load_from_field = Field(
-    load_from,
+    load_weights,
     "Download pre-trained model",
     "Whether to download pre-trained weights and finetune the model or train it from scratch.",
 )
-load_from.disable()
 
-tmp_txt = Text(
-    "Training from scratch will be available once GPU support is enabled.", status="info"
-)
 
 input_file = TeamFilesSelector(TEAM_ID, selection_file_type="file")
 path_field = Field(
@@ -189,7 +191,7 @@ path_field = Field(
 radio_tabs = RadioTabs(
     titles=["Pretrained models", "Custom weights"],
     contents=[
-        Container(widgets=[arch_select, table, text, load_from_field, tmp_txt]),
+        Container(widgets=[arch_select, table, text, load_from_field]),
         path_field,
     ],
 )

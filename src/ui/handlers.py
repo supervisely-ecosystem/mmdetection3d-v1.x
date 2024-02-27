@@ -105,7 +105,7 @@ models_select_callback = wrap_button_click(
         models.arch_select,
         models.path_field,
         models.table,
-        models.load_from,
+        models.load_weights,
     ],
     callback=classes_select_callback,
 )
@@ -167,7 +167,7 @@ def on_model_selected():
     )
 
     # update default hyperparameters in UI
-    is_pretrained_model = models.is_pretrained_model_selected()
+    is_pretrained_model = models.is_pretrained_model_radiotab_selected()
 
     if is_pretrained_model:
         selected_model = models.get_selected_pretrained_model()

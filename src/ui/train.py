@@ -21,6 +21,7 @@ from supervisely.app.widgets import (
     FolderThumbnail,
     DoneLabel,
 )
+from typing import Tuple
 
 import src.globals as g
 from src.train.train_parameters import TrainParameters
@@ -78,7 +79,7 @@ def get_train_params(cfg: Config) -> Tuple[ConfigParameters, TrainParameters]:
 def prepare_model():
     # download custom model if needed
     # returns config path and weights path
-    if models_ui.is_pretrained_model_selected():
+    if models_ui.is_pretrained_model_radiotab_selected():
         selected_model = models_ui.get_selected_pretrained_model()
         from mmdet3d.apis import Base3DInferencer
 
@@ -100,7 +101,7 @@ def prepare_model():
 
 
 def add_metadata(cfg: Config) -> Config:
-    is_pretrained = models_ui.is_pretrained_model_selected()
+    is_pretrained = models_ui.is_pretrained_model_radiotab_selected()
 
     if not is_pretrained and not hasattr(cfg, "sly_metadata"):
         # realy custom model
@@ -156,10 +157,11 @@ def train():
     train_params: TrainParameters
     train_params.data_root = project_dir
     train_params.selected_classes = classes.get_selected_classes()
-    train_params.weights_path_or_url = weights_path_or_url
     train_params.task_type = get_task()
     train_params.project_id = g.PROJECT_ID
     train_params.project_name = g.PROJECT_INFO.name
+    if train_params.load_weights is True and weights_path_or_url is not None:        
+        train_params.weights_path_or_url = weights_path_or_url
 
     # If we won't do this, restarting the training will throw a error
     Visualizer._instance_dict.clear()
@@ -173,10 +175,6 @@ def train():
         config_params,
         train_params,
     )
-
-    # update load_from with custom_weights_path
-    # if params.load_from and weights_path_or_url:
-    #     train_cfg.load_from = weights_path_or_url
 
     # add sly_metadata
     # cfg = add_metadata(cfg)

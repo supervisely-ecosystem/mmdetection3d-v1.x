@@ -9,8 +9,6 @@ import plotly.graph_objects as go
 import src.globals as g
 import src.ui.train as train_ui
 from src.ui.graphics import monitoring, grid_chart_val
-import open3d as o3d
-import numpy as np
 import pickle, random
 from supervisely.app.widgets.line_chart.line_chart import LineChart
 
@@ -45,12 +43,20 @@ class SuperviselyHook(Hook):
         with open(ann_file, "rb") as f:
             a = pickle.load(f)
 
-        save_idx = 0  # see nuscenes_metric.py ln. 136
+        # TODO
+        pcl_paths = [x["lidar_points"]["lidar_path"] for x in a["data_list"]]
+        if sly.is_development():
+            try:
+                g.debug_save_idx = pcl_paths.index(g.DEBUG_IFRAME_WITH_FILENAME)
+            except:
+                pass
+        save_idx = g.debug_save_idx # see nuscenes_metric.py ln. 136
         pts_filepath = g.PROJECT_DIR + "/" + a["data_list"][save_idx]["lidar_points"]["lidar_path"]
 
         gt_bboxes_3d = a["data_list"][save_idx]["instances"]
+        id2name ={v:k for k,v in runner.val_evaluator.dataset_meta['categories'].items()}
 
-        monitoring.initialize_iframe("visual", pts_filepath, gt_bboxes_3d)
+        monitoring.initialize_iframe("visual", pts_filepath, id2name, gt_bboxes_3d)
 
     def after_train_iter(
         self, runner: Runner, batch_idx: int, data_batch: DATA_BATCH = None, outputs: dict = None
@@ -104,9 +110,10 @@ class SuperviselyHook(Hook):
 
         if len(bboxes_3d) > 0 and runner.epoch % 5 == 0:
             bboxes_3d, labels_3d, scores_3d = filter_by_confidence(
-                bboxes_3d, labels_3d, scores_3d, threshold=0.5
+                bboxes_3d, labels_3d, scores_3d, threshold=0.3
             )
-            monitoring.update_iframe("visual", bboxes_3d, runner.epoch)
+            id2name = {v:k for k,v in runner.val_evaluator.dataset_meta['categories'].items()}
+            monitoring.update_iframe("visual", bboxes_3d, labels_3d, runner.epoch, id2name)
 
         # Add mAP metrics
         # TODO метрики по классам 'per class'
