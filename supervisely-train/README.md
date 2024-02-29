@@ -23,59 +23,99 @@
 
 # Overview
 
-Train your custom models for 3D object detection on Point Cloud data. Trained models will predict 3D bboxes (Cuboids) of objects in your dataset. After training you can deploy your model using Serve MMDetection3D v1.x app.
+Train your custom models for 3D object detection on Point Cloud data. Trained models predict 3D bboxes (Cuboids) of objects in your dataset. After training you can deploy your model using [Serve MMDetection3D v1.x]() app.
 
 
-**We provide two scenarios in which HRDA model offers advantages:**
-1. **Training on synthetic data**: Synthetic data refers to data that wasn't directly obtained from the real world, but was generated using algorithms, simulations, or other artificial means. Such data will always have differences compared to real world data. These discrepancies critically affect the model, potentially leading to suboptimal performance. HRDA will help to address this problem ensuring a more consistent and reliable result.
+Application key points:
+- Object Detection 3D models from MM Toolbox
+- Define Train / Validation splits
+- Select classes for training
+- Tune hyperparameters
+- Monitor Metric charts
+- Save training artifacts to Team Files
 
-2. **Semi-supervised learning**: In this case we usually have a small amount of labeled data in conjunction with a larger pool of unlabeled data. The labeled portion provides an initial understanding of the problem, enabling HRDA to leverage unlabeled data and further improve its performance.
+## Supported Models
 
-# Preparing the data
-For this app you should have a project with 3 datasets:
-1. Labeled dataset (e.g. it can be either synthetic data or a small part of labeled real data in case of semi-supervised learning)
-2. Unlabeled dataset (it can be real data with no annotations)
-3. Labeled dataset for validation
-
-This App can help to split your data: [split-dataset](https://ecosystem.supervisely.com/apps/split-dataset)
+| Paper Title   | Conference | Year |
+|---------------|------------|------|
+| CenterPoint   | CVPR       | 2021 |
+| PointPillars  | CVPR       | 2019 |
 
 
-# How To Run
 
-1. Run the application from the Ecosystem and select the input project, or run from the context menu of a project <br> </br>
-2. Select either a pre-trained model, or provide your own weights
-   <img src="https://github.com/supervisely-ecosystem/hrda/assets/115161827/98a331d6-7692-4c05-af92-25412029b035" /> <br> </br>
-3. Select the classes that will be used for training
-   <img src="https://github.com/supervisely-ecosystem/hrda/assets/115161827/a8a26831-db7f-4775-947a-779543416f51" /> <br> </br>
-4. Define source, target and validation datasets
-   <img src="https://github.com/supervisely-ecosystem/hrda/assets/115161827/b3c58004-4746-4482-8f8b-a5b0374dd38c" /> <br> </br>
-5. Use either pre-defined or custom augmentations
-   <img src="https://github.com/supervisely-ecosystem/hrda/assets/115161827/8f23509b-642a-4875-bc43-bd97688352ee" /> <br> </br>
-6. Configure training hyperparameters
-   <img src="https://github.com/supervisely-ecosystem/hrda/assets/115161827/f04cfcdc-fb9c-4bba-8fbd-21289487d730" /> <br> </br>
-7. Press `Train` button and observe the logs, charts and prediction visualizations
-   <img src="https://github.com/supervisely-ecosystem/hrda/assets/115161827/924fa93e-ef42-4daa-987e-5629da1c1530" /> <br> After each validation epoch the visualization of predictions will be updated <br>
-   <img src="https://github.com/supervisely-ecosystem/hrda/assets/31512713/a0049731-7a26-467f-950a-5b83602fbc6c" /> <br> </br>
+# How to Run
+
+Run app [Train MMDetection3D](https://app.supervise.ly/ecosystem/apps/mmdetection_3d/train) from ecosystem or from context menu of the point cloud / point cloud episodes project with annotations (`Cuboid3D` is supported as label type for object detection 3D)
+
+<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection_3d/train" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px" style='padding-bottom: 10px'/>
+
+
+# Training on Demo Data
+
+You can try training on demo data sample. Set following settings in training dashboard:
+
+- `Project`: [Demo Lyft 3D dataset annotated](https://app.supervise.ly/ecosystem/projects/demo-lyft-3d-dataset-annotated)
+- `Model`: centerpoint_0075voxel_second_secfpn_dcn_circlenms_4x8_cyclic_20e_nus
+- `Classes`: [Car]
+- `Train/Val splits`: 100 / 25
+- `Data Preparation`: Sliding window mode (`X`: 108, `Y`: 108, `Z`: 15)
+- `Augmentations`: No Augmentations
+- `Training hyperparams`: default
+
+Your result should look like:
+
+<img src="https://user-images.githubusercontent.com/97401023/192218062-294ccdf0-efcc-426e-b6fc-fc2f678f75fe.gif"/> 
 
 
 # How To Use Your Trained Model Outside Supervisely
 
-You can use your trained models outside Supervisely platform without any dependencies on Supervisely SDK. You need to download a config file and model weights (.pth) from Team Files. See this [Jupyter Notebook](https://github.com/supervisely-ecosystem/hrda/blob/master/inference_outside_supervisely.ipynb) for details.
+You can use your trained models outside Supervisely platform without any dependencies on Supervisely SDK. See this [Jupyter Notebook](https://github.com/supervisely-ecosystem/mmdetection_3d/blob/master/outside_supervisely/inference_outside_supervisely.ipynb) for details.
 
 
-# Related apps
+# Related Apps
 
-- [Serve HRDA](https://ecosystem.supervise.ly/apps/hrda/sly_app_serve) - app allows to deploy YOLOv8 model as REST API service.   
-    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/hrda/sly_app_serve" src="https://github.com/supervisely-ecosystem/hrda/assets/119248312/330f13e9-bc84-45ce-a9a3-d56fafec9c97" height="70px" margin-bottom="20px"/>
+1. [Train MMDetection3D](https://app.supervise.ly/ecosystem/apps/mmdetection_3d/train) - start training on your custom data. Just run app from the context menu of your project, choose classes of interest, train/val splits, configure training parameters and augmentations, and monitor training metrics in realtime. All training artifacts including model weights will be saved to Team Files and can be easily downloaded. 
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection_3d/train" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px"/>
+
+2. [Serve MMDetection3D](https://app.supervise.ly/ecosystem/apps/mmdetection_3d/serve) - serve model as Rest API service. You can run pretrained model, use custom model weights trained in Supervisely. Thus other apps from Ecosystem can get predictions from the deployed model. Also developers can send inference requiests in a few lines of python code.
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection_3d/serve" src="https://user-images.githubusercontent.com/97401023/192003614-4dbe1828-e9c1-4c78-bf89-8f3115103d29.png" width="350px"/>
   
-- [Export to YOLOv8 format](https://ecosystem.supervise.ly/apps/export-to-yolov8) - app allows to transform data from Supervisely format to YOLOv8 format.   
-    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/export-to-yolov8" src="https://github.com/supervisely-ecosystem/yolov8/assets/115161827/01d6658f-11c3-40a3-8ff5-100a27fa1480" height="70px" margin-bottom="20px"/>  
+3. [Apply 3D Detection to Pointcloud Project](https://app.supervise.ly/ecosystem/apps/apply-det3d-to-project-dataset) - app allows to play with different inference options and visualize predictions in real time.  Once you choose inference settings you can apply model to all images in your project to visually analise predictions and perform automatic data pre-labeling. 
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/apply-det3d-to-project-dataset" src="https://user-images.githubusercontent.com/97401023/192003658-ec094ea3-2410-470b-b944-cd0a6cc6703b.png" width="550px"/>
+
+4. [Import KITTI 3D](https://app.supervise.ly/ecosystem/apps/import-kitti-3d) - app allows to get sample from KITTI 3D dataset or upload your downloaded KITTI data to Supervisely in point clouds project format.
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/import-kitti-3d" src="https://user-images.githubusercontent.com/97401023/192003697-a6aa11c4-df2e-46cc-9072-b9937756c51b.png" width="350px"/>
+
+5. [Import KITTI-360](https://app.supervise.ly/ecosystem/apps/import-kitti-360/supervisely_app) - app allows to upload your downloaded KITTI-360 data to Supervisely in point cloud episodes project format.
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/import-kitti-360/supervisely_app" src="https://user-images.githubusercontent.com/97401023/192003741-0fd62655-60c3-4e57-80e8-85f936fc0f8d.png" width="350px"/>
+
+# Related Projects
+
+1. [Demo LYFT 3D dataset annotated](https://app.supervise.ly/ecosystem/projects/demo-lyft-3d-dataset-annotated) - demo sample from [Lyft](https://level-5.global/data) dataset with labels.
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/demo-lyft-3d-dataset-annotated" src="https://user-images.githubusercontent.com/97401023/192003812-1cefef97-29e3-40dd-82c6-7d3cf3d55585.png" width="400px"/>
+
+2. [Demo LYFT 3D dataset](https://app.supervise.ly/ecosystem/projects/demo-lyft-3d-dataset) - demo sample from [Lyft](https://level-5.global/data) dataset without labels.
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/demo-lyft-3d-dataset" src="https://user-images.githubusercontent.com/97401023/192003862-102de613-d365-4043-8ca0-d59e3c95659a.png" width="400px"/>
+
+3. [Demo KITTI pointcloud episodes annotated](https://app.supervise.ly/ecosystem/projects/demo-kitti-3d-episodes-annotated) - demo sample from [KITTI 3D](https://www.cvlibs.net/datasets/kitti/eval_tracking.php) dataset with labels.
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/demo-kitti-3d-episodes-annotated" src="https://user-images.githubusercontent.com/97401023/192003917-71425add-e985-4a9c-8739-df832324be2f.png" width="400px"/>
+
+4. [Demo KITTI pointcloud episodes](https://app.supervise.ly/ecosystem/projects/demo-kitti-3d-episodes) - demo sample from [KITTI 3D](https://www.cvlibs.net/datasets/kitti/eval_tracking.php) dataset without labels.
+
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/demo-kitti-3d-episodes" src="https://user-images.githubusercontent.com/97401023/192003975-972c1803-b502-4389-ae83-72958ddd89ad.png" width="400px"/>
 
 # Screenshot
 
-<img src="https://github.com/supervisely-ecosystem/hrda/assets/115161827/c3e4bae6-02b9-4d2e-8f59-ac65996505e7"/>
-
+<img src="https://user-images.githubusercontent.com/97401023/191994951-7243a2c4-127b-4d80-9a4a-e605745a0fb3.png" width="100%" style='padding-top: 10px'>
 
 # Acknowledgment
 
-This app is based on the great work `HRDA` ([github](https://github.com/lhoyer/HRDA)). ![GitHub Org's stars](https://img.shields.io/github/stars/lhoyer/HRDA?style=social)
+This app is based on the great work `MMDetection3D` ([github](https://github.com/open-mmlab/mmdetection3d)). ![GitHub Org's stars](https://img.shields.io/github/stars/open-mmlab/mmdetection3d?style=social)
