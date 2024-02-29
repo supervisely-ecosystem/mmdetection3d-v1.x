@@ -28,21 +28,26 @@ class CustomDataset(Det3DDataset):
                  add_dummy_velocities: bool = False,
                  **kwargs) -> None:
         self.add_dummy_velocities = add_dummy_velocities
-        sly_meta = mmengine.load(f"{data_root}/meta.json")
-        sly_meta = sly.ProjectMeta.from_json(sly_meta)
-        classes = [x.name for x in sly_meta.obj_classes]
-        palette = [x.color for x in sly_meta.obj_classes]
-        self.METAINFO = {"classes": classes, "palette": palette}
-        if selected_classes:
-            if isinstance(selected_classes, list):
-                filtered_classes = [x for x in classes if x in set(selected_classes)]
-            elif isinstance(selected_classes, dict):
-                filtered_classes = [x for x in classes if x in set(selected_classes.keys())]
-            assert len(filtered_classes) > 0, f"selected_classes {selected_classes} not found in {classes}"
-            metainfo = self.METAINFO.copy()
-            metainfo["classes"] = filtered_classes
-        else:
-            metainfo = None
+        try:
+            sly_meta = mmengine.load(f"{data_root}/meta.json")
+            sly_meta = sly.ProjectMeta.from_json(sly_meta)
+            classes = [x.name for x in sly_meta.obj_classes]
+            palette = [x.color for x in sly_meta.obj_classes]
+            self.METAINFO = {"classes": classes, "palette": palette}
+            if selected_classes:
+                if isinstance(selected_classes, list):
+                    filtered_classes = [x for x in classes if x in set(selected_classes)]
+                elif isinstance(selected_classes, dict):
+                    filtered_classes = [x for x in classes if x in set(selected_classes.keys())]
+                assert len(filtered_classes) > 0, f"selected_classes {selected_classes} not found in {classes}"
+                metainfo = self.METAINFO.copy()
+                metainfo["classes"] = filtered_classes
+            else:
+                metainfo = None
+        except FileNotFoundError:
+            # when running Serve App
+            self.METAINFO = {"classes": [], "palette": []}
+            metainfo = {"classes": [], "palette": []}
         data_prefix = dict(pts='', img='')
         box_type_3d = "LiDAR"
         super().__init__(data_root, ann_file, metainfo, data_prefix, pipeline, modality, default_cam_key, box_type_3d, filter_empty_gt, test_mode, load_eval_anns, backend_args, show_ins_var, **kwargs)
