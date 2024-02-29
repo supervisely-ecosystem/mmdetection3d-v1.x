@@ -30,6 +30,7 @@ class TrainParameters:
         
 
         self.log_interval = 50  # for text logger
+        self.log_level = "INFO"
         self.chart_update_interval = 1
         self.filter_empty_gt = True
         self.experiment_name = None
@@ -203,9 +204,10 @@ def configure_optimizer(cfg: Config, train_params: TrainParameters):
         cfg.optim_wrapper.clip_grad = dict(max_norm=train_params.clip_grad_norm, norm_type=2)
 
 
-def merge_default_runtime(cfg: Config):
+def merge_default_runtime(cfg: Config, log_level: str = "INFO"):
     default_runtime = Config.fromfile("src/config_factory/default_runtime.py")
     cfg.merge_from_dict(default_runtime)
+    cfg.log_level = log_level
 
 
 def add_sly_metadata(cfg: Config, train_params: TrainParameters):

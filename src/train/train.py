@@ -98,7 +98,7 @@ def update_config(
 
     # Write parameters to config file
     write_parameters_to_config_2(config_params, cfg, train_params.selected_classes)
-    config_factory.merge_default_runtime(cfg)
+    config_factory.merge_default_runtime(cfg, log_level=train_params.log_level)
 
     # Model weights
     weights_url = None

@@ -162,6 +162,7 @@ def train():
     train_params.project_name = g.PROJECT_INFO.name
     if train_params.load_weights is True and weights_path_or_url is not None:        
         train_params.weights_path_or_url = weights_path_or_url
+    train_params.log_level = "INFO" if sly.is_development() else "ERROR"
 
     # If we won't do this, restarting the training will throw a error
     Visualizer._instance_dict.clear()
