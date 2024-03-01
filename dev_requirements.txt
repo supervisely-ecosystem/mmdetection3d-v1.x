@@ -3,7 +3,8 @@ torchvision==0.16.0 --index-url https://download.pytorch.org/whl/cu118
 openmim
 git+https://github.com/DanielPollithy/pypcd.git
 Werkzeug==2.2.3
+numpy==1.22.0
 wheel
 fire
 executing==2.0.1
-# supervisely==6.72.199
+# supervisely==6.73.39

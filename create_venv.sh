@@ -26,6 +26,6 @@ echo "Install requirements..." && \
 pip3 install -r dev_requirements.txt && \
 mim install mmengine 'mmcv>=2.0.0rc4' 'mmdet>=3.0.0' 'mmdet3d>=1.1.0' && \
 echo "Installing supervisely." && \
-pip3 install supervisely==6.72.199 && \
+pip3 install supervisely==6.73.39 && \
 echo "Requirements have been successfully installed, VENV ready." && \
 deactivate
