@@ -1,2 +1,0 @@
-README
-inference_outside_supervisely
