@@ -14,11 +14,10 @@ from supervisely.geometry.cuboid_3d import Cuboid3d
 from src.serve.gui import MMDetectionGUI
 from src.inference.pcd_inferencer import PcdDet3DInferencer
 from src.inference.functional import up_bbox3d, filter_by_confidence, bbox_3d_to_cuboid3d
-from src.sly_utils import upload_point_cloud
 
 
 model_list = sly.json.load_json_file("model_list.json")
-mmdetection3d_root = "mmdetection3d"
+mmdetection3d_root = PcdDet3DInferencer._get_repo_or_mim_dir("mmdet3d")
 
 # Swap last two models in the list to make CenterPoint default
 model_list["detection_3d"][-1], model_list["detection_3d"][-2] = model_list["detection_3d"][-2], model_list["detection_3d"][-1]
