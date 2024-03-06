@@ -1,5 +1,5 @@
 <div align="center" markdown>
-<img src="https://github.com/supervisely-ecosystem/hrda/assets/115161827/9b0c3482-a55c-440e-afea-ff1a935836c2"/>  
+<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/864c236d-5f16-42bf-81b5-7a764bed59cc"/>  
 
 # Train MMDetection3D v1.x
 
@@ -13,18 +13,21 @@
   <a href="#Acknowledgment">Acknowledgment</a>
 </p>
 
-[![](https://img.shields.io/badge/supervisely-ecosystem-brightgreen)](https://ecosystem.supervise.ly/apps/supervisely-ecosystem/hrda/sly_app_train)
+[![](https://img.shields.io/badge/supervisely-ecosystem-brightgreen)](https://ecosystem.supervise.ly/apps/supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train)
 [![](https://img.shields.io/badge/slack-chat-green.svg?logo=slack)](https://supervise.ly/slack)
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/supervisely-ecosystem/hrda)
-[![views](https://app.supervise.ly/img/badges/views/supervisely-ecosystem/hrda/sly_app_train.png)](https://supervise.ly)
-[![runs](https://app.supervise.ly/img/badges/runs/supervisely-ecosystem/hrda/sly_app_train.png)](https://supervise.ly)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/supervisely-ecosystem/mmdetection3d-v1.x)
+[![views](https://app.supervise.ly/img/badges/views/supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train.png)](https://supervise.ly)
+[![runs](https://app.supervise.ly/img/badges/runs/supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train.png)](https://supervise.ly)
 
 </div>
 
 # Overview
 
-Train your custom models for 3D object detection on Point Cloud data. Trained models predict 3D bboxes (Cuboids) of objects in your dataset. After training you can deploy your model using [Serve MMDetection3D v1.x]() app.
+Train MMDetection3D v1.x model as Supervisely Application. MMDetection3D is an open source toolbox based on PyTorch. Learn more about MMDetection3D and available models [here](https://github.com/open-mmlab/mmdetection3d).
 
+MMDetection3D v1.x is released as an official version and achieves new state-of-the-art performance in 3D object detection.The segmentation task will be added in future releases ⏲.
+
+Train your custom models for 3D object detection on Point Cloud data. Trained models predict 3D bboxes (Cuboids) of objects in your dataset. After training you can deploy your model using [Serve MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection3d-v1.x/supervisely-serve) app.
 
 Application key points:
 - Object Detection 3D models from MM Toolbox
@@ -42,43 +45,38 @@ Application key points:
 | PointPillars  | CVPR       | 2019 |
 
 
-
 # How to Run
 
-Run app [Train MMDetection3D](https://app.supervise.ly/ecosystem/apps/mmdetection_3d/train) from ecosystem or from context menu of the point cloud / point cloud episodes project with annotations (`Cuboid3D` is supported as label type for object detection 3D)
+Run app [Train MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection3d-v1.x/supervisely-train) from [Ecosystem](https://app.supervisely.com/ecosystem/) or from context menu of the Point Cloud / Point Cloud Episodes project with annotations (`Cuboid3D` is supported as label type for object detection 3D)
 
-<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection_3d/train" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px" style='padding-bottom: 10px'/>
-
+<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px" style='padding-bottom: 10px'/>
 
 # Training on Demo Data
 
 You can try training on demo data sample. Set following settings in training dashboard:
 
 - `Project`: [Demo Lyft 3D dataset annotated](https://app.supervise.ly/ecosystem/projects/demo-lyft-3d-dataset-annotated)
-- `Model`: centerpoint_0075voxel_second_secfpn_dcn_circlenms_4x8_cyclic_20e_nus
-- `Classes`: [Car]
-- `Train/Val splits`: 100 / 25
-- `Data Preparation`: Sliding window mode (`X`: 108, `Y`: 108, `Z`: 15)
-- `Augmentations`: No Augmentations
-- `Training hyperparams`: default
+- `Model`: centerpoint_voxel01_second_secfpn_head_dcn_circlenms_8xb4-cyclic-20e_nus-3d
+- `Classes`: [Car] [Pedestrian] [Truck]
+- `Train/Val splits. Random`: 100 / 25
+- `Training hyperparameters`: default
+  <img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/131902d2-1478-40f4-ba8e-036efee569dd"/>
 
 Your result should look like:
 
 <img src="https://user-images.githubusercontent.com/97401023/192218062-294ccdf0-efcc-426e-b6fc-fc2f678f75fe.gif"/> 
 
-
 # How To Use Your Trained Model Outside Supervisely
 
 You can use your trained models outside Supervisely platform without any dependencies on Supervisely SDK. See this [Jupyter Notebook](https://github.com/supervisely-ecosystem/mmdetection_3d/blob/master/outside_supervisely/inference_outside_supervisely.ipynb) for details.
 
-
 # Related Apps
 
-1. [Train MMDetection3D](https://app.supervise.ly/ecosystem/apps/mmdetection_3d/train) - start training on your custom data. Just run app from the context menu of your project, choose classes of interest, train/val splits, configure training parameters and augmentations, and monitor training metrics in realtime. All training artifacts including model weights will be saved to Team Files and can be easily downloaded. 
+1. [Train MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection3d-v1.x/supervisely-train) - start training on your custom data. Just run app from the context menu of your project, choose classes of interest, train/val splits, configure training parameters and augmentations, and monitor training metrics in realtime. All training artifacts including model weights will be saved to Team Files and can be easily downloaded. 
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection_3d/train" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px"/>
 
-2. [Serve MMDetection3D](https://app.supervise.ly/ecosystem/apps/mmdetection_3d/serve) - serve model as Rest API service. You can run pretrained model, use custom model weights trained in Supervisely. Thus other apps from Ecosystem can get predictions from the deployed model. Also developers can send inference requiests in a few lines of python code.
+2. [Serve MMDetection3D](https://app.supervise.ly/ecosystem/apps/mmdetection3d-v1.x/supervisely-serve) - serve model as Rest API service. You can run pretrained model, use custom model weights trained in Supervisely. Thus other apps from Ecosystem can get predictions from the deployed model. Also developers can send inference requiests in a few lines of python code.
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection_3d/serve" src="https://user-images.githubusercontent.com/97401023/192003614-4dbe1828-e9c1-4c78-bf89-8f3115103d29.png" width="350px"/>
   
@@ -114,7 +112,7 @@ You can use your trained models outside Supervisely platform without any depende
 
 # Screenshot
 
-<img src="https://user-images.githubusercontent.com/97401023/191994951-7243a2c4-127b-4d80-9a4a-e605745a0fb3.png" width="100%" style='padding-top: 10px'>
+<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/9b6f5a9b-1b8d-4b79-8490-a27aa480ced7"/>
 
 # Acknowledgment
 
