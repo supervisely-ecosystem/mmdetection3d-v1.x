@@ -5,8 +5,7 @@
 
 <p align="center">
   <a href="#Overview">Overview</a> •
-  <a href="#How-To-Run">How To Run</a> •
-  <a href="#How-To-Use-Your-Trained-Model-Outside-Supervisely">How To Use Your Trained Model Outside Supervisely</a> •
+  <a href="#How-To-Use">How To Use</a> •
   <a href="#Related-apps">Related Apps</a> •
   <a href="#Acknowledgment">Acknowledgment</a>
 </p>
@@ -21,21 +20,27 @@
 
 # Overview
 
-This app allows you to deploy MMDetection3D models as a service for inference. The app supports all models for outdoor 3d object detection task from MMDetection3D framework. A prediction of a model is a 3D bbox (Cuboid). You can deploy both pre-trained checkpoints, and your custom checkpoints trained in [Train MMDetection3D v1.x](link/to/mmdetection_3d) app.
+Serve MMDetection3D 1v.x model as Supervisely Application. MMDetection3D is an open source toolbox based on PyTorch. Learn more about MMDetection3D and available models [here](https://github.com/open-mmlab/mmdetection3d).
+
+MMDetection3D v1.x is released as an official version and achieves new state-of-the-art performance in 3D object detection.The segmentation task will be added in future releases ⏲.
+
+This application allows you to deploy MMDetection3D models as an inference service. The app supports all models for outdoor 3D object detection task from the MMDetection3D framework. A prediction of a model is a 3D bbox (Cuboid). You can deploy both pre-trained checkpoints, and your custom checkpoints trained in [Train MMDetection3D v1.x](link/to/mmdetection_3d) application.
 
 # How to Use
 
 **Pretrained models**
 
-**Step 1.** Select architecture and pretrained model
+**Step 1.** Select a pretrained model and one of the model architectures.
 
-**Step 2.** Press the `Serve` button
+**Step 2.** Choose the device on which the model will be loaded.
 
-<img src="https://user-images.githubusercontent.com/48913536/171728083-bda7c593-641a-4feb-ace7-4f889cfeedbf.png" width="80%"> 
+**Step 3.** Press the `Serve` button
 
-**Step 3.** Wait for the model to deploy
+<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/ab540ec2-040f-4a4e-97c1-53f2fd8c220d"> 
 
-<img src="https://user-images.githubusercontent.com/48913536/171728064-98ee86fa-841b-4d11-80dd-68cc3411d1ed.png" width="80%">
+**Step 4.** Wait for the model to deploy. After that, you can explore the complete model information.
+
+<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/c8a47380-3967-4930-9ab8-14db06fcf94a">
 
 **Custom models**
 
