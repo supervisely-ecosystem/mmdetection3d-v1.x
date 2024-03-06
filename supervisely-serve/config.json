@@ -9,6 +9,7 @@
     "pointclouds",
     "detection & tracking",
     "object detection",
+    "semantic segmentation",
     "serve"
   ],
   "icon": "https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/2c73af37-dab8-4795-8ca9-801b2ee71d48",
