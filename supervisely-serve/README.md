@@ -58,7 +58,7 @@ Model and directory structure must be acquired via [Train MMDetection3D v1.x](ht
 
 <img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/32ee50b9-6692-4685-89ca-0f04af443368"/>  
 
-**Step 4.** Return to the [Serve MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection3d-v1.x/supervisely-serve) application tab in the `Custom Weights` section. Paste checkpoint path to opened text field and press `Serve` button. Your model is ready to use!
+**Step 4.** Return to the [Serve MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection3d-v1.x/supervisely-serve) application tab in the `Custom Models` section. Paste checkpoint path to opened text field and press `Serve` button. Your model is ready to use!
 
 <img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/9c738437-6558-4007-a1aa-43e84d823905"/>  
 
