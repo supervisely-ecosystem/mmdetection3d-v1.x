@@ -38,7 +38,7 @@ class MMDetectionGUI(GUI.InferenceGUI):
                     value="detection3d"
                 ),
                 Widgets.RadioGroup.Item(
-                    value="segmentation3d"
+                    value="segmentation3d (coming soon)"
                 ),
             ]
         )
