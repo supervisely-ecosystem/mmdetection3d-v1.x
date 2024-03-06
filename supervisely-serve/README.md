@@ -36,7 +36,7 @@ This application allows you to deploy MMDetection3D models as an inference servi
 
 **Step 3.** Press the `Serve` button
 
-<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/ab540ec2-040f-4a4e-97c1-53f2fd8c220d"/> 
+<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/f151afdf-3941-4129-835d-0630b05af744"/> 
 
 **Step 4.** Wait for the model to deploy. After that, you can explore the complete model information.
 
