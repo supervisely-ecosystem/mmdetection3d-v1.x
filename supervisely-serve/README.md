@@ -20,7 +20,7 @@
 
 # Overview
 
-Serve MMDetection3D 1v.x model as Supervisely Application. MMDetection3D is an open source toolbox based on PyTorch. Learn more about MMDetection3D and available models [here](https://github.com/open-mmlab/mmdetection3d).
+Serve MMDetection3D v1.x model as Supervisely Application. MMDetection3D is an open source toolbox based on PyTorch. Learn more about MMDetection3D and available models [here](https://github.com/open-mmlab/mmdetection3d).
 
 MMDetection3D v1.x is released as an official version and achieves new state-of-the-art performance in 3D object detection.The segmentation task will be added in future releases ⏲.
 
