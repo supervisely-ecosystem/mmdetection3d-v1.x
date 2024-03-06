@@ -24,7 +24,7 @@ Serve MMDetection3D v1.x model as Supervisely Application. MMDetection3D is an o
 
 MMDetection3D v1.x is released as an official version and achieves new state-of-the-art performance in 3D object detection.The segmentation task will be added in future releases ⏲.
 
-This application allows you to deploy MMDetection3D models as an inference service. The app supports all models for outdoor 3D object detection task from the MMDetection3D framework. A prediction of a model is a 3D bbox (Cuboid). You can deploy both pre-trained checkpoints, and your custom checkpoints trained in [Train MMDetection3D v1.x](link/to/mmdetection_3d) application.
+This application allows you to deploy MMDetection3D models as an inference service. The app supports all models for outdoor 3D object detection task from the MMDetection3D framework. A prediction of a model is a 3D bbox (Cuboid). You can deploy both pre-trained checkpoints, and your custom checkpoints trained in [Train MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection3d-v1.x/supervisely-train) application.
 
 # How to Use
 
@@ -36,31 +36,35 @@ This application allows you to deploy MMDetection3D models as an inference servi
 
 **Step 3.** Press the `Serve` button
 
-<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/ab540ec2-040f-4a4e-97c1-53f2fd8c220d"> 
+<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/ab540ec2-040f-4a4e-97c1-53f2fd8c220d"/> 
 
 **Step 4.** Wait for the model to deploy. After that, you can explore the complete model information.
 
-<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/c8a47380-3967-4930-9ab8-14db06fcf94a">
+<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/c8a47380-3967-4930-9ab8-14db06fcf94a"/>
 
 **Custom models**
 
-Model and directory structure must be acquired via [Train MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection_3d/train) app or manually created with the same directory structure.
+Model and directory structure must be acquired via [Train MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection3d-v1.x/supervisely-train) app or manually created with the same directory structure.
 
-**Step 1.** Open `checkpoints/data` directory in Team Files
+**Step 1.** Press the `Open Team Files` button to access the Team Files page.
 
-<img src="https://user-images.githubusercontent.com/97401023/192815622-9d87b91f-e9a6-4419-93c1-d29f97c438d3.png" width="80%" style='padding-top: 10px'/>  
+<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/ac1c0c1e-c7ac-4343-b67e-53d9ab10c7fd"/>  
 
-**Step 2.** Select checkpoint to serve and click right button to open context menu. Select `Copy path`.
+**Step 2.** Open one of the directory in `mmdetection3d-v1.x` folder.
 
-<img src="https://user-images.githubusercontent.com/97401023/192815866-8e8683cc-394e-4bd2-aea7-64a5ddf09dae.png" width="80%" style='padding-top: 10px'/>  
+<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/d8963a18-9853-4880-bd56-cace8dd4629a"/>
 
-**Step 3.** Open [Serve MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection_3d/serve) app and open `Custom weights` tab. Paste checkpoint path to opened text field and press `Serve` button. Your model is ready to use!
+**Step 3.** Select checkpoint to serve and click right button to open context menu. Select `Copy Path`.
 
-<img src="https://user-images.githubusercontent.com/97401023/192815991-e0f70ae7-701e-40ec-9493-f1da57ae443a.png" width="80%" style='padding-top: 10px'/>  
+<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/32ee50b9-6692-4685-89ca-0f04af443368"/>  
+
+**Step 4.** Return to the [Serve MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection3d-v1.x/supervisely-serve) application tab in the `Custom Weights` section. Paste checkpoint path to opened text field and press `Serve` button. Your model is ready to use!
+
+<img src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/9c738437-6558-4007-a1aa-43e84d823905"/>  
 
 # Related Apps
 
-1. [Train MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection_3d/train) - start training on your custom data. Just run app from the context menu of your project, choose classes of interest, train/val splits, configure training parameters and augmentations, and monitor training metrics in realtime. All training artifacts including model weights will be saved to Team Files and can be easily downloaded. 
+1. [Train MMDetection3D v1.x](https://app.supervise.ly/ecosystem/apps/mmdetection3d-v1.x/supervisely-train) - start training on your custom data. Just run app from the context menu of your project, choose classes of interest, train/val splits, configure training parameters and augmentations, and monitor training metrics in realtime. All training artifacts including model weights will be saved to Team Files and can be easily downloaded. 
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection_3d/train" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px"/>
 
