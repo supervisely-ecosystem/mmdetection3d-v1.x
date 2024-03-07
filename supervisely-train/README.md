@@ -29,7 +29,7 @@ MMDetection3D v1.x is released as an official version and achieves new state-of-
 
 Train your custom models for 3D object detection on Point Cloud data. Trained models predict 3D bboxes (Cuboids) of objects in your dataset. After training you can deploy your model using [Serve MMDetection3D v1.x](https://app.supervisely.com/ecosystem/apps/mmdetection3d-v1.x/supervisely-serve) app.
 
-<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-serve/" src="https://i.imgur.com/e1SsMJh.png" width="350px" style='padding-bottom: 10px'/>
+<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-serve" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px"/>
 
 Application key points:
 - Object Detection 3D models from MM Toolbox
@@ -51,7 +51,7 @@ Application key points:
 
 Run app [Train MMDetection3D v1.x](https://app.supervisely.com/ecosystem/apps/mmdetection3d-v1.x/supervisely-train) from [Ecosystem](https://app.supervisely.com/ecosystem/) or from context menu of the Point Cloud / Point Cloud Episodes project with annotations (`Cuboid3D` is supported as label type for object detection 3D)
 
-<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train/" src="https://i.imgur.com/e1SsMJh.png" width="350px" style='padding-bottom: 10px'/>
+<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px"/>
 
 # Training on Demo Data
 
