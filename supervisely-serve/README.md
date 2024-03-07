@@ -26,7 +26,7 @@ MMDetection3D v1.x is released as an official version and achieves new state-of-
 
 This application allows you to deploy MMDetection3D models as an inference service. The app supports all models for outdoor 3D object detection task from the MMDetection3D framework. A prediction of a model is a 3D bbox (Cuboid). You can deploy both pre-trained checkpoints, and your custom checkpoints trained in [Train MMDetection3D v1.x](https://app.supervisely.com/ecosystem/apps/mmdetection3d-v1.x/supervisely-train) application.
 
-<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train/" src="https://i.imgur.com/e1SsMJh.png" width="350px" style='padding-bottom: 10px'/>
+<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px"/>
 
 # How to Use
 
