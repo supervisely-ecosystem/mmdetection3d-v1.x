@@ -29,7 +29,7 @@ MMDetection3D v1.x is released as an official version and achieves new state-of-
 
 Train your custom models for 3D object detection on Point Cloud data. Trained models predict 3D bboxes (Cuboids) of objects in your dataset. After training you can deploy your model using [Serve MMDetection3D v1.x](https://app.supervisely.com/ecosystem/apps/mmdetection3d-v1.x/supervisely-serve) app.
 
-<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-serve" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px"/>
+<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-serve" src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/cd21ace0-e51f-4aaa-9c71-b8a8922b0236" width="500px"/>
 
 Application key points:
 - Object Detection 3D models from MM Toolbox
@@ -51,7 +51,7 @@ Application key points:
 
 Run app [Train MMDetection3D v1.x](https://app.supervisely.com/ecosystem/apps/mmdetection3d-v1.x/supervisely-train) from [Ecosystem](https://app.supervisely.com/ecosystem/) or from context menu of the Point Cloud / Point Cloud Episodes project with annotations (`Cuboid3D` is supported as label type for object detection 3D)
 
-<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px"/>
+<img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train" src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/5162895b-3166-4e75-8b59-cc5f83db3b51" width="500px"/>
 
 # Training on Demo Data
 
@@ -76,11 +76,11 @@ You can use your trained models outside Supervisely platform without any depende
 
 1. [Train MMDetection3D v1.x](https://app.supervisely.com/ecosystem/apps/mmdetection3d-v1.x/supervisely-train) - start training on your custom data. Just run app from the context menu of your project, choose classes of interest, train/val splits, configure training parameters and augmentations, and monitor training metrics in realtime. All training artifacts including model weights will be saved to Team Files and can be easily downloaded. 
 
-    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train" src="https://user-images.githubusercontent.com/97401023/192003567-4446f620-6540-4e68-a6a1-d3a9fcc85fbc.png" width="350px"/>
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train" src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/5162895b-3166-4e75-8b59-cc5f83db3b51" width="400px"/>
 
 2. [Serve MMDetection3D v1.x](https://app.supervisely.com/ecosystem/apps/mmdetection3d-v1.x/supervisely-serve) - serve model as Rest API service. You can run pretrained model, use custom model weights trained in Supervisely. Thus other apps from Ecosystem can get predictions from the deployed model. Also developers can send inference requiests in a few lines of python code.
 
-    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-serve" src="https://user-images.githubusercontent.com/97401023/192003614-4dbe1828-e9c1-4c78-bf89-8f3115103d29.png" width="350px"/>
+    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmdetection3d-v1.x/supervisely-serve" src="https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/cd21ace0-e51f-4aaa-9c71-b8a8922b0236" width="400px"/>
   
 3. [Apply 3D Detection to Pointcloud Project](https://app.supervisely.com/ecosystem/apps/apply-det3d-to-project-dataset) - app allows to play with different inference options and visualize predictions in real time.  Once you choose inference settings you can apply model to all images in your project to visually analise predictions and perform automatic data pre-labeling. 
 
