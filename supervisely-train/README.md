@@ -70,7 +70,7 @@ Your result should look like:
 
 # How To Use Your Trained Model Outside Supervisely
 
-You can use your trained models outside Supervisely platform without any dependencies on Supervisely SDK. See this [Jupyter Notebook](https://github.com/supervisely-ecosystem/mmdetection_3d/blob/master/outside_supervisely/inference_outside_supervisely.ipynb) for details.
+You can use your trained models outside Supervisely platform without any dependencies on Supervisely SDK. See this [Jupyter Notebook](https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/blob/master/supervisely-train/inference_outside_supervisely.ipynb) for details.
 
 # Related Apps
 
