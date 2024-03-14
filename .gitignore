@@ -25,3 +25,4 @@ supervisely
 /detection3d_configs
 *.pcd
 supervisely
+supervisely-train/my_model
