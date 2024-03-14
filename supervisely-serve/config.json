@@ -8,8 +8,13 @@
     "neural network",
     "pointclouds",
     "detection & tracking",
+    "object detection",
+    "semantic segmentation",
     "serve"
   ],
+  "icon": "https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/2c73af37-dab8-4795-8ca9-801b2ee71d48",
+  "icon_cover": true,
+  "poster": "https://github.com/supervisely-ecosystem/mmdetection3d-v1.x/assets/119248312/32d9bb64-3fb8-4a47-9dcd-f9e62be94c5f",
   "description": "Deploy MMDetection3D models to detect objects in Point Clouds",
   "docker_image": "supervisely/mmdet3d-v1.x:1.0.1",
   "instance_version": "6.6.7",
