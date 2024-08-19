@@ -37,14 +37,14 @@ def workflow_output(api: sly.Api, artefacts_path: str):
             elif ".pth" in info.name:
                 all_checkpoints.append(info)
         if len(best_checkpoints) > 1:
-            best_file_info = sorted(best_checkpoints, key=lambda x: x.name, reverse=True)
+            best_file_info = sorted(best_checkpoints, key=lambda x: x.name, reverse=True)[0]
         elif len(best_checkpoints) == 1:
             best_file_info = best_checkpoints[0]
         else:
             best_file_info = None
         
         if len(all_checkpoints) > 1:
-            last_file_info = sorted(all_checkpoints, key=lambda x: x.name, reverse=True)
+            last_file_info = sorted(all_checkpoints, key=lambda x: x.name, reverse=True)[0]
         elif len(all_checkpoints) == 1:
             last_file_info = all_checkpoints[0]
         else:
