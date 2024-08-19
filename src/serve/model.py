@@ -14,7 +14,7 @@ from supervisely.geometry.cuboid_3d import Cuboid3d
 from src.serve.gui import MMDetectionGUI
 from src.inference.pcd_inferencer import PcdDet3DInferencer
 from src.inference.functional import up_bbox3d, filter_by_confidence, bbox_3d_to_cuboid3d
-
+import src.serve.workflow as w 
 
 model_list = sly.json.load_json_file("model_list.json")
 mmdetection3d_root = PcdDet3DInferencer._get_repo_or_mim_dir("mmdet3d")
@@ -78,6 +78,7 @@ class MMDetection3dModel(ObjectDetection3D):
                 self.checkpoint_name = os.path.basename(custom_weights_link)
                 self.dataset_name = cfg.sly_metadata.project_name
                 self.task_type = cfg.sly_metadata.task_type
+                w.workflow_input(self.api, custom_weights_link)
             else:
                 raise ValueError(f"Model source {model_source} is not supported")
         else:

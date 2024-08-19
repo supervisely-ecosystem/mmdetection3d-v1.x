@@ -191,7 +191,7 @@ def on_model_selected():
     cfg = Config.fromfile(config_path)
     if not is_pretrained_model:
         # check task type is correct
-        model_task = cfg.train_dataloader.dataset.task
+        model_task = cfg.sly_metadata.task_type
         selected_task = train.get_task()
         assert (
             model_task == selected_task

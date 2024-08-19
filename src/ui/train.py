@@ -24,6 +24,7 @@ from supervisely.app.widgets import (
 from typing import Tuple
 
 import src.globals as g
+import src.train.workflow as w
 from src.train.train_parameters import TrainParameters
 from src.ui.task import task_selector
 from src.ui.train_val_split import dump_train_val_splits
@@ -148,7 +149,7 @@ def train():
 
     # prepare model files
     iter_progress(message="Preparing the model...", total=1)
-    config_path, weights_path_or_url = prepare_model()
+    config_path, weights_path_or_url = prepare_model()   
 
     # create config
     cfg = Config.fromfile(config_path)
@@ -164,6 +165,9 @@ def train():
         train_params.weights_path_or_url = weights_path_or_url
     train_params.log_level = "INFO" if sly.is_development() else "ERROR"
 
+    # configure workflow input
+    w.workflow_input(g.api, g.PROJECT_ID)
+    
     # If we won't do this, restarting the training will throw a error
     Visualizer._instance_dict.clear()
     Det3DLocalVisualizer._instance_dict.clear()
@@ -227,6 +231,8 @@ def train():
     # set task results
     file_info = g.api.file.get_info_by_path(g.TEAM_ID, out_path + "/config.py")
 
+    w.workflow_output(g.api, out_path)
+    
     # add link to artifacts
     folder_thumb.set(info=file_info)
     folder_thumb.show()
