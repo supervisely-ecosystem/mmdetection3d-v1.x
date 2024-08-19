@@ -302,7 +302,10 @@ def write_parameters_to_config_2(
     if cfg.model.type == "CenterPoint":
         # in_channaels
         if cfg.model.get("pts_voxel_encoder") is not None:
-            cfg.model.pts_voxel_encoder.in_channels = p.in_channels
+            if cfg.model.pts_voxel_encoder.get("num_features") is not None:
+                cfg.model.pts_voxel_encoder.num_features = p.in_channels
+            elif cfg.model.pts_voxel_encoder.get("in_channels") is not None:
+                cfg.model.pts_voxel_encoder.in_channels = p.in_channels
 
         # tasks
         cfg.model.pts_bbox_head.tasks = [
