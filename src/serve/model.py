@@ -62,7 +62,13 @@ class MMDetection3dModel(ObjectDetection3D):
                 config = selected_model["config"]
                 weights = model_info["weights"]
                 config_path = os.path.join(mmdetection3d_root, model_info["config"])
-                cfg = Config.fromfile(config_path)
+                try:
+                    cfg = Config.fromfile(config_path)
+                except Exception as e:
+                    if str(e).startswith("FileNotFoundError"):
+                        e.args = ("Can't build a Config instance: config file not found.",)
+                        raise e
+
                 zero_aux_dims = cfg.dataset_type == "KittiDataset"
                 classes = cfg.class_names
                 self.model_name = model_name
