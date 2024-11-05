@@ -13,11 +13,11 @@
   <a href="#Acknowledgment">Acknowledgment</a>
 </p>
 
-[![](https://img.shields.io/badge/supervisely-ecosystem-brightgreen)](https://ecosystem.supervise.ly/apps/supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train)
-[![](https://img.shields.io/badge/slack-chat-green.svg?logo=slack)](https://supervise.ly/slack)
+[![](https://img.shields.io/badge/supervisely-ecosystem-brightgreen)](https://ecosystem.supervisely.com/apps/supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train)
+[![](https://img.shields.io/badge/slack-chat-green.svg?logo=slack)](https://supervisely.com/slack)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/supervisely-ecosystem/mmdetection3d-v1.x)
-[![views](https://app.supervise.ly/img/badges/views/supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train.png)](https://supervise.ly)
-[![runs](https://app.supervise.ly/img/badges/runs/supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train.png)](https://supervise.ly)
+[![views](https://app.supervisely.com/img/badges/views/supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train.png)](https://supervisely.com)
+[![runs](https://app.supervisely.com/img/badges/runs/supervisely-ecosystem/mmdetection3d-v1.x/supervisely-train.png)](https://supervisely.com)
 
 </div>
 
@@ -57,7 +57,7 @@ Run app [Train MMDetection3D v1.x](https://app.supervisely.com/ecosystem/apps/mm
 
 You can try training on demo data sample. Set following settings in training dashboard:
 
-- `Project`: [Demo Lyft 3D dataset annotated](https://app.supervise.ly/ecosystem/projects/demo-lyft-3d-dataset-annotated)
+- `Project`: [Demo Lyft 3D dataset annotated](https://app.supervisely.com/ecosystem/projects/demo-lyft-3d-dataset-annotated)
 - `Model`: centerpoint_voxel01_second_secfpn_head_dcn_circlenms_8xb4-cyclic-20e_nus-3d
 - `Classes`: [Car] [Pedestrian] [Truck]
 - `Train/Val splits. Random`: 100 / 25
@@ -86,7 +86,7 @@ You can use your trained models outside Supervisely platform without any depende
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/apply-det3d-to-project-dataset" src="https://user-images.githubusercontent.com/97401023/192003658-ec094ea3-2410-470b-b944-cd0a6cc6703b.png" width="550px"/>
 
-4. [Import KITTI 3D](https://app.supervise.ly/ecosystem/apps/import-kitti-3d) - app allows to get sample from KITTI 3D dataset or upload your downloaded KITTI data to Supervisely in point clouds project format.
+4. [Import KITTI 3D](https://app.supervisely.com/ecosystem/apps/import-kitti-3d) - app allows to get sample from KITTI 3D dataset or upload your downloaded KITTI data to Supervisely in point clouds project format.
 
     <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/import-kitti-3d" src="https://user-images.githubusercontent.com/97401023/192003697-a6aa11c4-df2e-46cc-9072-b9937756c51b.png" width="350px"/>
 
