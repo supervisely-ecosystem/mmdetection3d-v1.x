@@ -180,6 +180,11 @@ def train():
         config_params,
         train_params,
     )
+    
+    # Fix task_id IndexError: out of range for CenterPoint
+    if cfg.model.type =="CenterPoint":
+        cfg.model.test_cfg.pts.min_radius = [2] * len(cfg.model.pts_bbox_head.tasks)
+    
 
     # add sly_metadata
     # cfg = add_metadata(cfg)
