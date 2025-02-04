@@ -7,4 +7,4 @@ numpy==1.22.0
 wheel
 fire
 executing==2.0.1
-# supervisely==6.73.39
+# supervisely==6.73.292

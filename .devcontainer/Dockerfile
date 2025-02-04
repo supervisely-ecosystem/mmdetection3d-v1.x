@@ -28,4 +28,4 @@ RUN pip install Werkzeug==2.2.3
 RUN pip install numpy==1.22.0
 
 # Update Supervisely
-RUN pip install -U supervisely==6.73.158
+RUN pip install -U supervisely==6.73.292
